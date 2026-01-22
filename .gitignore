@@ -1,0 +1,39 @@
+# DB 데이터
+postgres_data/
+
+# 로컬 환경 변수
+.env
+
+# 빌드 및 설정 파일
+build/
+.gradle/
+.idea/
+
+README.md
+.gradle
+/build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
