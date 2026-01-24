@@ -1,10 +1,10 @@
 package com.running.runapp.global.common;
 
-import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-@Entity
 @AllArgsConstructor
+@Getter
 public class ApiResponse<T> {
     private boolean success;
     private String message;
@@ -23,5 +23,9 @@ public class ApiResponse<T> {
     // Fail Response
     public static <T> ApiResponse<T> error(String message, T data) {
         return new ApiResponse<>(false, message, data);
+    }
+
+    public static <T> ApiResponse<T> error(String message) {
+        return new ApiResponse<>(false, message, null);
     }
 }

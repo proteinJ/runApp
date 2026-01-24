@@ -15,7 +15,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException e) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.error(ApiResponse.error(e.getMessage())));
+                .body(ApiResponse.error((e.getMessage())));
+    }
+
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        ErrorResponse errorResponse = ErrorResponse.of(errorCode);
+
+        return new ResponseEntity<>(errorResponse, errorCode.getHttpStatus());
     }
 
 }
