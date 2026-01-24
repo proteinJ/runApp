@@ -127,6 +127,23 @@ public class JwtProvider {
     }
 
     /**
+     * 토큰 만료시간 반환 메서드
+     */
+    public Long getExpiration(String accessToken) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(accessToken)
+                .getBody();
+
+        Date expiration = claims.getExpiration();
+
+        long now = (new Date()).getTime();
+
+        return expiration.getTime() - now;
+    }
+
+    /**
      * 만료된 토큰이라도 정보 추출 메서드 - RF 재발급 시 사용
      */
 //    private Claims parseToken(String token) {}
