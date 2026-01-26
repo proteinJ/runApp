@@ -3,7 +3,6 @@ package com.running.runapp.domain.member.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.locationtech.jts.geom.Point;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @Entity
 @Getter
@@ -45,5 +44,9 @@ public class Member {
     public void updateProfile(String nickname, String realname) {
         this.nickname = nickname;
         this.realname = realname;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
     }
 }
