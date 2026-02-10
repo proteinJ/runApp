@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface RunningRecordRepository extends JpaRepository<RunningRecord, Long> {
 
-    Optional<RunningRecord> findByRunIdAndMember_Id(Long runId, Long memberId);
+    Optional<RunningRecord> findByIdAndMember_Id(Long runId, Long memberId);
 
     List<RunningRecord> findByMember_IdOrderByStartTimeDesc(Long memberId);
 }

@@ -18,7 +18,7 @@ public class RunningRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Postgres: bigint auto increment
     @Column(name = "run_id", updatable = false, nullable = false)
-    private Long runId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "member_id", nullable = false)
