@@ -1,7 +1,7 @@
-package com.running.runapp.domain.spot;
+package com.running.runapp.domain.spot.domain;
 
 import com.running.runapp.domain.member.domain.Member;
-import com.running.runapp.domain.running.RunningRecord; // ⚠️ 패키지 경로 확인 필요!
+import com.running.runapp.domain.running.domain.RunningRecord;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -18,7 +18,7 @@ public class SpotVisitLog {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "log_id")
-    private String logId;
+    private String id;
 
     // 1. 어떤 스팟에 갔는지
     @ManyToOne(fetch = FetchType.LAZY)
