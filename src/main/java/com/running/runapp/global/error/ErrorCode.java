@@ -21,7 +21,19 @@ public enum ErrorCode {
     AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "A001", " 인증에 실패하였습니다."),
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "A002", " 토큰이 만료되었습니다."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "A003", " 유효하지 않은 토큰입니다."),
-    ACCESS_DENIED(HttpStatus.FORBIDDEN, "A005", " 접근 권한이 없습니다.");
+    ACCESS_DENIED(HttpStatus.FORBIDDEN, "A005", " 접근 권한이 없습니다."),
+
+    // Spot (장소 관련)
+    SPOT_NAME_DUPLICATION(HttpStatus.BAD_REQUEST, "S001", " 이미 존재하는 이름입니다."),
+    POINT_DUPLICATION(HttpStatus.BAD_REQUEST, "S002", "이미 존재하는 좌표입니다."),
+    SPOT_NOT_FOUND(HttpStatus.NOT_FOUND, "S004", " 존재하지 않는 Spot입니다."),
+
+    // Checkin (체크인 관련)
+    RUNNING_RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "C001", "존재하지 않는 Running 기록입니다."),
+    INVALID_RECORD_OWNER(HttpStatus.UNAUTHORIZED, "C002", "본인의 달리기 기록이 아닙니다."),
+    DUPLICATE_CHECKIN(HttpStatus.BAD_REQUEST, "C003", "24시간 이내에 이미 체크인 하셨습니다."),
+    OUT_OF_RANGE(HttpStatus.BAD_REQUEST, "C004", "반경(30m) 밖에서 체크인 할 수 없습니다."),
+    NOT_RUNNING_STATUS(HttpStatus.BAD_REQUEST, "C005", "러닝중에만 체크인 할 수 있습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
