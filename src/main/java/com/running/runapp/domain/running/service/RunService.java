@@ -39,10 +39,10 @@ public class RunService {
         RunningRecord record = RunningRecord.create(member, request.getStartTime());
         runningRecordRepository.save(record);
 
-        log.info("Run start: memberId={}, runId={}", member.getId(), record.getRunId());
+        log.info("Run start: memberId={}, runId={}", member.getId(), record.getId());
 
         return RunResponse.RunStartResponse.builder()
-                .runId(record.getRunId())
+                .runId(record.getId())
                 .memberId(member.getId())
                 .build();
     }
@@ -53,7 +53,7 @@ public class RunService {
     public RunResponse.RunFinishResponse finish(Long runId, RunRequest.RunFinishRequest request) {
         Member member = getCurrentMember();
 
-        RunningRecord record = runningRecordRepository.findByRunIdAndMember_Id(runId, member.getId())
+        RunningRecord record = runningRecordRepository.findByIdAndMember_Id(runId, member.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.ACCESS_DENIED));
 
         if (record.getStatus().equals(RunStatus.FINISHED)) {
@@ -65,10 +65,10 @@ public class RunService {
         record.finish(request.getEndTime(), calculatedDistance, lineString);
 
         log.info("Run finish: memberId={}, runId={}, totalDistance={}",
-                member.getId(), record.getRunId(), calculatedDistance);
+                member.getId(), record.getId(), calculatedDistance);
 
         return RunResponse.RunFinishResponse.builder()
-                .runId(record.getRunId())
+                .runId(record.getId())
                 .totalDistance(record.getTotalDistance())
                 .earnedPoints(0)
                 .build();
@@ -88,7 +88,7 @@ public class RunService {
     public RunResponse.RunDetailResponse detail(Long runId) {
         Member member = getCurrentMember();
 
-        RunningRecord record = runningRecordRepository.findByRunIdAndMember_Id(runId, member.getId())
+        RunningRecord record = runningRecordRepository.findByIdAndMember_Id(runId, member.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.ACCESS_DENIED));
 
         return RunResponse.RunDetailResponse.from(record);
