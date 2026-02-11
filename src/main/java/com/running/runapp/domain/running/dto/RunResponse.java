@@ -36,7 +36,7 @@ public class RunResponse
 
         public static RunDetailResponse from(RunningRecord record) {
             return RunDetailResponse.builder()
-                    .runId(record.getRunId())
+                    .runId(record.getId())
                     .path(GeometryUtils.toLatLngList(record.getPath()))
                     .build();
         }
@@ -49,11 +49,11 @@ public class RunResponse
         private LocalDateTime startTime;
         private Double totalDistance;
 
-        public static MyRunSummaryResponse from(RunningRecord r) {
+        public static MyRunSummaryResponse from(RunningRecord run) {
             return MyRunSummaryResponse.builder()
-                    .runId(r.getRunId())
-                    .startTime(r.getStartTime())
-                    .totalDistance(r.getTotalDistance())
+                    .runId(run.getId())
+                    .startTime(run.getStartTime())
+                    .totalDistance(run.getTotalDistance())
                     .build();
         }
     }
