@@ -2,6 +2,8 @@ package com.running.runapp.domain.member.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 import org.locationtech.jts.geom.Point;
 
@@ -47,6 +49,15 @@ public class Member {
     @Column(nullable = false)
     private Role role;
 
+    @Builder.Default
+    @Column(name = "reward_amount", nullable = false, columnDefinition = "integer default 0")
+    @Min(0)
+    @Max(10000)
+    private Integer totalPoint = 0;
+
+
+
+
     public void updateProfile(String nickname, String realname) {
         this.nickname = nickname;
         this.realname = realname;
@@ -64,4 +75,8 @@ public class Member {
     @Builder.Default // 1. 빌더 써도 초기화 유지해줘!
     @JsonIgnore      // 2. JSON 만들 때 무한루프 끊어줘! (DTO 안 쓸 때 대비)
     private List<Follow> followers = new ArrayList<>();
+
+    public Integer addPointAmount(int earnedPoints) {
+        return this.totalPoint += earnedPoints;
+    }
 }
