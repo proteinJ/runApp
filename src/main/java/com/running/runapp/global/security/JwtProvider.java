@@ -93,7 +93,7 @@ public class JwtProvider {
                 .parseClaimsJws(accessToken)
                 .getBody();
 
-        if (claims.get(AUTHORITIES_KEY) != null) {
+        if (claims.get(AUTHORITIES_KEY) == null) {
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
         }
 
@@ -130,13 +130,11 @@ public class JwtProvider {
      * 토큰 만료시간 반환 메서드
      */
     public Long getExpiration(String accessToken) {
-        Claims claims = Jwts.parserBuilder()
+        Date expiration = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(accessToken)
-                .getBody();
-
-        Date expiration = claims.getExpiration();
+                .getBody().getExpiration();
 
         long now = (new Date()).getTime();
 

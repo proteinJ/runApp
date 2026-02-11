@@ -1,6 +1,5 @@
 package com.running.runapp.global.security;
 
-import ch.qos.logback.core.util.StringUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,12 +31,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
 
+        log.info("### 필터 진입 - URI: {}, Method: {}", request.getRequestURI(), request.getMethod());
+
         // 2. 요청 헤더에서 JWT 토큰 추출 메서드 호출
-        String jwt = resolveToken((HttpServletRequest) request);
+        String jwt = resolveToken(request);
+        log.info("### 추출된 토큰: {}", jwt);
 
         // 3. 토큰이 존재하고, 유효성 검사 통과 시 인증 정보 가져옴
         if (StringUtils.hasText(jwt) && jwtProvider.validateToken(jwt)) {
-
+            log.info("### 토큰 존재하고, 유효성 검사 통과");
             String Logout = (String) redisTemplate.opsForValue().get(jwt);
 
             if (ObjectUtils.isEmpty(Logout)) {
@@ -48,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // 저장 이후 Controller에서 @AuthenticationPrincipal로 유저 정보 꺼낼 수 있음.
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                log.debug("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(), request.getRequestURI());
+                log.info("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(), request.getRequestURI());
             }
         }
         // 6. 다음 필터로 요청을 넘김

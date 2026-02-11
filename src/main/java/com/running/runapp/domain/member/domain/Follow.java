@@ -15,7 +15,7 @@ public class Follow {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "follow_id")
-    private String followId;
+    private String id;
 
     // 팔로우 하는 사람 (팬 / Follower)
     @ManyToOne(fetch = FetchType.LAZY)
