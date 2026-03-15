@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-public interface SpotRepository extends JpaRepository<Spot, Long> {
+public interface SpotRepository extends JpaRepository<Spot, Long>, SpotRepositoryCustom {
     boolean existsByName(String name);
     Optional<Spot> findByName(String name);
 
