@@ -215,16 +215,11 @@ public class SpotService {
      * 내 주변 Spot 조회
      */
     @Transactional(readOnly = true)
-    public List<SpotResponse.SummaryInfo> getNearbySpots(SpotRequest.NearbySpotsRequest dto) {
+    public List<SpotResponse.SummaryInfo> getNearbySpots(SpotRequest.NearbySpotsRequest dto, Long memberId) {
         // 반경이 넘어오지 않으면 기본 1km(1000m) 설정
         double searchRadius = (dto.radius() != null) ? dto.radius() : 1000.0;
 
-        List<Spot> spots = spotRepository.findNearbySpot(dto.latitude(), dto.longitude(), searchRadius);
-
-        // spots(List) -> from 메서드 -> SpotInfoResponse 형태 -> Collect(List에 다시 채움)
-        return spots.stream()
-                .map(SpotResponse.SummaryInfo::from)
-                .collect(Collectors.toList());
+        return spotRepository.findNearbyWithCheckInStatus(memberId, dto.latitude(), dto.longitude(), searchRadius);
     }
 
 

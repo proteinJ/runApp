@@ -3,6 +3,7 @@ package com.running.runapp.domain.spot.controller;
 import com.running.runapp.domain.spot.dto.*;
 import com.running.runapp.domain.spot.service.SpotService;
 import com.running.runapp.global.common.ApiResponse;
+import com.running.runapp.global.security.PrincipalDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -66,8 +67,8 @@ public class SpotController {
     @GetMapping("/nearby")
     public ResponseEntity<?> getNearbySpots(
             @RequestBody SpotRequest.NearbySpotsRequest dto,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        List<SpotResponse.SummaryInfo> nearbySpots = spotService.getNearbySpots(dto);
+            @AuthenticationPrincipal PrincipalDetails principal) {
+        List<SpotResponse.SummaryInfo> nearbySpots = spotService.getNearbySpots(dto, principal.getMemberId());
 
         return ResponseEntity.ok(ApiResponse.success("내 주변 스팟 조회 완료", nearbySpots));
     }
