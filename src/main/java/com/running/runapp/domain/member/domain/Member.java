@@ -55,16 +55,9 @@ public class Member {
     @Max(10000)
     private Integer totalPoint = 0;
 
-
-
-
     public void updateProfile(String nickname, String realname) {
         this.nickname = nickname;
         this.realname = realname;
-    }
-
-    public void updatePassword(String password) {
-        this.password = password;
     }
     // 👇 [추가] 내가 팔로우하는 사람들 목록 (내가 팬)
     // 의미: Follow 테이블의 'follower' 칸에 내 이름(ID)이 적힌 내역들 가져와!
