@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -35,8 +34,9 @@ public class CustomUserDetailService implements UserDetailsService {
         GrantedAuthority grantedAuthority = new SimpleGrantedAuthority("ROLE_" + member.getRole().name());
 
         log.info("UserDetails로 변환 {}", grantedAuthority);
-        return new User(
-                String.valueOf(member.getEmail()),
+        return new PrincipalDetails(
+                member.getId(),
+                member.getEmail(),     // username으로 사용할 값
                 member.getPassword(),
                 Collections.singleton(grantedAuthority)
         );

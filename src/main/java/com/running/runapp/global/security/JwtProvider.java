@@ -10,8 +10,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -56,12 +54,18 @@ public class JwtProvider {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
+        Long memberId = null;
+        if (auth.getPrincipal() instanceof PrincipalDetails principal) {
+            memberId = principal.getMemberId();
+        }
+
         long now = (new Date()).getTime();
         Date accessTokenExpiresIn = new Date(now + accessTokenValidityInMilliseconds);
         Date refreshTokenExpiresIn = new Date(now + refreshTokenValidityInMilliseconds);
 
         String accessToken = Jwts.builder()
                 .setSubject(auth.getName())
+                .claim("memberId", memberId)
                 .claim(AUTHORITIES_KEY, authorities)
                 .setExpiration(accessTokenExpiresIn)
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -102,8 +106,15 @@ public class JwtProvider {
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
 
-        // UserDetails 객체를 생성하여 Authentication을 Return (여기서 User는 Security가 제공하는 객체)
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
+        Long memberId = claims.get("memberId", Long.class);
+
+        PrincipalDetails principal = new PrincipalDetails(
+                memberId,
+                claims.getSubject(),
+                "",
+                authorities
+        );
+
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
