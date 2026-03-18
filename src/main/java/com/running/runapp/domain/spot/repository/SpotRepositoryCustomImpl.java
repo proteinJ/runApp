@@ -22,12 +22,12 @@ public class SpotRepositoryCustomImpl implements SpotRepositoryCustom {
 
         // 1. ST_Distance 로직을 Template으로 정의 (거리 정렬용)
         NumberExpression<Double> distanceExpression = Expressions.numberTemplate(Double.class,
-                "ST_Distance({0}, ST_SetSRID(ST_MakePoint({1}, {2}), 4326)::geography)",
+                "ST_Distance({0}, CAST(ST_SetSRID(ST_MakePoint({1}, {2}), 4326) AS geography))",
                 spot.location, lon, lat);
 
         // 2. ST_DWithin 로직을 Template으로 정의 (반경 내 필터링용)
         BooleanExpression isWithinDistance = Expressions.booleanTemplate(
-                "ST_DWithin({0}, ST_SetSRID(ST_MakePoint({1}, {2}), 4326)::geography, {3})",
+                "ST_DWithin({0}, CAST(ST_SetSRID(ST_MakePoint({1}, {2}), 4326) AS geography), {3})",
                 spot.location, lon, lat, distance);
 
         return queryFactory

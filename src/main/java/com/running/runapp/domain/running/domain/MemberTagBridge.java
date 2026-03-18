@@ -1,7 +1,6 @@
 package com.running.runapp.domain.running.domain;
 
 import com.running.runapp.domain.member.domain.Member; // 친구가 만든 Member 가져오기
-import com.running.runapp.domain.running.RunningTag;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
