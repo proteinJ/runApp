@@ -27,3 +27,9 @@ jwt:
   secret: ${JWT_SECRET}
   access-token-validity-in-milliseconds: ${JWT_ACCESS_TOKEN_TIME}
   refresh-token-validity-in-milliseconds: ${JWT_REFRESH_TOKEN_TIME}
+
+springdoc:
+  swagger-ui:
+    path: /swagger # 이제 localhost:8080/swagger 로 접속 가능
+  api-docs:
+    path: /api-docs
