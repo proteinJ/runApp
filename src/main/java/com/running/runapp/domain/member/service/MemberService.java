@@ -3,9 +3,7 @@ package com.running.runapp.domain.member.service;
 import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.domain.member.domain.Role;
 import com.running.runapp.domain.member.domain.TokenDto;
-import com.running.runapp.domain.member.dto.JoinRequest;
-import com.running.runapp.domain.member.dto.LoginRequest;
-import com.running.runapp.domain.member.dto.PasswordChangeRequest;
+import com.running.runapp.domain.member.dto.MemberRequest;
 import com.running.runapp.domain.member.repository.MemberRepository;
 import com.running.runapp.domain.member.repository.RefreshTokenRepository;
 import com.running.runapp.global.error.BusinessException;
@@ -46,19 +44,20 @@ public class MemberService {
      * 회원가입
      */
     @Transactional
-    public Long join(JoinRequest req) {
+    public Long join(MemberRequest.Join req) {
         // 1. 중복 검증
         validateDuplicateMember(req);
 
         // 2. 비밀번호 암호화 및 엔티티 생성
-        String encodedPassword = passwordEncoder.encode(req.getPassword());
+        String encodedPassword = passwordEncoder.encode(req.password());
 
         Member member = Member.builder()
-                .email(req.getEmail())
+                .email(req.email())
                 .password(encodedPassword)
-                .nickname(req.getNickname())
-                .realname(req.getRealname())
+                .nickname(req.nickname())
+                .realname(req.realname())
                 .role(Role.USER)
+                .totalPoint(0)
                 .build();
 
         return memberRepository.save(member).getId();
@@ -68,11 +67,11 @@ public class MemberService {
      * 로그인
      */
     @Transactional
-    public TokenDto login(LoginRequest req) {
+    public TokenDto login(MemberRequest.Login req) {
 
         try {
             UsernamePasswordAuthenticationToken token =
-                    new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword());
+                    new UsernamePasswordAuthenticationToken(req.email(), req.password());
 
             // 토큰 인증 확인
             Authentication authentication = authenticationManager.authenticate(token);
@@ -89,11 +88,11 @@ public class MemberService {
             return tokenDto;
         } catch (BadCredentialsException e) {
             // 비밀번호가 틀릴 경우
-            log.warn("로그인 실패: 비밀번호 불일치 - 이메일: {}", req.getEmail());
+            log.warn("로그인 실패: 비밀번호 불일치 - 이메일: {}", req.email());
             throw new BusinessException(ErrorCode.INVALID_LOGIN_CREDENTIALS);
         } catch (InternalAuthenticationServiceException e) {
             // 아이디가 없는 경우
-            log.warn("로그인 실패: 존재하지 않는 계정 - 이메일: {}", req.getEmail());
+            log.warn("로그인 실패: 존재하지 않는 계정 - 이메일: {}", req.email());
             throw new BusinessException(ErrorCode.INVALID_LOGIN_CREDENTIALS);
         } catch (AuthenticationException e) {
             // 그 외 인증 관련 모든 예외
@@ -130,9 +129,9 @@ public class MemberService {
      * 비밀번호 변경
      */
     @Transactional
-    public void changePassword(String email, String bearerToken, PasswordChangeRequest dto) {
+    public void changePassword(String email, String bearerToken, MemberRequest.PasswordChange dto) {
 
-        // 1. UserDetails에서 넘겨받은 email(UserDetails.getUsername())로 실제 유저 조회
+        // 1. UserDetails에서 넘겨받은 email(UserDetails.username())로 실제 유저 조회
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
@@ -151,10 +150,10 @@ public class MemberService {
     /**
      * 유효성 검사
      */
-    public void validateDuplicateMember(JoinRequest req) {
-        if (memberRepository.existsByEmail(req.getEmail())) {
+    public void validateDuplicateMember(MemberRequest.Join req) {
+        if (memberRepository.existsByEmail(req.email())) {
             throw new BusinessException(ErrorCode.EMAIL_DUPLICATION);
-        } else if (memberRepository.findByNickname(req.getNickname()).isPresent()) {
+        } else if (memberRepository.findByNickname(req.nickname()).isPresent()) {
             throw new BusinessException(ErrorCode.NICKNAME_DUPLICATION);
         }
     }

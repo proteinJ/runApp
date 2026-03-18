@@ -1,9 +1,7 @@
 package com.running.runapp.domain.member.controller;
 
 import com.running.runapp.domain.member.domain.TokenDto;
-import com.running.runapp.domain.member.dto.JoinRequest;
-import com.running.runapp.domain.member.dto.LoginRequest;
-import com.running.runapp.domain.member.dto.PasswordChangeRequest;
+import com.running.runapp.domain.member.dto.MemberRequest;
 import com.running.runapp.domain.member.service.MemberService;
 import com.running.runapp.global.common.ApiResponse;
 import jakarta.validation.Valid;
@@ -26,14 +24,14 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/join")
-    public ResponseEntity<?> join(@RequestBody JoinRequest dto) {
+    public ResponseEntity<?> join(@RequestBody MemberRequest.Join dto) {
         Long memberId = memberService.join(dto);
 
         return ResponseEntity.ok(ApiResponse.success("회원가입 완료", memberId));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest dto) {
+    public ResponseEntity<?> login(@RequestBody MemberRequest.Login dto) {
         TokenDto tokenDto = memberService.login(dto);
         return ResponseEntity.ok(ApiResponse.success("로그인 완료", tokenDto));
     }
@@ -49,7 +47,7 @@ public class MemberController {
     public ResponseEntity<?> changePassword(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestHeader("Authorization") String bearerToken,
-            @RequestBody @Valid PasswordChangeRequest dto
+            @RequestBody @Valid MemberRequest.PasswordChange dto
         )
          {
         Authentication auth= SecurityContextHolder.getContext().getAuthentication();
@@ -61,4 +59,16 @@ public class MemberController {
         memberService.changePassword(userDetails.getUsername(), bearerToken, dto);
         return ResponseEntity.ok(ApiResponse.success("비밀번호 변경 완료 - 다시 로그인해주세요."));
     }
+
+//    @GetMapping("/me")
+//    public ResponseEntity<?> getMember(@RequestHeader("Authorization") String bearerToken) {
+//
+//    }
+//
+//    @GetMapping("/{memberId}")
+//    public ResponseEntity<?> getMember(@PathVariable("memberId") Long memberId) {
+//
+//    }
+
+
 }
