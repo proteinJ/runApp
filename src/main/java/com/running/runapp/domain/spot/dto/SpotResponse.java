@@ -16,7 +16,8 @@ public class SpotResponse {
             @Min(0) @Max(10000)
             Integer rewardAmount,
             Double latitude,
-            Double longitude
+            Double longitude,
+            boolean canCheckIn
     ) {
         public static SummaryInfo from(Spot spot) {
             return new SummaryInfo(
@@ -24,7 +25,8 @@ public class SpotResponse {
                     spot.getName(),
                     spot.getRewardAmount(),
                     spot.getLocation().getY(),
-                    spot.getLocation().getX()
+                    spot.getLocation().getX(),
+                    true
             );
         }
     }

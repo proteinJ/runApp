@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Bridge") // ⚠️ 중요: 자바 이름은 MemberTagBridge지만, DB 테이블 이름은 Bridge입니다!
+@Table(name = "Bridge")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 

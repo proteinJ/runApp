@@ -215,15 +215,28 @@ public class SpotService {
      * 내 주변 Spot 조회
      */
     @Transactional(readOnly = true)
-    public List<SpotResponse.SummaryInfo> getNearbySpots(SpotRequest.NearbySpotsRequest dto) {
+    public List<SpotResponse.SummaryInfo> getNearbySpots(SpotRequest.NearbySpotsRequest dto, Long memberId) {
         // 반경이 넘어오지 않으면 기본 1km(1000m) 설정
         double searchRadius = (dto.radius() != null) ? dto.radius() : 1000.0;
 
-        List<Spot> spots = spotRepository.findNearbySpot(dto.latitude(), dto.longitude(), searchRadius);
+        // 1. Native Query 호출 (결과는 List<Object[]>)
+        List<Object[]> results = spotRepository.findNearbySpotsNative(
+                memberId,
+                dto.longitude(), // 🚩 주의: 쿼리 순서에 맞춰 경도(lng) 먼저
+                dto.latitude(),  // 위도(lat)
+                searchRadius
+        );
 
-        // spots(List) -> from 메서드 -> SpotInfoResponse 형태 -> Collect(List에 다시 채움)
-        return spots.stream()
-                .map(SpotResponse.SummaryInfo::from)
+        // 2. Object[]를 SummaryInfo DTO로 변환
+        return results.stream()
+                .map(row -> new SpotResponse.SummaryInfo(
+                        ((Number) row[0]).longValue(),      // spot_id
+                        (String) row[1],                    // name
+                        (int) ((Number) row[2]).longValue(),      // rewardAmount
+                        ((Number) row[3]).doubleValue(),    // latitude
+                        ((Number) row[4]).doubleValue(),    // longitude
+                        (Boolean) row[5]                    // isVisited (visited)
+                ))
                 .collect(Collectors.toList());
     }
 
