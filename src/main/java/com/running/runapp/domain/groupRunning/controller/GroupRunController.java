@@ -24,7 +24,7 @@ public class GroupRunController {
 
     // 파티 생성
     @PostMapping("/group/add")
-    public ResponseEntity<?> groupAdd(
+    public ResponseEntity<ApiResponse<Long>> groupAdd(
             @RequestBody GroupRequest.groupAdd dto,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
@@ -36,7 +36,7 @@ public class GroupRunController {
 
     // 파티 수정
     @PostMapping("/group/edit/{groupId}")
-    public ResponseEntity<?> groupEdit(
+    public ResponseEntity<ApiResponse<Long>> groupEdit(
             @RequestBody GroupRequest.UpdateExtraRequest dto,
             @PathVariable("groupId") Long groupId,
             @AuthenticationPrincipal PrincipalDetails principalDetails
@@ -46,7 +46,7 @@ public class GroupRunController {
         return ResponseEntity.ok(ApiResponse.success("그룹런 수정 완료", groupId));
     }
 
-    // 파티 삭제
+//    // 파티 삭제
 //    @PostMapping("/group/delete/{groupId}")
 //    public ResponseEntity<?> groupDelete(
 //            @PathVariable("groupId") Long groupId
