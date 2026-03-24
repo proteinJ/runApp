@@ -2,7 +2,6 @@ package com.running.runapp.domain.groupRunning.domain;
 
 import com.running.runapp.domain.member.domain.Member;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -15,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@Table(name = "group")
+@Table(name = "run_groups")
 public class GroupRunning {
 
     @Id
