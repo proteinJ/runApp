@@ -24,27 +24,27 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/join")
-    public ResponseEntity<?> join(@RequestBody MemberRequest.Join dto) {
+    public ResponseEntity<ApiResponse<Long>> join(@RequestBody MemberRequest.Join dto) {
         Long memberId = memberService.join(dto);
 
         return ResponseEntity.ok(ApiResponse.success("회원가입 완료", memberId));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody MemberRequest.Login dto) {
+    public ResponseEntity<ApiResponse<TokenDto>> login(@RequestBody MemberRequest.Login dto) {
         TokenDto tokenDto = memberService.login(dto);
         return ResponseEntity.ok(ApiResponse.success("로그인 완료", tokenDto));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String bearerToken) {
+    public ResponseEntity<ApiResponse<String>> logout(@RequestHeader("Authorization") String bearerToken) {
         memberService.logout(bearerToken);
 
         return ResponseEntity.ok(ApiResponse.success("로그아웃 완료"));
     }
 
     @PostMapping("/password")
-    public ResponseEntity<?> changePassword(
+    public ResponseEntity<ApiResponse<String>> changePassword(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestHeader("Authorization") String bearerToken,
             @RequestBody @Valid MemberRequest.PasswordChange dto
