@@ -38,9 +38,10 @@ public class GroupRunController {
     @PostMapping("/group/edit/{groupId}")
     public ResponseEntity<?> groupEdit(
             @RequestBody GroupRequest.UpdateExtraRequest dto,
-            @PathVariable("groupId") Long groupId
+            @PathVariable("groupId") Long groupId,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
             ) {
-         groupService.groupEdit(dto, groupId);
+         groupService.groupEdit(dto, groupId, principalDetails);
 
         return ResponseEntity.ok(ApiResponse.success("그룹런 수정 완료", groupId));
     }

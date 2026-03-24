@@ -1,8 +1,9 @@
 package com.running.runapp.domain.groupRunning.domain;
 
 import com.running.runapp.domain.member.domain.Member;
+import com.running.runapp.global.error.BusinessException;
+import com.running.runapp.global.error.ErrorCode;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -56,6 +57,10 @@ public class GroupRunning {
         if (startTime != null) this.startTime = startTime;
         if (maxParticipants != null) {
             // 현재 참여 인원보다 적게 수정하려는지 체크 로직 추가 가능
+            if (this.maxParticipants < maxParticipants && maxParticipants > 2) {
+                throw new BusinessException(ErrorCode.INVALID_PARTICIPANTS_COUNT);
+            }
+
             this.maxParticipants = maxParticipants;
         }
     }

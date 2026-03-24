@@ -9,9 +9,13 @@ import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.domain.member.repository.MemberRepository;
 import com.running.runapp.global.error.BusinessException;
 import com.running.runapp.global.error.ErrorCode;
+import com.running.runapp.global.security.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.swing.text.html.Option;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -51,12 +55,19 @@ public class GroupService {
 
 
     @Transactional
-    public void groupEdit(GroupRequest.UpdateExtraRequest dto, Long groupId) {
+    public void groupEdit(GroupRequest.UpdateExtraRequest dto, Long groupId, PrincipalDetails principalDetails) {
 
         GroupRunning groupRunning = groupRunningRepository.findById(groupId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.GROUP_NOT_FOUND));
 
+        Optional<Member> member = memberRepository.findById(principalDetails.getMemberId());
 
+        Optional.of(groupRunning.getHost())
+                .filter(host -> host.equals(member))
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_HOST));
+
+        // update Function (Domain안의 함수)
+        groupRunning.updateInfo(dto.title(), dto.content(), dto.maxParticipants(), dto.startTime());
     }
 
 }
