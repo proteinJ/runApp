@@ -33,7 +33,10 @@ public enum ErrorCode {
     INVALID_RECORD_OWNER(HttpStatus.UNAUTHORIZED, "C002", "본인의 달리기 기록이 아닙니다."),
     DUPLICATE_CHECKIN(HttpStatus.BAD_REQUEST, "C003", "24시간 이내에 이미 체크인 하셨습니다."),
     OUT_OF_RANGE(HttpStatus.BAD_REQUEST, "C004", "반경(30m) 밖에서 체크인 할 수 없습니다."),
-    NOT_RUNNING_STATUS(HttpStatus.BAD_REQUEST, "C005", "러닝중에만 체크인 할 수 있습니다.");
+    NOT_RUNNING_STATUS(HttpStatus.BAD_REQUEST, "C005", "러닝중에만 체크인 할 수 있습니다."),
+
+    // GroupRunning (그룹 러닝 관련)
+    GROUP_NOT_FOUND(HttpStatus.NOT_FOUND, "G001", "존재하지 않는 Group 입니다");
 
     private final HttpStatus httpStatus;
     private final String code;
