@@ -1,6 +1,5 @@
 package com.running.runapp.global.config;
 
-import com.querydsl.core.annotations.Config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

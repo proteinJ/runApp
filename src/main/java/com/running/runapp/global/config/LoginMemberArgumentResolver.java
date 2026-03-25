@@ -5,7 +5,6 @@ import com.running.runapp.domain.member.repository.MemberRepository;
 import com.running.runapp.global.common.annotaion.LoginMember;
 import com.running.runapp.global.error.BusinessException;
 import com.running.runapp.global.error.ErrorCode;
-import com.running.runapp.global.security.CustomUserDetailService;
 import com.running.runapp.global.security.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
