@@ -2,12 +2,12 @@ package com.running.runapp.domain.groupRunning.controller;
 
 import com.running.runapp.domain.groupRunning.dto.GroupRequest;
 import com.running.runapp.domain.groupRunning.service.GroupService;
+import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.global.common.ApiResponse;
-import com.running.runapp.global.security.PrincipalDetails;
+import com.running.runapp.global.common.annotaion.LoginMember;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,10 +26,9 @@ public class GroupRunController {
     @PostMapping("/group/add")
     public ResponseEntity<ApiResponse<Long>> groupAdd(
             @RequestBody GroupRequest.groupAdd dto,
-            @AuthenticationPrincipal PrincipalDetails principalDetails
+            @LoginMember Member member
     ) {
-        Long memberId = principalDetails.getMemberId();
-        Long groupId = groupService.groupAdd(dto, memberId);
+        Long groupId = groupService.groupAdd(dto, member);
 
         return ResponseEntity.ok(ApiResponse.success("그룹런 생성 완료", groupId));
     }
@@ -39,22 +38,23 @@ public class GroupRunController {
     public ResponseEntity<ApiResponse<Long>> groupEdit(
             @RequestBody GroupRequest.UpdateExtraRequest dto,
             @PathVariable("groupId") Long groupId,
-            @AuthenticationPrincipal PrincipalDetails principalDetails
+            @LoginMember Member member
             ) {
-         groupService.groupEdit(dto, groupId, principalDetails);
+         groupService.groupEdit(dto, groupId, member);
 
         return ResponseEntity.ok(ApiResponse.success("그룹런 수정 완료", groupId));
     }
 
-//    // 파티 삭제
-//    @PostMapping("/group/delete/{groupId}")
-//    public ResponseEntity<?> groupDelete(
-//            @PathVariable("groupId") Long groupId
-//    ) {
-//        groupService.groupDelete(groupId);
-//
-//        return ResponseEntity.ok(ApiResponse.success("그룹런 삭제 완료"));
-//    }
+    // 파티 삭제
+    @PostMapping("/group/delete/{groupId}")
+    public ResponseEntity<ApiResponse<String>> groupDelete(
+            @PathVariable("groupId") Long groupId,
+            @LoginMember Member member
+    ) {
+        groupService.groupDelete(groupId, member);
+
+        return ResponseEntity.ok(ApiResponse.success("그룹런 삭제 완료"));
+    }
 
 
 

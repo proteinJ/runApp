@@ -3,12 +3,15 @@ package com.running.runapp.domain.groupRunning.domain;
 import com.running.runapp.domain.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.SoftDeleteType;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SoftDelete(columnName = "isDeleted", strategy = SoftDeleteType.DELETED)
 public class GroupMember {
 
     @Id

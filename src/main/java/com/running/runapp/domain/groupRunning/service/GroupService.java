@@ -9,13 +9,9 @@ import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.domain.member.repository.MemberRepository;
 import com.running.runapp.global.error.BusinessException;
 import com.running.runapp.global.error.ErrorCode;
-import com.running.runapp.global.security.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.swing.text.html.Option;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -27,10 +23,7 @@ public class GroupService {
 
 
     @Transactional
-    public Long groupAdd(GroupRequest.groupAdd dto, Long memberId) {
-
-        Member host = memberRepository.findById(memberId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+    public Long groupAdd(GroupRequest.groupAdd dto, Member member) {
 
         GroupRunning groupRunning = GroupRunning.builder()
                 .title(dto.title())
@@ -38,13 +31,13 @@ public class GroupService {
                 .maxParticipants(dto.maxParticipants())
                 .startTime(dto.startTime())
                 .status(GroupStatus.RECRUITING)
-                .host(host) // 객체 타입 안맞음 변경 필요
+                .host(member) // 객체 타입 안맞음 변경 필요
                 .build();
 
         // Host 사용자를 GroupMember 객체로 하나 만들기
         GroupMember hostParticipant = GroupMember.builder()
                 .groupRunning(groupRunning)
-                .member(host)
+                .member(member)
                 .build();
 
         // Host 사용자도 참가인원으로 추가
@@ -55,19 +48,34 @@ public class GroupService {
 
 
     @Transactional
-    public void groupEdit(GroupRequest.UpdateExtraRequest dto, Long groupId, PrincipalDetails principalDetails) {
+    public void groupEdit(GroupRequest.UpdateExtraRequest dto, Long groupId, Member member) {
 
-        GroupRunning groupRunning = groupRunningRepository.findById(groupId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.GROUP_NOT_FOUND));
+        // 그룹 유무 확인
+        GroupRunning groupRunning = getGroupRunning(groupId);
 
-        Optional<Member> member = memberRepository.findById(principalDetails.getMemberId());
-
-        Optional.of(groupRunning.getHost())
-                .filter(host -> host.equals(member))
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_HOST));
+        // host와 member가 같은지 검사
+        groupRunning.verify(member);
 
         // update Function (Domain안의 함수)
         groupRunning.updateInfo(dto.title(), dto.content(), dto.maxParticipants(), dto.startTime());
     }
 
+    @Transactional
+    public void groupDelete(Long groupId, Member member) {
+
+        // 그룹 유무 확인
+        GroupRunning groupRunning = getGroupRunning(groupId);
+
+        // host와 member가 같은지 검사
+        groupRunning.verify(member);
+
+        groupRunningRepository.delete(groupRunning);
+
+        groupRunning.setStatus(GroupStatus.CANCELLED);
+    }
+
+    private GroupRunning getGroupRunning(Long groupId) {
+        return groupRunningRepository.findById(groupId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.GROUP_NOT_FOUND));
+    }
 }
