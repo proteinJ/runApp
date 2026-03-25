@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@SoftDelete(columnName = "is_deleted", strategy = SoftDeleteType.DELETED)
+@SoftDelete(columnName = "isDeleted", strategy = SoftDeleteType.DELETED)
 @Table(name = "run_groups")
 public class GroupRunning {
 
@@ -50,9 +50,6 @@ public class GroupRunning {
 
     @OneToMany(mappedBy = "groupRunning", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<GroupMember> participants = new ArrayList<>();
-    
-    // 그룹 삭제 시각
-    private boolean isDeleted;
 
 
     public void addParticipants(GroupMember participant) {

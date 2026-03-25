@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/groupRun")
+@RequestMapping("/api/v1/groups")
 @RequiredArgsConstructor
 @Slf4j
 public class GroupRunController {
@@ -23,7 +23,7 @@ public class GroupRunController {
      */
 
     // 파티 생성
-    @PostMapping("/group/add")
+    @PostMapping
     public ResponseEntity<ApiResponse<Long>> groupAdd(
             @RequestBody GroupRequest.groupAdd dto,
             @LoginMember Member member
@@ -34,7 +34,7 @@ public class GroupRunController {
     }
 
     // 파티 수정
-    @PostMapping("/group/edit/{groupId}")
+    @PatchMapping("/{groupId}")
     public ResponseEntity<ApiResponse<Long>> groupEdit(
             @RequestBody GroupRequest.UpdateExtraRequest dto,
             @PathVariable("groupId") Long groupId,
@@ -46,7 +46,7 @@ public class GroupRunController {
     }
 
     // 파티 삭제
-    @PostMapping("/group/delete/{groupId}")
+    @DeleteMapping("/{groupId}")
     public ResponseEntity<ApiResponse<String>> groupDelete(
             @PathVariable("groupId") Long groupId,
             @LoginMember Member member
@@ -61,4 +61,14 @@ public class GroupRunController {
     /**
      * Participants 입장
      */
+    // 그룹 참여
+    @PostMapping("/{groupId}/join")
+    public ResponseEntity<ApiResponse<Long>> groupJoin(
+            @PathVariable("groupId") Long groupId,
+            @LoginMember Member member
+    ) {
+        groupService.groupJoin(groupId, member);
+
+        return ResponseEntity.ok(ApiResponse.success("GroupID: ${groupId} 참가 완료", groupId));
+    }
 }

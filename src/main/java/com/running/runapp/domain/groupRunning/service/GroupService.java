@@ -21,6 +21,11 @@ public class GroupService {
     private final GroupRunningRepository groupRunningRepository;
     private final MemberRepository memberRepository;
 
+    private GroupRunning getGroupRunning(Long groupId) {
+        return groupRunningRepository.findById(groupId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.GROUP_NOT_FOUND));
+    }
+
 
     @Transactional
     public Long groupAdd(GroupRequest.groupAdd dto, Member member) {
@@ -74,8 +79,20 @@ public class GroupService {
         groupRunning.setStatus(GroupStatus.CANCELLED);
     }
 
-    private GroupRunning getGroupRunning(Long groupId) {
-        return groupRunningRepository.findById(groupId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.GROUP_NOT_FOUND));
+
+    @Transactional
+    public void groupJoin(Long groupId, Member member) {
+
+        // 그룹 유무 확인
+        GroupRunning groupRunning = getGroupRunning(groupId);
+
+        // ########### [조건] 다른 그룹런의 시간과 겹치는지 확인 ###########
+
+        GroupMember participant = GroupMember.builder()
+                .groupRunning(groupRunning)
+                .member(member)
+                .build();
+
+        groupRunning.addParticipants(participant);
     }
 }
