@@ -4,7 +4,9 @@ import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.global.error.BusinessException;
 import com.running.runapp.global.error.ErrorCode;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.SoftDelete;
 import org.hibernate.annotations.SoftDeleteType;
@@ -33,8 +35,9 @@ public class GroupRunning {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Column(nullable = false)
-    @Size(max = 10, min = 1)
+    @NotNull(message = "참여 인원은 필수입니다.")
+    @Min(value = 2, message = "최소 2명 이상이어야 합니다.")
+    @Max(value = 100, message = "최대 100명까지만 가능합니다.")
     private Integer maxParticipants;
 
     @Column(nullable = false)
@@ -48,11 +51,17 @@ public class GroupRunning {
     @JoinColumn(name = "host_id")
     private Member host;
 
+    @Builder.Default
     @OneToMany(mappedBy = "groupRunning", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<GroupMember> participants = new ArrayList<>();
 
 
-    public void addParticipants(GroupMember participant) {
+    public void addParticipants(Member member) {
+        GroupMember participant = GroupMember.builder()
+                .groupRunning(this)
+                .member(member)
+                .build();
+
         this.participants.add(participant);
     }
 

@@ -1,6 +1,5 @@
 package com.running.runapp.domain.groupRunning.service;
 
-import com.running.runapp.domain.groupRunning.domain.GroupMember;
 import com.running.runapp.domain.groupRunning.domain.GroupRunning;
 import com.running.runapp.domain.groupRunning.domain.GroupStatus;
 import com.running.runapp.domain.groupRunning.dto.GroupRequest;
@@ -39,14 +38,8 @@ public class GroupService {
                 .host(member) // 객체 타입 안맞음 변경 필요
                 .build();
 
-        // Host 사용자를 GroupMember 객체로 하나 만들기
-        GroupMember hostParticipant = GroupMember.builder()
-                .groupRunning(groupRunning)
-                .member(member)
-                .build();
-
         // Host 사용자도 참가인원으로 추가
-        groupRunning.addParticipants(hostParticipant);
+        groupRunning.addParticipants(member);
 
         return groupRunningRepository.save(groupRunning).getId();
     }
@@ -88,11 +81,6 @@ public class GroupService {
 
         // ########### [조건] 다른 그룹런의 시간과 겹치는지 확인 ###########
 
-        GroupMember participant = GroupMember.builder()
-                .groupRunning(groupRunning)
-                .member(member)
-                .build();
-
-        groupRunning.addParticipants(participant);
+        groupRunning.addParticipants(member);
     }
 }
