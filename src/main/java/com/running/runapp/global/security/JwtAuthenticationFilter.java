@@ -49,8 +49,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // 5. 해당 유저가 인증되었다는 사실을 'SecurityContext'에 저장
                 // 저장 이후 Controller에서 @AuthenticationPrincipal로 유저 정보 꺼낼 수 있음.
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                log.info("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(), request.getRequestURI());
             }
         }
         // 6. 다음 필터로 요청을 넘김
