@@ -1,6 +1,7 @@
 package com.running.runapp.domain.groupRunning.domain;
 
 import com.running.runapp.domain.member.domain.Member;
+import com.running.runapp.global.common.BaseTimeEntity;
 import com.running.runapp.global.error.BusinessException;
 import com.running.runapp.global.error.ErrorCode;
 import jakarta.persistence.*;
@@ -22,7 +23,7 @@ import java.util.List;
 @Builder
 @SoftDelete(columnName = "isDeleted", strategy = SoftDeleteType.DELETED)
 @Table(name = "run_groups")
-public class GroupRunning {
+public class GroupRunning extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,7 +55,6 @@ public class GroupRunning {
     @Builder.Default
     @OneToMany(mappedBy = "groupRunning", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<GroupMember> participants = new ArrayList<>();
-
 
     public void addParticipants(Member member) {
         GroupMember participant = GroupMember.builder()
