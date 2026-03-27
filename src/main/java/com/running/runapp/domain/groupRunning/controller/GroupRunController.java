@@ -1,12 +1,17 @@
 package com.running.runapp.domain.groupRunning.controller;
 
 import com.running.runapp.domain.groupRunning.dto.GroupRequest;
+import com.running.runapp.domain.groupRunning.dto.GroupResponse;
 import com.running.runapp.domain.groupRunning.service.GroupService;
 import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.global.common.ApiResponse;
 import com.running.runapp.global.common.annotaion.LoginMember;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -70,5 +75,15 @@ public class GroupRunController {
         groupService.groupJoin(groupId, member);
 
         return ResponseEntity.ok(ApiResponse.success("GroupID: ${groupId} 참가 완료", groupId));
+    }
+
+    // 그룹 목록 조회
+    @GetMapping
+    public ResponseEntity<ApiResponse<Slice<GroupResponse.GroupSummary>>> groupList(
+            @PageableDefault(size = 5, sort = "startTime", direction = Sort.Direction.DESC) Pageable pageable
+            ) {
+        Slice<GroupResponse.GroupSummary> groups = groupService.findAllGroups(pageable);
+
+        return ResponseEntity.ok(ApiResponse.success("그룹 목록 조회 완료", groups));
     }
 }
