@@ -1,5 +1,6 @@
 package com.running.runapp.domain.groupRunning.domain;
 
+import com.running.runapp.domain.groupRunning.dto.GroupRequest;
 import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.global.common.BaseTimeEntity;
 import com.running.runapp.global.error.BusinessException;
@@ -44,6 +45,12 @@ public class GroupRunning extends BaseTimeEntity {
     @Column(nullable = false)
     private LocalDateTime startTime;
 
+    @Column(nullable = false)
+    private LocalDateTime endTime;
+
+    @Column(nullable = false)
+    private Integer distance;
+
     @Enumerated(EnumType.STRING)
     @Setter
     private GroupStatus status; // RECRUITING, RUNNING, COMPLETED, CANCELLED
@@ -56,6 +63,10 @@ public class GroupRunning extends BaseTimeEntity {
     @OneToMany(mappedBy = "groupRunning", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<GroupMember> participants = new ArrayList<>();
 
+    private String location;
+
+    private String address;
+
     public void addParticipants(Member member) {
         GroupMember participant = GroupMember.builder()
                 .groupRunning(this)
@@ -65,17 +76,21 @@ public class GroupRunning extends BaseTimeEntity {
         this.participants.add(participant);
     }
 
-    public void updateInfo(String title, String content, Integer maxParticipants, LocalDateTime startTime) {
-        if (title != null) this.title = title;
-        if (content != null) this.content = content;
-        if (startTime != null) this.startTime = startTime;
+    public void updateInfo(GroupRequest.UpdateExtraRequest dto) {
+        if (title != null) this.title = dto.title();
+        if (content != null) this.content = dto.content();
+        if (startTime != null) this.startTime = dto.startTime();
+        if (endTime != null) this.endTime = dto.endTime();
+        if (distance != null) this.distance = dto.distance();
+        if (address != null) this.address = dto.address();
+        if (location != null) this.location = dto.location();
         if (maxParticipants != null) {
-            // 현재 참여 인원보다 적게 수정하려는지 체크 로직 추가 가능
-            if (this.maxParticipants < maxParticipants && maxParticipants > 2) {
+            // 현재 참여 인원보다 적게 && 최대 인원보다 많게 수정하려는지 체크 로직 추가
+            if (this.maxParticipants < dto.maxParticipants() && dto.maxParticipants() > 2) {
                 throw new BusinessException(ErrorCode.INVALID_PARTICIPANTS_COUNT);
             }
 
-            this.maxParticipants = maxParticipants;
+            this.maxParticipants = dto.maxParticipants();
         }
     }
 
