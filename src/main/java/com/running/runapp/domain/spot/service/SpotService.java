@@ -35,7 +35,6 @@ public class SpotService {
 
     private final SpotRepository spotRepository;
     private final GeometryFactory geometryFactory;
-    private final MemberRepository memberRepository;
     private final RunningRecordRepository runningRecordRepository;
     private final SpotVisitLogRepository spotVisitLogRepository;
     private final PointHistoryRepository pointHistoryRepository;
@@ -117,14 +116,10 @@ public class SpotService {
      * Spot 체크인
      */
     @Transactional
-    public SpotResponse.SpotCheckinResponse spotCheckin(Long spotId, SpotRequest.SpotCheckinRequest dto, String email) {
+    public SpotResponse.SpotCheckinResponse spotCheckin(Long spotId, SpotRequest.SpotCheckinRequest dto, Member member) {
         // [ 기본 Entity 조회 ]
         // Spot 찾기 (아래 편의메서드 사용)
         Spot spot = findSpotById(spotId);
-
-        // Member 찾기
-        Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
         // 전달받은 DTO안의 runId로  러닝 기록 조회 및 검증
         RunningRecord runningRecord = runningRecordRepository.findById(dto.runId())
@@ -140,6 +135,7 @@ public class SpotService {
 
         // 상태 확인: 이 기록의 상태가 여전히 RUNNING(진행 중)인가?
         if (runningRecord.getStatus() != RunStatus.RUNNING) {
+            log.warn("러닝중이 아님, 실제 상태: {}", runningRecord.getStatus());
             throw new BusinessException(ErrorCode.NOT_RUNNING_STATUS);
         }
 
