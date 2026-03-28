@@ -7,9 +7,9 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {
-    INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "C001", " 올바르지 않은 입력값입니다."),
-    METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "C002", " 잘못된 HTTP 메서드 호출입니다."),
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "C003", " 서버 내부 오류가 발생했습니다."),
+    INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "E001", " 올바르지 않은 입력값입니다."),
+    METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "E002", " 잘못된 HTTP 메서드 호출입니다."),
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "E003", " 서버 내부 오류가 발생했습니다."),
 
     // Member (회원 관련)
     EMAIL_DUPLICATION(HttpStatus.BAD_REQUEST, "M001", " 이미 존재하는 이메일입니다."),
@@ -27,6 +27,9 @@ public enum ErrorCode {
     SPOT_NAME_DUPLICATION(HttpStatus.BAD_REQUEST, "S001", " 이미 존재하는 이름입니다."),
     POINT_DUPLICATION(HttpStatus.BAD_REQUEST, "S002", "이미 존재하는 좌표입니다."),
     SPOT_NOT_FOUND(HttpStatus.NOT_FOUND, "S004", " 존재하지 않는 Spot입니다."),
+
+    // Run (달리기 관련)
+    ALREADY_FINISHED_RUN(HttpStatus.BAD_REQUEST, "R001","이미 종료된 러닝입니다." ),
 
     // Checkin (체크인 관련)
     RUNNING_RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "C001", "존재하지 않는 Running 기록입니다."),
