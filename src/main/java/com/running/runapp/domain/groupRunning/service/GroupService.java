@@ -4,6 +4,7 @@ import com.running.runapp.domain.groupRunning.domain.GroupRunning;
 import com.running.runapp.domain.groupRunning.domain.GroupStatus;
 import com.running.runapp.domain.groupRunning.dto.GroupRequest;
 import com.running.runapp.domain.groupRunning.dto.GroupResponse;
+import com.running.runapp.domain.groupRunning.repository.GroupMemberRepository;
 import com.running.runapp.domain.groupRunning.repository.GroupRunningRepository;
 import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.domain.member.repository.MemberRepository;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class GroupService {
 
     private final GroupRunningRepository groupRunningRepository;
+    private final GroupMemberRepository groupMemberRepository;
     private final MemberRepository memberRepository;
 
     private GroupRunning getGroupRunning(Long groupId) {
@@ -75,6 +77,7 @@ public class GroupService {
         groupRunning.verify(member);
 
         groupRunningRepository.delete(groupRunning);
+//        groupMemberRepository.updateIsDeletedByGroup(groupRunning);
 
         groupRunning.setStatus(GroupStatus.CANCELLED);
     }

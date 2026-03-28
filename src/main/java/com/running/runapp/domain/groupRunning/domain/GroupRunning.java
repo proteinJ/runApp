@@ -22,7 +22,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@SoftDelete(columnName = "isDeleted", strategy = SoftDeleteType.DELETED)
+@SoftDelete
 @Table(name = "run_groups")
 public class GroupRunning extends BaseTimeEntity {
 
@@ -66,6 +66,9 @@ public class GroupRunning extends BaseTimeEntity {
     private String location;
 
     private String address;
+
+    private boolean isDeleted;
+
 
     public void addParticipants(Member member) {
         GroupMember participant = GroupMember.builder()
