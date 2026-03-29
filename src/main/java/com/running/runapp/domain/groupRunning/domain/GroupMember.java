@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SoftDelete
+@SoftDelete(columnName = "is_deleted")
 public class GroupMember {
 
     @Id
@@ -30,8 +30,6 @@ public class GroupMember {
     private GroupRole role; // HOST, PARTICIPANT
 
     private LocalDateTime joinedAt;
-
-    private boolean isDeleted;
 
     @Builder
     public GroupMember(GroupRunning groupRunning, Member member, GroupRole role) {

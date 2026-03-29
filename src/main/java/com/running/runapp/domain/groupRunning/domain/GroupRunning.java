@@ -22,7 +22,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@SoftDelete
+@SoftDelete(columnName = "is_deleted")
 @Table(name = "run_groups")
 public class GroupRunning extends BaseTimeEntity {
 
@@ -60,14 +60,12 @@ public class GroupRunning extends BaseTimeEntity {
     private Member host;
 
     @Builder.Default
-    @OneToMany(mappedBy = "groupRunning", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "groupRunning")
     private List<GroupMember> participants = new ArrayList<>();
 
     private String location;
 
     private String address;
-
-    private boolean isDeleted;
 
 
     public void addParticipants(Member member) {
@@ -101,5 +99,9 @@ public class GroupRunning extends BaseTimeEntity {
         if (!this.host.equals(loginMember)) {
             throw new BusinessException(ErrorCode.NOT_HOST);
         }
+    }
+
+    public void cancel() {
+        this.status = GroupStatus.CANCELLED;
     }
 }
