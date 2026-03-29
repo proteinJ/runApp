@@ -74,9 +74,9 @@ public class GroupService {
         groupRunning.verify(member);
 
         groupRunningRepository.delete(groupRunning);
-//        groupMemberRepository.updateIsDeletedByGroup(groupRunning);
+        groupMemberRepository.bulkSoftDeleteByGroup(groupId);
 
-        groupRunning.setStatus(GroupStatus.CANCELLED);
+        groupRunning.cancel();
     }
 
 
@@ -88,6 +88,13 @@ public class GroupService {
 
         // ########### [조건] 다른 그룹런의 시간과 겹치는지 확인 ###########
 
+        GroupMember participant = GroupMember.builder()
+                .groupRunning(groupRunning)
+                .member(member)
+                .role(GroupRole.PARTICIPANT)
+                .build();
+
+        groupMemberRepository.save(participant);
         groupRunning.addParticipants(member);
     }
 
