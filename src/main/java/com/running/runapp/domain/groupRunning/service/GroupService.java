@@ -1,5 +1,7 @@
 package com.running.runapp.domain.groupRunning.service;
 
+import com.running.runapp.domain.groupRunning.domain.GroupMember;
+import com.running.runapp.domain.groupRunning.domain.GroupRole;
 import com.running.runapp.domain.groupRunning.domain.GroupRunning;
 import com.running.runapp.domain.groupRunning.domain.GroupStatus;
 import com.running.runapp.domain.groupRunning.dto.GroupRequest;
@@ -34,23 +36,18 @@ public class GroupService {
     @Transactional
     public Long groupAdd(GroupRequest.groupAdd dto, Member member) {
 
-        GroupRunning groupRunning = GroupRunning.builder()
-                .title(dto.title())
-                .content(dto.content())
-                .maxParticipants(dto.maxParticipants())
-                .startTime(dto.startTime())
-                .endTime(dto.endTime())
-                .status(GroupStatus.RECRUITING)
-                .host(member)
-                .location(dto.location())
-                .address(dto.address())
-                .distance(dto.distance())
+        GroupRunning groupRunning = groupRunningRepository.save(dto.toEntity(member));
+
+        GroupMember host = GroupMember.builder()
+                .groupRunning(groupRunning)
+                .member(member)
+                .role(GroupRole.HOST)
                 .build();
 
-        // Host 사용자도 참가인원으로 추가
-        groupRunning.addParticipants(member);
+        groupMemberRepository.save(host); // DB 저장 담당
+        groupRunning.addParticipants(member); // 메모리 객체 상태 업데이트 담당
 
-        return groupRunningRepository.save(groupRunning).getId();
+        return groupRunning.getId();
     }
 
 
