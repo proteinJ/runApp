@@ -39,7 +39,7 @@ public class GroupRunning extends BaseTimeEntity {
 
     @NotNull(message = "참여 인원은 필수입니다.")
     @Min(value = 2, message = "최소 2명 이상이어야 합니다.")
-    @Max(value = 100, message = "최대 100명까지만 가능합니다.")
+    @Max(value = 5, message = "최대 5명까지만 가능합니다.")
     private Integer maxParticipants;
 
     @Column(nullable = false)
