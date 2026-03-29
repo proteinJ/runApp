@@ -27,6 +27,7 @@ public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
     private final RedisTemplate<Object, Object> redisTemplate;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
     // 비밀번호 암호화
     @Bean
@@ -35,7 +36,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationEntryPoint authenticationEntryPoint) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable)
