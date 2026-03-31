@@ -17,7 +17,7 @@ public abstract class BaseTimeEntity { // 단지 다른 Entity의 속성일뿐 -
 
     @CreatedDate
     @Column(updatable = false)
-    private LocalDateTime createdDate;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
