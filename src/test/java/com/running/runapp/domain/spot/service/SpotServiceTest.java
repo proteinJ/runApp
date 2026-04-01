@@ -1,7 +1,6 @@
 package com.running.runapp.domain.spot.service;
 
 import com.running.runapp.domain.member.domain.Member;
-import com.running.runapp.domain.member.repository.MemberRepository;
 import com.running.runapp.domain.point.PointHistoryRepository;
 import com.running.runapp.domain.running.RunStatus;
 import com.running.runapp.domain.running.repository.RunningRecordRepository;

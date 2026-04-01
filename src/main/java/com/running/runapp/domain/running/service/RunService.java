@@ -9,13 +9,12 @@ import com.running.runapp.domain.running.dto.RunRequest;
 import com.running.runapp.domain.running.repository.RunningRecordRepository;
 import com.running.runapp.domain.running.util.DistanceUtils;
 import com.running.runapp.domain.running.util.GeometryUtils;
+import com.running.runapp.domain.spot.repository.SpotVisitLogRepository;
 import com.running.runapp.global.error.BusinessException;
 import com.running.runapp.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.LineString;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,13 +28,10 @@ public class RunService {
 
     private final RunningRecordRepository runningRecordRepository;
     private final MemberRepository memberRepository;
+    private final SpotVisitLogRepository spotVisitLogRepository;
 
-    /**
-     * Run 시작
-     */
-    public RunResponse.RunStartResponse start(RunRequest.RunStartRequest request) {
-        Member member = getCurrentMember();
-
+    // Run 시작 (Member를 직접 받음)
+    public RunResponse.RunStartResponse start(Member member, RunRequest.RunStartRequest request) {
         RunningRecord record = RunningRecord.create(member, request.getStartTime());
         runningRecordRepository.save(record);
 
@@ -47,12 +43,8 @@ public class RunService {
                 .build();
     }
 
-    /**
-     * Run 종료
-     */
-    public RunResponse.RunFinishResponse finish(Long runId, RunRequest.RunFinishRequest request) {
-        Member member = getCurrentMember();
-
+    // Run 종료
+    public RunResponse.RunFinishResponse finish(Member member, Long runId, RunRequest.RunFinishRequest request) {
         RunningRecord record = runningRecordRepository.findByIdAndMember_Id(runId, member.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.ACCESS_DENIED));
 
@@ -64,20 +56,18 @@ public class RunService {
         double calculatedDistance = DistanceUtils.totalDistanceMeter(request);
         record.finish(request.getEndTime(), calculatedDistance, lineString);
 
-        log.info("Run finish: memberId={}, runId={}, totalDistance={}",
-                member.getId(), record.getId(), calculatedDistance);
+        Integer earnedPoints = spotVisitLogRepository
+                .sumEarnedPointsByRunIdAndMemberId(record.getId(), member.getId());
 
         return RunResponse.RunFinishResponse.builder()
                 .runId(record.getId())
                 .totalDistance(record.getTotalDistance())
-                .earnedPoints(0)
+                .earnedPoints(earnedPoints)
                 .build();
     }
 
     @Transactional(readOnly = true)
-    public List<RunResponse.MyRunSummaryResponse> myRuns() {
-        Member member = getCurrentMember();
-
+    public List<RunResponse.MyRunSummaryResponse> myRuns(Member member) {
         return runningRecordRepository.findByMember_IdOrderByStartTimeDesc(member.getId())
                 .stream()
                 .map(RunResponse.MyRunSummaryResponse::from)
@@ -85,20 +75,10 @@ public class RunService {
     }
 
     @Transactional(readOnly = true)
-    public RunResponse.RunDetailResponse detail(Long runId) {
-        Member member = getCurrentMember();
-
+    public RunResponse.RunDetailResponse detail(Member member, Long runId) {
         RunningRecord record = runningRecordRepository.findByIdAndMember_Id(runId, member.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.ACCESS_DENIED));
 
         return RunResponse.RunDetailResponse.from(record);
-    }
-
-    private Member getCurrentMember() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-
-        return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
     }
 }

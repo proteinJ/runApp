@@ -6,9 +6,11 @@ spring:
     driver-class-name: org.postgresql.Driver
 
   jpa:
-    database-platform: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect # 혹은 최신 버전 반영
+    database-platform: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
     hibernate:
-      ddl-auto: update
+      # ✅ 'update'에서 'create'로 수정했습니다.
+      # 서버 실행 시 테이블을 새로 생성하여 @GeneratedValue 설정을 DB에 강제 반영합니다.
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true

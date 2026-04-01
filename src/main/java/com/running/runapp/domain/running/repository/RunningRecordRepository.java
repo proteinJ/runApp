@@ -11,4 +11,6 @@ public interface RunningRecordRepository extends JpaRepository<RunningRecord, Lo
     Optional<RunningRecord> findByIdAndMember_Id(Long runId, Long memberId);
 
     List<RunningRecord> findByMember_IdOrderByStartTimeDesc(Long memberId);
+
+    List<RunningRecord> findTop30ByMember_IdInOrderByStartTimeDesc(List<Long> memberIds);
 }
