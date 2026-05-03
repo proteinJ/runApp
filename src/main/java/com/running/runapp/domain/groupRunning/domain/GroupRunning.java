@@ -102,6 +102,9 @@ public class GroupRunning extends BaseTimeEntity {
 
 
     public boolean isAlreadyStarted() {
-        return this.getStartTime().isAfter(LocalDateTime.now()) && this.getEndTime().isBefore(LocalDateTime.now());
+        return LocalDateTime.now().isAfter(this.startTime);
+    }
+    public boolean isAlreadyEnded() {
+        return LocalDateTime.now().isAfter(this.endTime);
     }
 }

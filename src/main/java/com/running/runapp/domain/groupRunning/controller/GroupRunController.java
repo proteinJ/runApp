@@ -42,12 +42,23 @@ public class GroupRunController {
     @PatchMapping("/{groupId}")
     public ResponseEntity<ApiResponse<Long>> groupEdit(
             @RequestBody GroupRequest.UpdateExtraRequest dto,
-            @PathVariable("groupId") Long groupId,
+            @PathVariable Long groupId,
             @LoginMember Member member
             ) {
-         groupService.groupEdit(dto, groupId, member);
+         Long returnGroupId = groupService.groupEdit(dto, groupId, member);
 
-        return ResponseEntity.ok(ApiResponse.success("그룹런 수정 완료", groupId));
+        return ResponseEntity.ok(ApiResponse.success("그룹런 수정 완료", returnGroupId));
+    }
+
+    // 그룹 나가기
+    @DeleteMapping("/{groupId}/members/me")
+    public ResponseEntity<ApiResponse<String>> groupLeave(
+            @PathVariable Long groupId,
+            @LoginMember Member member
+    ) {
+        groupService.groupLeave(groupId, member);
+
+        return ResponseEntity.ok(ApiResponse.success("그룹 나가기"));
     }
 
     // 파티 삭제

@@ -52,7 +52,7 @@ public class GroupService {
     }
 
     @Transactional
-    public void groupEdit(GroupRequest.UpdateExtraRequest dto, Long groupId, Member member) {
+    public Long groupEdit(GroupRequest.UpdateExtraRequest dto, Long groupId, Member member) {
 
         // 그룹 유무 확인
         GroupRunning groupRunning = getGroupRunning(groupId);
@@ -62,6 +62,8 @@ public class GroupService {
 
         // update Function (Domain안의 함수)
         groupRunning.updateInfo(dto);
+
+        return groupRunning.getId();
     }
 
     @Transactional
@@ -110,11 +112,10 @@ public class GroupService {
         GroupMember groupMember = groupMemberRepository.findByGroupRunningIdAndMember(groupId, member)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_PARTICIPATED));
 
-        LocalDateTime startTime = groupMember.getGroupRunning().getStartTime();
-        LocalDateTime endTime = groupMember.getGroupRunning().getEndTime();
-
         if (groupMember.getGroupRunning().isAlreadyStarted()) {
             throw new BusinessException(ErrorCode.ALREADY_START_RUNNING);
+        } else if (groupMember.getGroupRunning().isAlreadyEnded()) {
+            throw new BusinessException(ErrorCode.ALREADY_END_RUNNING);
         }
 
         groupMemberRepository.delete(groupMember);
