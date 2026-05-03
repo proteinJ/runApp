@@ -86,7 +86,17 @@ public class GroupService {
         // 그룹 유무 확인
         GroupRunning groupRunning = getGroupRunning(groupId);
 
-        // ########### [조건] 다른 그룹런의 시간과 겹치는지 확인 ###########
+        // ########### [조건1] 다른 그룹런의 시간과 겹치는지 확인 ###########
+        if (groupMemberRepository.hasOverlappingSchedule(member, groupRunning.getStartTime(), groupRunning.getEndTime())) {
+            throw new BusinessException(ErrorCode.DUPLICATE_GROUP_TIME);
+        }
+
+        // ########### [조건2] 이미 이 그룹에 들어가 있는지 확인 ###########
+        if (groupMemberRepository.existsByGroupRunningAndMember(groupRunning, member)) {
+            throw new BusinessException(ErrorCode.ALREADY_JOINED_GROUP);
+        }
+
+
 
         GroupMember participant = GroupMember.builder()
                 .groupRunning(groupRunning)

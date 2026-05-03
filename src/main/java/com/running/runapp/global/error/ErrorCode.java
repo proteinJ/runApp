@@ -38,7 +38,9 @@ public enum ErrorCode {
     // GroupRunning (그룹 러닝 관련)
     GROUP_NOT_FOUND(HttpStatus.NOT_FOUND, "G001", "존재하지 않는 Group 입니다"),
     NOT_HOST(HttpStatus.UNAUTHORIZED, "G002", "그룹의 방장이 아닙니다."),
-    INVALID_PARTICIPANTS_COUNT(HttpStatus.UNAUTHORIZED, "G003", "인원수 범위를 벗어났습니다.");
+    INVALID_PARTICIPANTS_COUNT(HttpStatus.UNAUTHORIZED, "G003", "인원수 범위를 벗어났습니다."),
+    ALREADY_JOINED_GROUP(HttpStatus.BAD_REQUEST, "G004", "이미 참여되어 있습니다."),
+    DUPLICATE_GROUP_TIME(HttpStatus.BAD_REQUEST, "G005", "해당 시간에 이미 그룹러닝이 있습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
