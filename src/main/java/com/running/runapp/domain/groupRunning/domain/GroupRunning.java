@@ -11,7 +11,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.SoftDelete;
-import org.hibernate.annotations.SoftDeleteType;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -101,7 +100,8 @@ public class GroupRunning extends BaseTimeEntity {
         }
     }
 
-    public void cancel() {
-        this.status = GroupStatus.CANCELLED;
+
+    public boolean isAlreadyStarted() {
+        return this.getStartTime().isAfter(LocalDateTime.now()) && this.getEndTime().isBefore(LocalDateTime.now());
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> {
 
@@ -23,6 +24,8 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
     )
     boolean hasOverlappingSchedule(Member member, LocalDateTime startTime, LocalDateTime endTime);
 
-    boolean existsByGroupRunningAndMember(GroupRunning attr0, Member member);
+    boolean existsByGroupRunningIdAndMember(Long groupRunningId, Member member);
+
+    Optional<GroupMember> findByGroupRunningIdAndMember(Long groupRunningId, Member member);
 }
 
