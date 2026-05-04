@@ -3,6 +3,7 @@ package com.running.runapp.domain.groupRunning.service;
 import com.running.runapp.domain.groupRunning.domain.GroupMember;
 import com.running.runapp.domain.groupRunning.domain.GroupRole;
 import com.running.runapp.domain.groupRunning.domain.GroupRunning;
+import com.running.runapp.domain.groupRunning.domain.GroupStatus;
 import com.running.runapp.domain.groupRunning.dto.GroupRequest;
 import com.running.runapp.domain.groupRunning.dto.GroupResponse;
 import com.running.runapp.domain.groupRunning.repository.GroupMemberRepository;
@@ -85,12 +86,17 @@ public class GroupService {
         // 그룹 유무 확인
         GroupRunning groupRunning = getGroupRunning(groupId);
 
-        // ########### [조건1] 다른 그룹런의 시간과 겹치는지 확인 ###########
+        // ########### [조건1] 해당 그룹이 모집중인지 확인 ###########
+        if (groupRunning.getStatus() != GroupStatus.RECRUITING) {
+            throw new BusinessException(ErrorCode.NOT_RECRUITING);
+        }
+
+        // ########### [조건2] 다른 그룹런의 시간과 겹치는지 확인 ###########
         if (groupMemberRepository.hasOverlappingSchedule(member, groupRunning.getStartTime(), groupRunning.getEndTime())) {
             throw new BusinessException(ErrorCode.DUPLICATE_GROUP_TIME);
         }
 
-        // ########### [조건2] 이미 이 그룹에 들어가 있는지 확인 ###########
+        // ########### [조건3] 이미 이 그룹에 들어가 있는지 확인 ###########
         if (groupMemberRepository.existsByGroupRunningIdAndMember(groupRunning.getId(), member)) {
             throw new BusinessException(ErrorCode.ALREADY_JOINED_GROUP);
         }

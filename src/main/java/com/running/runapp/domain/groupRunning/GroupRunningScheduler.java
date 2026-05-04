@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class GroupRunningScheduler {
     private final GroupRunningRepository groupRunningRepository;
 
-    @Scheduled(cron = "0 0 0 1 * *")
+    @Scheduled(cron = "0 0 * * * *")
     @Transactional
     public void autoUpdateStatus() {
         LocalDateTime now = LocalDateTime.now();

@@ -43,7 +43,8 @@ public enum ErrorCode {
     DUPLICATE_GROUP_TIME(HttpStatus.BAD_REQUEST, "G005", "해당 시간에 이미 그룹러닝이 있습니다."),
     NOT_PARTICIPATED(HttpStatus.BAD_REQUEST, "G006", "해당 그룹 참여자가 아닙니다."),
     ALREADY_START_RUNNING(HttpStatus.BAD_REQUEST, "G007", "이미 그룹 러닝이 시작되었습니다."),
-    ALREADY_END_RUNNING(HttpStatus.BAD_REQUEST, "G008", "이미 그룹 러닝이 종료되었습니다.");
+    ALREADY_END_RUNNING(HttpStatus.BAD_REQUEST, "G008", "이미 그룹 러닝이 종료되었습니다."),
+    NOT_RECRUITING(HttpStatus.BAD_REQUEST, "G009", "모집중인 그룹만 참여 가능합니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
