@@ -107,4 +107,26 @@ public class GroupRunning extends BaseTimeEntity {
     public boolean isAlreadyEnded() {
         return LocalDateTime.now().isAfter(this.endTime);
     }
+
+    public GroupStatus getDynamicStatus() {
+        LocalDateTime now = LocalDateTime.now();
+
+        // 취소된 상태는 시간과 무관하게 유지
+        if (this.status == GroupStatus.CANCELED) return GroupStatus.CANCELED;
+
+        // 현재 시간 기준 상태 계산
+        GroupStatus computedStatus;
+        if (now.isAfter(this.endTime)) {
+            computedStatus = GroupStatus.COMPLETED;
+        } else if (now.isAfter(this.startTime)) {
+            computedStatus = GroupStatus.RUNNING;
+        } else {
+            computedStatus = GroupStatus.RECRUITING;
+        }
+
+        // 계산된 상태와 현재 DB 상태가 다르면 업데이트 로직을 태울 수도 있음
+        // if (this.status != computedStatus) { ... }
+
+        return computedStatus;
+    }
 }

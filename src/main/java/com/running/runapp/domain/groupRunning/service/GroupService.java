@@ -17,7 +17,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 
 @Service
 @Transactional(readOnly = true)
@@ -112,10 +111,10 @@ public class GroupService {
         GroupMember groupMember = groupMemberRepository.findByGroupRunningIdAndMember(groupId, member)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_PARTICIPATED));
 
-        if (groupMember.getGroupRunning().isAlreadyStarted()) {
-            throw new BusinessException(ErrorCode.ALREADY_START_RUNNING);
-        } else if (groupMember.getGroupRunning().isAlreadyEnded()) {
+        if (groupMember.getGroupRunning().isAlreadyEnded()) {
             throw new BusinessException(ErrorCode.ALREADY_END_RUNNING);
+        } else if (groupMember.getGroupRunning().isAlreadyStarted()) {
+            throw new BusinessException(ErrorCode.ALREADY_START_RUNNING);
         }
 
         groupMemberRepository.delete(groupMember);

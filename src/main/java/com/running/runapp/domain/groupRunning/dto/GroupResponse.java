@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 
 public class GroupResponse {
 
+
+
     public record GroupSummary(
             Long groupId,
             String title,
@@ -25,7 +27,7 @@ public class GroupResponse {
                     group.getParticipants().size(),
                     group.getMaxParticipants(),
                     group.getStartTime(),
-                    group.getStatus().name(),
+                    group.getDynamicStatus().name(), // 동적으로 바뀌게
                     group.getCreatedAt()
             );
         }
