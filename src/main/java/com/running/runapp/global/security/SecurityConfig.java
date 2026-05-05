@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -26,7 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
-    private final RedisTemplate<Object, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
     // 비밀번호 암호화
@@ -54,7 +53,7 @@ public class SecurityConfig {
 
             // API별 접근 권한 설정
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/v1/member/join", "/api/v1/member/login", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                    .requestMatchers("/api/v1/member/join", "/api/v1/member/login", "/swagger-ui/**", "/v3/api-docs/**", "/ws/run/**").permitAll()
                     .requestMatchers("/api/v1/member/password", "/api/v1/groups/**").authenticated()
                     .anyRequest().authenticated()
             )

@@ -35,7 +35,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final JwtProvider jwtProvider;
-    private final RedisTemplate<Object, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenRepository refreshTokenRepository;
