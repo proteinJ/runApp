@@ -64,12 +64,34 @@ public class GroupRunController {
     // 파티 삭제
     @DeleteMapping("/{groupId}")
     public ResponseEntity<ApiResponse<String>> groupDelete(
-            @PathVariable("groupId") Long groupId,
+            @PathVariable Long groupId,
             @LoginMember Member member
     ) {
         groupService.groupDelete(groupId, member);
 
         return ResponseEntity.ok(ApiResponse.success("그룹런 삭제 완료"));
+    }
+
+    // 그룹 러닝 시작
+    @PostMapping("/{groupId}/run/start")
+    public ResponseEntity<ApiResponse<GroupResponse.GroupDetail>> runStart(
+            @PathVariable Long groupId,
+            @LoginMember Member member
+    ) {
+        GroupResponse.GroupDetail res = groupService.groupRunStart(groupId, member);
+
+        return ResponseEntity.ok(ApiResponse.success("그룹 러닝 시작", res));
+    }
+
+    // 그룹 러닝 종료
+    @PostMapping("/{groupId}/run/finish")
+    public ResponseEntity<ApiResponse<GroupResponse.GroupDetail>> runFinish(
+            @PathVariable Long groupId,
+            @LoginMember Member member
+    ) {
+        GroupResponse.GroupDetail res = groupService.groupRunFinish(groupId, member);
+
+        return ResponseEntity.ok(ApiResponse.success("그룹 러닝 종료", res));
     }
 
 

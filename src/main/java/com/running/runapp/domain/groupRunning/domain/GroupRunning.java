@@ -129,4 +129,8 @@ public class GroupRunning extends BaseTimeEntity {
 
         return computedStatus;
     }
+
+    public void groupRunEnd() {
+        this.status = GroupStatus.COMPLETED;
+    }
 }

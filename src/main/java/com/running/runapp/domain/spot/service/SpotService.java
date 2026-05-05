@@ -140,7 +140,7 @@ public class SpotService {
 
         // 상태 확인: 이 기록의 상태가 여전히 RUNNING(진행 중)인가?
         if (runningRecord.getStatus() != RunStatus.RUNNING) {
-            throw new BusinessException(ErrorCode.NOT_RUNNING_STATUS);
+            throw new BusinessException(ErrorCode.CHEKIN_ONLY_RUN);
         }
 
         // 시간 확인: 너무 오래된 기록(예: 어제 시작하고 안 끈 기록) - Fail

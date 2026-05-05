@@ -126,6 +126,61 @@ public class GroupService {
         groupMemberRepository.delete(groupMember);
     }
 
+    /**
+     * 그룹 러닝 시작
+     */
+    @Transactional
+    public GroupResponse.GroupDetail groupRunStart(Long groupId, Member member) {
+        // 그룹 유무 확인
+        GroupRunning groupRunning = getGroupRunning(groupId);
+
+        // host와 member가 같은지 검사
+        groupRunning.verify(member);
+
+        // [조건1] 그룹 러닝이 이미 끝났을 때
+        if (groupRunning.isAlreadyEnded()) {
+            throw new BusinessException(ErrorCode.ALREADY_END_RUNNING);
+        }
+
+        // [조건2] 그룹 러닝 아직 시작 시간이 아닐 때
+        if (!groupRunning.isAlreadyStarted()) {
+            throw new BusinessException(ErrorCode.NOT_START_TIME_YET);
+        }
+
+        return GroupResponse.GroupDetail.from(groupRunning);
+    }
+
+    /**
+     * 그룹 러닝 종료
+     */
+    public GroupResponse.GroupDetail groupRunFinish(Long groupId, Member member) {
+        // 그룹 유무 확인
+        GroupRunning groupRunning = getGroupRunning(groupId);
+
+        // host와 member가 같은지 검사
+        groupRunning.verify(member);
+
+        // 상태 검증 (이미 종료되었거나, 아직 시작 안 한 방은 종료할 수 없음)
+        if (groupRunning.getDynamicStatus() == GroupStatus.COMPLETED) {
+            throw new BusinessException(ErrorCode.ALREADY_END_RUNNING);
+        }
+        if (groupRunning.getDynamicStatus() == GroupStatus.RECRUITING) {
+            throw new BusinessException(ErrorCode.NOT_START_TIME_YET);
+        }
+
+        // 그룹 러닝 상태 종료로 변경
+        groupRunning.groupRunEnd();
+
+        // 나중에 추가할 부분] 웹소켓으로 종료 이벤트 발행
+        // messagingTemplate.convertAndSend("/topic/group/" + groupId, new RunEndEvent());
+
+        // [나중에 추가할 부분] Redis 메모리 정리
+        // 실시간 위치 추적을 위해 Redis에 쌓아두었던 이 방의 데이터를 삭제해서 메모리 확보
+        // redisTemplate.delete("group_location:" + groupId);
+
+        return GroupResponse.GroupDetail.from(groupRunning);
+    }
+
 
     /**
      * 그룹 목록 조회
@@ -133,4 +188,6 @@ public class GroupService {
     public Slice<GroupResponse.GroupSummary> findAllGroups(Pageable pageable) {
         return groupRunningRepository.findAllByFilter(pageable);
     }
+
+
 }
