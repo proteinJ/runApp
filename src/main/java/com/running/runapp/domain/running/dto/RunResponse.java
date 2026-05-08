@@ -1,3 +1,4 @@
+// RunResponse.java
 package com.running.runapp.domain.running.dto;
 
 import com.running.runapp.domain.running.domain.RunningRecord;
@@ -9,8 +10,8 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class RunResponse
-{
+public class RunResponse {
+
     @Getter
     @Builder
     @AllArgsConstructor
@@ -24,7 +25,7 @@ public class RunResponse
     @AllArgsConstructor
     public static class RunFinishResponse {
         private Long runId;
-        private Double totalDistance;
+        private Double totalDistanceKm;
         private Integer earnedPoints;
     }
 
@@ -47,14 +48,35 @@ public class RunResponse
     public static class MyRunSummaryResponse {
         private Long runId;
         private LocalDateTime startTime;
-        private Double totalDistance;
+        private Double totalDistanceKm;
 
         public static MyRunSummaryResponse from(RunningRecord run) {
             return MyRunSummaryResponse.builder()
                     .runId(run.getId())
                     .startTime(run.getStartTime())
-                    .totalDistance(run.getTotalDistance())
+                    .totalDistanceKm(UnitUtils.metersToKm(run.getTotalDistance()))
                     .build();
         }
+    }
+
+    // 월별 요약
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class MonthlySummaryResponse {
+        private Integer year;
+        private Integer month;
+        private Integer totalRuns;
+
+        private Double totalDistanceKm;
+        private Double avgDistanceKm;
+        private Double bestDistanceKm;
+
+        // ✅ 실무형: 없으면 null
+        private Integer avgPaceSecPerKm;
+        // ✅ 실무형: "mm:ss" 형태, 없으면 null
+        private String avgPaceText;
+
+        private Integer earnedPoints;
     }
 }

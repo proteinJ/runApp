@@ -1,8 +1,8 @@
 package com.running.runapp.domain.running.controller;
 
 import com.running.runapp.domain.member.domain.Member;
-import com.running.runapp.domain.running.dto.RunResponse;
 import com.running.runapp.domain.running.dto.RunRequest;
+import com.running.runapp.domain.running.dto.RunResponse;
 import com.running.runapp.domain.running.service.RunService;
 import com.running.runapp.global.common.ApiResponse;
 import com.running.runapp.global.common.annotaion.LoginMember;
@@ -22,6 +22,7 @@ public class RunController {
 
     /**
      * 러닝 시작
+     * POST /api/v1/runs/start
      */
     @PostMapping("/runs/start")
     public ResponseEntity<ApiResponse<RunResponse.RunStartResponse>> start(
@@ -33,6 +34,7 @@ public class RunController {
 
     /**
      * 러닝 종료
+     * POST /api/v1/runs/{runId}/finish
      */
     @PostMapping("/runs/{runId}/finish")
     public ResponseEntity<ApiResponse<RunResponse.RunFinishResponse>> finish(
@@ -45,6 +47,7 @@ public class RunController {
 
     /**
      * 내 러닝 목록 조회
+     * GET /api/v1/members/me/runs
      */
     @GetMapping("/members/me/runs")
     public ResponseEntity<ApiResponse<List<RunResponse.MyRunSummaryResponse>>> myRuns(
@@ -55,6 +58,7 @@ public class RunController {
 
     /**
      * 러닝 상세 조회
+     * GET /api/v1/runs/{runId}
      */
     @GetMapping("/runs/{runId}")
     public ResponseEntity<ApiResponse<RunResponse.RunDetailResponse>> detail(
@@ -62,5 +66,20 @@ public class RunController {
             @PathVariable Long runId
     ) {
         return ResponseEntity.ok(ApiResponse.success("러닝 상세", runService.detail(me, runId)));
+    }
+
+    /**
+     * 월별 러닝 요약
+     * GET /api/v1/members/me/runs/monthly-summary?year=2026&month=3
+     */
+    @GetMapping("/members/me/runs/monthly-summary")
+    public ResponseEntity<ApiResponse<RunResponse.MonthlySummaryResponse>> monthlySummary(
+            @LoginMember Member me,
+            @RequestParam int year,
+            @RequestParam int month
+    ) {
+        return ResponseEntity.ok(
+                ApiResponse.success("월별 러닝 요약 조회 완료", runService.monthlySummary(me, year, month))
+        );
     }
 }
