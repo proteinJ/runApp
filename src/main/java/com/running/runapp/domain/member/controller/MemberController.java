@@ -4,6 +4,9 @@ import com.running.runapp.domain.member.domain.TokenDto;
 import com.running.runapp.domain.member.dto.MemberRequest;
 import com.running.runapp.domain.member.service.MemberService;
 import com.running.runapp.global.common.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 
+@Tag(name = "Member", description = "멤버 관련 API")
 @RestController
 @RequestMapping("/api/v1/member")
 @RequiredArgsConstructor
@@ -23,6 +27,7 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    @Operation(summary = "회원가입", description = "새로운 사용자 회원가입")
     @PostMapping("/join")
     public ResponseEntity<ApiResponse<Long>> join(@RequestBody MemberRequest.Join dto) {
         Long memberId = memberService.join(dto);
@@ -37,16 +42,17 @@ public class MemberController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<String>> logout(@RequestHeader("Authorization") String bearerToken) {
+    public ResponseEntity<ApiResponse<String>> logout(@Parameter(hidden = true) @RequestHeader("Authorization") String bearerToken) {
         memberService.logout(bearerToken);
 
         return ResponseEntity.ok(ApiResponse.success("로그아웃 완료"));
     }
 
+    @Operation(summary = "비밀번호 변경", description = "기존 비번 확인 후 새 비번으로 변경 (변경 후 토큰 만료)")
     @PostMapping("/password")
     public ResponseEntity<ApiResponse<String>> changePassword(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @RequestHeader("Authorization") String bearerToken,
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails,
+            @Parameter(hidden = true) @RequestHeader("Authorization") String bearerToken,
             @RequestBody @Valid MemberRequest.PasswordChange dto
         )
          {
