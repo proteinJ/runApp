@@ -22,14 +22,14 @@ public class SpotController {
     private final SpotService spotService;
     
     @PostMapping
-    public ResponseEntity<?> createSpot(@RequestBody @Valid SpotRequest.SpotCreateRequest dto) {
+    public ResponseEntity<ApiResponse<Long>> createSpot(@RequestBody @Valid SpotRequest.SpotCreateRequest dto) {
         Long SpotId = spotService.createSpot(dto);
         
         return ResponseEntity.ok(ApiResponse.success("Spot 생성 완료 - SpotId: ", SpotId));
     }
 
     @PatchMapping("{spotId}")
-    public ResponseEntity<?> updateSpot(
+    public ResponseEntity<ApiResponse<Long>> updateSpot(
             @RequestBody @Valid SpotRequest.SpotUpdateRequest dto,
             @PathVariable Long spotId) {
         Long SpotId = spotService.updateSpot(spotId, dto);
@@ -39,21 +39,21 @@ public class SpotController {
 
 
     @DeleteMapping("/{spotId}")
-    public ResponseEntity<?> deleteSpot(@PathVariable Long spotId) {
+    public ResponseEntity<ApiResponse<Long>> deleteSpot(@PathVariable Long spotId) {
         Long SpotId = spotService.deleteSpot(spotId);
 
         return ResponseEntity.ok(ApiResponse.success("Spot 삭제 완료 - SpotId: ", SpotId));
     }
 
     @GetMapping("/{spotId}")
-    public ResponseEntity<?> getSpot(@PathVariable Long spotId) {
+    public ResponseEntity<ApiResponse<SpotResponse.DetailInfo>> getSpot(@PathVariable Long spotId) {
         SpotResponse.DetailInfo spotInfoResponse = spotService.spotInfoResponse(spotId);
 
         return ResponseEntity.ok(ApiResponse.success("Spot 상세 정보 불러오기 완료", spotInfoResponse));
     }
 
     @PostMapping("/{spotId}/checkin")
-    public ResponseEntity<?> checkin(
+    public ResponseEntity<ApiResponse<SpotResponse.SpotCheckinResponse>> checkin(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long spotId,
             @RequestBody @Valid SpotRequest.SpotCheckinRequest dto
@@ -65,7 +65,7 @@ public class SpotController {
     }
 
     @GetMapping("/nearby")
-    public ResponseEntity<?> getNearbySpots(
+    public ResponseEntity<ApiResponse<List<SpotResponse.SummaryInfo>>> getNearbySpots(
             @RequestBody SpotRequest.NearbySpotsRequest dto,
             @AuthenticationPrincipal PrincipalDetails principal) {
         List<SpotResponse.SummaryInfo> nearbySpots = spotService.getNearbySpots(dto, principal.getMemberId());

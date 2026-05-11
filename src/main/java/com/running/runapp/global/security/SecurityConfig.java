@@ -25,7 +25,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
-    private final RedisTemplate<Object, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
     // 비밀번호 암호화
     @Bean
@@ -40,14 +41,20 @@ public class SecurityConfig {
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
 
-            // 4. JWT 사용 하므로 세션 생성하지 않도록 설정 (무상태성 STATELESS)
+            // JWT 사용 하므로 세션 생성하지 않도록 설정 (무상태성 STATELESS)
             .sessionManagement(session ->
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            // 5. API별 접근 권한 설정
+            // 예외 핸들링 설정
+            .exceptionHandling(exception -> exception
+                    .authenticationEntryPoint(authenticationEntryPoint)
+            )
+
+
+            // API별 접근 권한 설정
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/v1/member/join", "/api/v1/member/login", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                    .requestMatchers("/api/v1/member/password").authenticated()
+                    .requestMatchers("/api/v1/member/join", "/api/v1/member/login", "/swagger-ui/**", "/v3/api-docs/**", "/ws/run/**").permitAll()
+                    .requestMatchers("/api/v1/member/password", "/api/v1/groups/**").authenticated()
                     .anyRequest().authenticated()
             )
 

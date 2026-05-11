@@ -7,5 +7,5 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum GroupStatus {
     // 모집중, 러닝중, 완료, 취소
-    RECRUITING, RUNNING, COMPLETED, CANCELLED;
+    RECRUITING, RUNNING, COMPLETED, CANCELED;
 }

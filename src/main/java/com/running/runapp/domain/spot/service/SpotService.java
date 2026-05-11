@@ -1,12 +1,12 @@
 package com.running.runapp.domain.spot.service;
 
 import com.running.runapp.domain.member.domain.Member;
-import com.running.runapp.domain.member.repository.MemberRepository;
 import com.running.runapp.domain.point.PointHistory;
 import com.running.runapp.domain.point.PointHistoryRepository;
 import com.running.runapp.domain.running.domain.RunStatus;
 import com.running.runapp.domain.running.domain.RunningRecord;
 import com.running.runapp.domain.running.repository.RunningRecordRepository;
+import com.running.runapp.domain.member.repository.MemberRepository;
 import com.running.runapp.domain.spot.domain.Spot;
 import com.running.runapp.domain.spot.domain.SpotVisitLog;
 import com.running.runapp.domain.spot.dto.*;
@@ -140,7 +140,7 @@ public class SpotService {
 
         // 상태 확인: 이 기록의 상태가 여전히 RUNNING(진행 중)인가?
         if (runningRecord.getStatus() != RunStatus.RUNNING) {
-            throw new BusinessException(ErrorCode.NOT_RUNNING_STATUS);
+            throw new BusinessException(ErrorCode.CHEKIN_ONLY_RUN);
         }
 
         // 시간 확인: 너무 오래된 기록(예: 어제 시작하고 안 끈 기록) - Fail

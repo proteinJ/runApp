@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class RunningRecord {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Postgres: bigint auto increment
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "run_id", updatable = false, nullable = false)
     private Long id;
 
