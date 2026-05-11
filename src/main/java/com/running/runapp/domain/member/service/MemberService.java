@@ -23,13 +23,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Slf4j
 public class MemberService {
 
@@ -45,10 +43,8 @@ public class MemberService {
      */
     @Transactional
     public Long join(MemberRequest.Join req) {
-        // 1. 중복 검증
         validateDuplicateMember(req);
 
-        // 2. 비밀번호 암호화 및 엔티티 생성
         String encodedPassword = passwordEncoder.encode(req.password());
 
         Member member = Member.builder()
@@ -68,100 +64,90 @@ public class MemberService {
      */
     @Transactional
     public TokenDto login(MemberRequest.Login req) {
-
         try {
             UsernamePasswordAuthenticationToken token =
                     new UsernamePasswordAuthenticationToken(req.email(), req.password());
 
-            // 토큰 인증 확인
             Authentication authentication = authenticationManager.authenticate(token);
 
             TokenDto tokenDto = jwtProvider.createToken(authentication);
 
             RefreshToken refreshToken = RefreshToken.builder()
-                    .key(authentication.getName())
+                    .key(authentication.getName())          // 보통 email
                     .value(tokenDto.getRefreshToken())
                     .build();
 
             refreshTokenRepository.save(refreshToken);
 
             return tokenDto;
+
         } catch (BadCredentialsException e) {
-            // 비밀번호가 틀릴 경우
-            log.warn("로그인 실패: 비밀번호 불일치 - 이메일: {}", req.email());
+            log.warn("로그인 실패(비밀번호 불일치): {}", req.email());
             throw new BusinessException(ErrorCode.INVALID_LOGIN_CREDENTIALS);
+
         } catch (InternalAuthenticationServiceException e) {
-            // 아이디가 없는 경우
-            log.warn("로그인 실패: 존재하지 않는 계정 - 이메일: {}", req.email());
+            log.warn("로그인 실패(계정 없음): {}", req.email());
             throw new BusinessException(ErrorCode.INVALID_LOGIN_CREDENTIALS);
+
         } catch (AuthenticationException e) {
-            // 그 외 인증 관련 모든 예외
             throw new BusinessException(ErrorCode.AUTHENTICATION_FAILED);
         }
-
     }
 
-
-    /**
-     * 로그아웃
-     */
     @Transactional
     public void logout(String bearerToken) {
-        String accessToken = bearerToken.toLowerCase().startsWith("bearer ") ? bearerToken.substring(7) : bearerToken;
+        String accessToken = extractToken(bearerToken);
 
         if (!jwtProvider.validateToken(accessToken)) {
-            throw new RuntimeException("잘못된 요청입니다.");
+            throw new BusinessException(ErrorCode.AUTHENTICATION_FAILED);
         }
 
         Authentication authentication = jwtProvider.getAuthentication(accessToken);
 
-        Long expiration = jwtProvider.getExpiration(accessToken);
+        Long expirationMs = jwtProvider.getExpiration(accessToken);
 
-        // Redis에서 AccessToken을 블랙리스트에 등록
-        redisTemplate.opsForValue()
-                        .set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
+        // Redis에 블랙리스트 저장
+        redisTemplate.opsForValue().set(accessToken, "logout", expirationMs, TimeUnit.MILLISECONDS);
 
-        // RF 삭제
+        // RefreshToken 삭제
         refreshTokenRepository.deleteByKey(authentication.getName());
     }
 
-    /**
-     * 비밀번호 변경
-     */
     @Transactional
     public void changePassword(String email, String bearerToken, MemberRequest.PasswordChange dto) {
-
-        // 1. UserDetails에서 넘겨받은 email(UserDetails.username())로 실제 유저 조회
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
-        // 2. 현재 비밀번호가 맞는지 검증
+        // 기존 비밀번호 검증
         if (!passwordEncoder.matches(dto.oldPassword(), member.getPassword())) {
-            log.warn("비밀번호 변경 실패: 비밀번호 불일치 - 이메일: {}", member.getEmail());
+            log.warn("비밀번호 변경 실패(기존 비번 불일치): {}", email);
             throw new BusinessException(ErrorCode.INVALID_LOGIN_CREDENTIALS);
         }
 
-        member.updatePassword(passwordEncoder.encode(dto.newPassword()));
+        // 변경
+        String encodedNew = passwordEncoder.encode(dto.newPassword());
+        member.updatePassword(encodedNew); // <- Member 엔티티에 메서드 없으면 추가해야 함
+
+        // 변경했으니 토큰 무효화(로그아웃)
         logout(bearerToken);
     }
 
-
-
     /**
-     * 유효성 검사
+     * 중복 검증
      */
-    public void validateDuplicateMember(MemberRequest.Join req) {
+    private void validateDuplicateMember(MemberRequest.Join req) {
         if (memberRepository.existsByEmail(req.email())) {
             throw new BusinessException(ErrorCode.EMAIL_DUPLICATION);
-        } else if (memberRepository.findByNickname(req.nickname()).isPresent()) {
+        }
+        if (memberRepository.findByNickname(req.nickname()).isPresent()) {
             throw new BusinessException(ErrorCode.NICKNAME_DUPLICATION);
         }
     }
 
-    /**
-     * 회원 조회
-     */
-    public List<Member> findAll() { return memberRepository.findAll(); }
-
-    public Optional<Member> findOne(Long memberId) { return memberRepository.findById(memberId); }
+    private String extractToken(String bearerToken) {
+        if (bearerToken == null) return "";
+        return bearerToken.toLowerCase().startsWith("bearer ")
+                ? bearerToken.substring(7)
+                : bearerToken;
+    }
 }
