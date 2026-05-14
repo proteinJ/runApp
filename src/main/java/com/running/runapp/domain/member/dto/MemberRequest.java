@@ -13,7 +13,7 @@ public class MemberRequest {
         @Email(message = "이메일 형식이 아닙니다.") @NotBlank
         String email,
 
-    @Schema(description = "비밀번호", example = "password1234")
+        @Schema(description = "비밀번호", example = "password1234")
         @NotBlank
         @Size(min = 8, max =30, message = "비밀번호는 8자리 이상 30자리 이하이어야 합니다.")
         String password,

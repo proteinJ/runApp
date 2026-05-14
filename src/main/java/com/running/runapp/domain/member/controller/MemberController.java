@@ -18,7 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 
-@Tag(name = "Member", description = "멤버 관련 API")
+@Tag(name = "Member", description = "계정 관련 API")
 @RestController
 @RequestMapping("/api/v1/member")
 @RequiredArgsConstructor
