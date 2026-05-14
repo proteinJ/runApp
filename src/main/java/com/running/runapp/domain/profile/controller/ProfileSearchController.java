@@ -1,10 +1,11 @@
-package com.running.runapp.domain.member.controller;
+package com.running.runapp.domain.profile.controller;
 
-import com.running.runapp.domain.member.domain.Follow;
+import com.running.runapp.domain.profile.domain.Follow;
 import com.running.runapp.domain.member.domain.Member;
-import com.running.runapp.domain.member.dto.SocialResponse;
-import com.running.runapp.domain.member.repository.FollowRepository;
-import com.running.runapp.domain.member.repository.MemberRepository;
+import com.running.runapp.domain.profile.dto.SocialResponse;
+import com.running.runapp.domain.profile.repository.FollowRepository;
+import com.running.runapp.domain.profile.domain.Profile;
+import com.running.runapp.domain.profile.repository.ProfileRepository;
 import com.running.runapp.global.common.ApiResponse;
 import com.running.runapp.global.common.annotaion.LoginMember;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +17,10 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/members")
-public class MemberSearchController {
+public class ProfileSearchController {
 
-    private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
+    private final ProfileRepository profileRepository;
 
     /**
      * 닉네임으로 유저 검색
@@ -29,9 +30,9 @@ public class MemberSearchController {
             @LoginMember Member me,
             @RequestParam("nickname") String nickname
     ) {
-        List<Member> members = memberRepository.findByNicknameContainingIgnoreCase(nickname);
+        List<Profile> profiles = profileRepository.findByNicknameContainingIgnoreCase(nickname);
 
-        List<SocialResponse.SearchMemberSummary> result = members.stream()
+        List<SocialResponse.SearchMemberSummary> result = profiles.stream()
                 .filter(m -> !m.getId().equals(me.getId()))
                 .map(m -> new SocialResponse.SearchMemberSummary(
                         m.getId(),

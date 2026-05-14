@@ -1,4 +1,4 @@
-package com.running.runapp.domain.member.domain;
+package com.running.runapp.domain.profile.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -21,12 +21,12 @@ public class Follow {
     // 팔로우 하는 사람
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "follower_id", nullable = false)
-    private Member follower;
+    private Profile follower;
 
     // 팔로우 받는 사람
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "following_id", nullable = false)
-    private Member following;
+    private Profile following;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -43,7 +43,7 @@ public class Follow {
     }
 
     // 친구 신청 생성
-    public static Follow request(Member follower, Member following) {
+    public static Follow request(Profile follower, Profile following) {
         Follow f = new Follow();
         f.follower = follower;
         f.following = following;

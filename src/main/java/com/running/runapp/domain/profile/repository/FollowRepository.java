@@ -1,7 +1,7 @@
-package com.running.runapp.domain.member.repository;
+package com.running.runapp.domain.profile.repository;
 
-import com.running.runapp.domain.member.domain.Follow;
-import com.running.runapp.domain.member.domain.Follow.FollowStatus;
+import com.running.runapp.domain.profile.domain.Follow;
+import com.running.runapp.domain.profile.domain.Follow.FollowStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

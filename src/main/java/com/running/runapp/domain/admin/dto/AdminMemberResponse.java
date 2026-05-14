@@ -20,9 +20,7 @@ public class AdminMemberResponse {
             return Summary.builder()
                     .memberId(m.getId())
                     .email(m.getEmail())
-                    .nickname(m.getNickname())
                     .role(m.getRole().name())
-                    .totalPoint(m.getTotalPoint())
                     .build();
         }
     }
@@ -44,13 +42,11 @@ public class AdminMemberResponse {
             return Detail.builder()
                     .memberId(m.getId())
                     .email(m.getEmail())
-                    .nickname(m.getNickname())
                     .realname(m.getRealname())
                     .city(m.getCity())
                     .street(m.getStreet())
                     .imageUrl(m.getImageUrl())
                     .role(m.getRole().name())
-                    .totalPoint(m.getTotalPoint())
                     .build();
         }
     }

@@ -1,11 +1,13 @@
-package com.running.runapp.domain.member.service;
+package com.running.runapp.domain.profile.service;
 
-import com.running.runapp.domain.member.domain.Follow;
+import com.running.runapp.domain.profile.domain.Follow;
 import com.running.runapp.domain.member.domain.Member;
-import com.running.runapp.domain.member.dto.SocialRequest;
-import com.running.runapp.domain.member.dto.SocialResponse;
-import com.running.runapp.domain.member.repository.FollowRepository;
+import com.running.runapp.domain.profile.dto.SocialRequest;
+import com.running.runapp.domain.profile.dto.SocialResponse;
+import com.running.runapp.domain.profile.repository.FollowRepository;
 import com.running.runapp.domain.member.repository.MemberRepository;
+import com.running.runapp.domain.profile.domain.Profile;
+import com.running.runapp.domain.profile.repository.ProfileRepository;
 import com.running.runapp.global.error.BusinessException;
 import com.running.runapp.global.error.ErrorCode;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,12 +23,12 @@ import java.util.List;
 @Transactional
 public class FollowService {
 
-    private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
+    private final ProfileRepository profileRepository;
 
     // 친구 신청
     public SocialResponse.FollowInfo requestFollow(Member me, SocialRequest.FollowSend dto) {
-        Member target = memberRepository.findByNickname(dto.targetNickname())
+        Profile target = profileRepository.findByNickname(dto.targetNickname())
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
         if (me.getId().equals(target.getId())) {
@@ -39,13 +41,13 @@ public class FollowService {
             throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
         }
 
-        Follow follow = Follow.request(me, target);
+        Follow follow = Follow.request(me.getProfile(), target);
         Follow saved = followRepository.save(follow);
 
         return SocialResponse.FollowInfo.builder()
                 .followId(saved.getId())
                 .followerId(me.getId())
-                .followerNickname(me.getNickname())
+                .followerNickname(me.getProfile().getNickname())
                 .followingId(target.getId())
                 .followingNickname(target.getNickname())
                 .status(saved.getStatus().name())

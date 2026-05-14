@@ -24,7 +24,7 @@ public class GroupResponse {
             return new GroupSummary(
                     group.getId(),
                     group.getTitle(),
-                    group.getHost().getNickname(),
+                    group.getHost().getProfile().getNickname(),
                     group.getParticipants().size(),
                     group.getMaxParticipants(),
                     group.getStartTime(),
@@ -47,10 +47,10 @@ public class GroupResponse {
             return new GroupDetail(
                     group.getId(),
                     group.getTitle(),
-                    group.getHost().getNickname(),
+                    group.getHost().getProfile().getNickname(),
                     group.getDynamicStatus().name(),
                     group.getParticipants().stream()
-                            .map(p -> p.getMember().getNickname())
+                            .map(p -> p.getMember().getProfile().getNickname())
                             .toList()
             );
         }

@@ -1,8 +1,8 @@
-package com.running.runapp.domain.member.controller;
+package com.running.runapp.domain.profile.controller;
 
 import com.running.runapp.domain.member.domain.Member;
-import com.running.runapp.domain.member.dto.SocialResponse;
-import com.running.runapp.domain.member.service.FeedService;
+import com.running.runapp.domain.profile.dto.SocialResponse;
+import com.running.runapp.domain.profile.service.FeedService;
 import com.running.runapp.global.common.ApiResponse;
 import com.running.runapp.global.common.annotaion.LoginMember;
 import lombok.RequiredArgsConstructor;

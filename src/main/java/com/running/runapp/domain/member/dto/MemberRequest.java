@@ -7,12 +7,13 @@ import jakarta.validation.constraints.Size;
 
 public class MemberRequest {
 
+    @Schema(description = "회원가입 요청")
     public record Join (
         @Schema(description = "사용자 이메일", example = "username1234@naver.com")
         @Email(message = "이메일 형식이 아닙니다.") @NotBlank
         String email,
 
-    @Schema(description = "비밀번호", example = "password1234")
+        @Schema(description = "비밀번호", example = "password1234")
         @NotBlank
         @Size(min = 8, max =30, message = "비밀번호는 8자리 이상 30자리 이하이어야 합니다.")
         String password,
@@ -27,6 +28,7 @@ public class MemberRequest {
         String realname
     ) {}
 
+    @Schema(description = "로그인 요청")
     public record Login (
         @Schema(description = "이메일", example = "username1234@naver.com")
         @Email(message = "이메일 형식이 아닙니다.")
@@ -39,6 +41,7 @@ public class MemberRequest {
         String password
     ) {}
 
+    @Schema(description = "비밀번호 변경 요청")
     public record PasswordChange (
         @Schema(name = "이전 비밀번호", example = "username1234@naver.com")
         @NotBlank String oldPassword,

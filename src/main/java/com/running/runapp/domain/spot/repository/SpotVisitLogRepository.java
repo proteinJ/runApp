@@ -52,12 +52,12 @@ public interface SpotVisitLogRepository extends JpaRepository<SpotVisitLog, Long
     @Query("""
         select
             l.member.id as memberId,
-            l.member.nickname as nickname,
+            l.member.profile.nickname as nickname,
             coalesce(sum(l.spot.rewardAmount), 0) as totalPoints
         from SpotVisitLog l
         where l.visitedAt >= :start
           and l.visitedAt < :end
-        group by l.member.id, l.member.nickname
+        group by l.member.id, l.member.profile.nickname
         order by coalesce(sum(l.spot.rewardAmount), 0) desc, l.member.id asc
     """)
     List<RankingRow> findPointRanking(

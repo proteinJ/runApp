@@ -46,7 +46,10 @@ public enum ErrorCode {
     ALREADY_START_RUNNING(HttpStatus.BAD_REQUEST, "G007", "이미 그룹 러닝이 시작되었습니다."),
     ALREADY_END_RUNNING(HttpStatus.BAD_REQUEST, "G008", "이미 그룹 러닝이 종료되었습니다."),
     NOT_RECRUITING(HttpStatus.BAD_REQUEST, "G009", "모집중인 그룹만 참여 가능합니다."),
-    NOT_START_TIME_YET(HttpStatus.BAD_REQUEST, "G010", "아직 그룹러닝 시작 전입니다.");
+    NOT_START_TIME_YET(HttpStatus.BAD_REQUEST, "G010", "아직 그룹러닝 시작 전입니다."),
+
+    // Profile
+    PROFILE_NOT_FOUND(HttpStatus.NOT_FOUND, "P001", "존재하지 않는 프로필 입니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

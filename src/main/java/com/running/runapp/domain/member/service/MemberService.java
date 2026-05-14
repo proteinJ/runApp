@@ -6,6 +6,8 @@ import com.running.runapp.domain.member.domain.TokenDto;
 import com.running.runapp.domain.member.dto.MemberRequest;
 import com.running.runapp.domain.member.repository.MemberRepository;
 import com.running.runapp.domain.member.repository.RefreshTokenRepository;
+import com.running.runapp.domain.profile.domain.Profile;
+import com.running.runapp.domain.profile.repository.ProfileRepository;
 import com.running.runapp.global.error.BusinessException;
 import com.running.runapp.global.error.ErrorCode;
 import com.running.runapp.global.security.JwtProvider;
@@ -32,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final ProfileRepository profileRepository;
     private final JwtProvider jwtProvider;
     private final RedisTemplate<String, Object> redisTemplate;
     private final PasswordEncoder passwordEncoder;
@@ -50,11 +53,17 @@ public class MemberService {
         Member member = Member.builder()
                 .email(req.email())
                 .password(encodedPassword)
-                .nickname(req.nickname())
                 .realname(req.realname())
                 .role(Role.USER)
-                .totalPoint(0)
                 .build();
+
+        Profile profile = Profile.builder()
+                .totalPoint(0)
+                .totalDistance(0.0)
+                .avgPace(0.0)
+                .build();
+
+        member.setProfile(profile);
 
         return memberRepository.save(member).getId();
     }
@@ -139,7 +148,7 @@ public class MemberService {
         if (memberRepository.existsByEmail(req.email())) {
             throw new BusinessException(ErrorCode.EMAIL_DUPLICATION);
         }
-        if (memberRepository.findByNickname(req.nickname()).isPresent()) {
+        if (profileRepository.findByNickname(req.nickname()).isPresent()) {
             throw new BusinessException(ErrorCode.NICKNAME_DUPLICATION);
         }
     }

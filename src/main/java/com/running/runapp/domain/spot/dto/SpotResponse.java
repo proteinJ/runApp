@@ -56,7 +56,7 @@ public class SpotResponse {
             return SpotCheckinResponse.builder()
                 .spotName(spot.getName())
                 .earnedPoints(spot.getRewardAmount())
-                .currentTotalPoints(member.getTotalPoint())
+                .currentTotalPoints(member.getProfile().getTotalPoint())
                 .visitLogId(pointHistory.getId())
                 .build();
         }
