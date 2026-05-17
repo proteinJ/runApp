@@ -57,6 +57,23 @@ public class Profile {
     @JsonIgnore
     private List<Follow> followers = new ArrayList<>();
 
+    // 현재 장착 중인 칭호
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "equipped_title_id")
+    private Title equippedTitle;
+
+    // 내가 획득한 칭호 목록
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL)
+    private List<ProfileTitle> ownedTitles = new ArrayList<>();
+
+
+    /**
+     * 칭호 장착 메서드
+     */
+    public void equipTitle(Title title) {
+        this.equippedTitle = title;
+    }
+
     /**
      * 포인트 적립
      */

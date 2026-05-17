@@ -58,6 +58,7 @@ public class MemberService {
                 .build();
 
         Profile profile = Profile.builder()
+                .nickname(req.nickname())
                 .totalPoint(0)
                 .totalDistance(0.0)
                 .avgPace(0.0)
