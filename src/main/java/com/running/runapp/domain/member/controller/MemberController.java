@@ -18,7 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 
-@Tag(name = "Member", description = "멤버 관련 API")
+@Tag(name = "Member", description = "계정 관련 API")
 @RestController
 @RequestMapping("/api/v1/member")
 @RequiredArgsConstructor
@@ -65,16 +65,4 @@ public class MemberController {
         memberService.changePassword(userDetails.getUsername(), bearerToken, dto);
         return ResponseEntity.ok(ApiResponse.success("비밀번호 변경 완료 - 다시 로그인해주세요."));
     }
-
-//    @GetMapping("/me")
-//    public ResponseEntity<?> getMember(@RequestHeader("Authorization") String bearerToken) {
-//
-//    }
-//
-//    @GetMapping("/{memberId}")
-//    public ResponseEntity<?> getMember(@PathVariable("memberId") Long memberId) {
-//
-//    }
-
-
 }

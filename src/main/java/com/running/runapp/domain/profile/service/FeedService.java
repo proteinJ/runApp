@@ -1,9 +1,9 @@
-package com.running.runapp.domain.member.service;
+package com.running.runapp.domain.profile.service;
 
-import com.running.runapp.domain.member.domain.Follow;
+import com.running.runapp.domain.profile.domain.Follow;
 import com.running.runapp.domain.member.domain.Member;
-import com.running.runapp.domain.member.dto.SocialResponse;
-import com.running.runapp.domain.member.repository.FollowRepository;
+import com.running.runapp.domain.profile.dto.SocialResponse;
+import com.running.runapp.domain.profile.repository.FollowRepository;
 import com.running.runapp.domain.running.domain.RunningRecord;
 import com.running.runapp.domain.running.repository.RunningRecordRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,6 @@ public class FeedService {
                 .map(r -> SocialResponse.FeedItem.builder()
                         .type("RUN")
                         .memberId(r.getMember().getId())
-                        .nickname(r.getMember().getNickname())
                         .runId(r.getId())
                         .startTime(r.getStartTime())
                         .totalDistance(r.getTotalDistance())

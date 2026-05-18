@@ -3,6 +3,7 @@ package com.running.runapp.domain.spot.service;
 import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.domain.point.PointHistory;
 import com.running.runapp.domain.point.PointHistoryRepository;
+import com.running.runapp.domain.profile.domain.Profile;
 import com.running.runapp.domain.running.domain.RunStatus;
 import com.running.runapp.domain.running.domain.RunningRecord;
 import com.running.runapp.domain.running.repository.RunningRecordRepository;
@@ -177,11 +178,13 @@ public class SpotService {
 
         if (distance > 30.0) { throw new BusinessException(ErrorCode.OUT_OF_RANGE); }
 
-
-
+        Profile memberProfile = member.getProfile();
+        if (memberProfile == null) {
+            throw new BusinessException(ErrorCode.PROFILE_NOT_FOUND);
+        }
 
         // Points(Reward) 지급
-        member.addPointAmount(spot.getRewardAmount());
+        Integer updatedPointAmount = memberProfile.addPointAmount(spot.getRewardAmount());
 
         // Point 획득 기록 생성 (By Builder)
         PointHistory pointHistory = PointHistory.builder()

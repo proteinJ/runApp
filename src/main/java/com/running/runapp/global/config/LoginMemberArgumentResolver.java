@@ -50,6 +50,6 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
             return memberRepository.findById(memberId)
                     .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
         }
-        return null;
+        throw new BusinessException(ErrorCode.AUTHENTICATION_FAILED);
     }
 }

@@ -1,9 +1,9 @@
-package com.running.runapp.domain.member.controller;
+package com.running.runapp.domain.profile.controller;
 
 import com.running.runapp.domain.member.domain.Member;
-import com.running.runapp.domain.member.dto.SocialRequest;
-import com.running.runapp.domain.member.dto.SocialResponse;
-import com.running.runapp.domain.member.service.FollowService;
+import com.running.runapp.domain.profile.dto.SocialRequest;
+import com.running.runapp.domain.profile.dto.SocialResponse;
+import com.running.runapp.domain.profile.service.FollowService;
 import com.running.runapp.global.common.ApiResponse;
 import com.running.runapp.global.common.annotaion.LoginMember;
 import jakarta.validation.Valid;

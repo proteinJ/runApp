@@ -1,4 +1,4 @@
-package com.running.runapp.domain.member.dto;
+package com.running.runapp.domain.profile.dto;
 
 import lombok.Builder;
 

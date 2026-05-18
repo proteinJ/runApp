@@ -106,7 +106,8 @@ public class JwtProvider {
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
 
-        Long memberId = claims.get("memberId", Long.class);
+        Object memberIdObj = claims.get("memberId");
+        Long memberId = memberIdObj != null ? ((Number) memberIdObj).longValue() : null;
 
         PrincipalDetails principal = new PrincipalDetails(
                 memberId,
