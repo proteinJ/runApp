@@ -66,7 +66,7 @@ public class SpotController {
 
     @GetMapping("/nearby")
     public ResponseEntity<ApiResponse<List<SpotResponse.SummaryInfo>>> getNearbySpots(
-            @RequestBody SpotRequest.NearbySpotsRequest dto,
+            @ModelAttribute SpotRequest.NearbySpotsRequest dto,
             @AuthenticationPrincipal PrincipalDetails principal) {
         List<SpotResponse.SummaryInfo> nearbySpots = spotService.getNearbySpots(dto, principal.getMemberId());
 

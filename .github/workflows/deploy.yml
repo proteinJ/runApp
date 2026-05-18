@@ -3,7 +3,7 @@ name: Spring Boot & Docker CI/CD
 # 1. 'on' (언제 실행할 것인가?) - 필수
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "develop" ]
 
 # 2. 'jobs' (무슨 일을 할 것인가?) - 필수
 jobs:
