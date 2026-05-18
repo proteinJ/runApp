@@ -52,7 +52,8 @@ public enum ErrorCode {
     PROFILE_NOT_FOUND(HttpStatus.NOT_FOUND, "P001", "존재하지 않는 프로필 입니다."),
 
     // Title
-    DUPLICATE_TITLE_CODE(HttpStatus.BAD_REQUEST, "T001", "이미 존재하는 칭호 코드 입니다.");
+    DUPLICATE_TITLE_CODE(HttpStatus.BAD_REQUEST, "T001", "이미 존재하는 칭호 코드입니다."),
+    TITLE_NOT_FOUND(HttpStatus.NOT_FOUND, "T002", "존재하지 않는 칭호입니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

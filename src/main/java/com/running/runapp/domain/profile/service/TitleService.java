@@ -46,4 +46,16 @@ public class TitleService {
         // 엔티티를 응답 DTO로 변환하여 최종 리턴
         return TitleResponse.TitleInfo.from(savedTitle);
     }
+
+    @Transactional
+    public void deleteTitle(Long titleId) {
+        if (!titleRepository.existsById(titleId)) {
+            log.warn("칭호 삭제 실패 - 해당 아이디: {} 칭호 존재하지 않음", titleId);
+            throw new BusinessException(ErrorCode.TITLE_NOT_FOUND);
+        }
+
+        log.info("칭호 삭제 완료 - ID: {}", titleId);
+
+        titleRepository.deleteById(titleId);
+    }
 }

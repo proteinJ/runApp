@@ -49,4 +49,14 @@ public class TitleController {
 
         return ResponseEntity.ok(ApiResponse.success("새로운 칭호 추가 성공", title));
     }
+
+    @Operation(summary = "칭호 삭제", description = "관리자용 칭호 삭제")
+    @DeleteMapping("/delete")
+    public ResponseEntity<ApiResponse<String>> deleteTitle(
+            @LoginMember Member me,
+            @RequestParam("titleId") Long titleId
+    ) {
+        titleService.deleteTitle(titleId);
+        return ResponseEntity.ok(ApiResponse.success("칭호 삭제 성공"));
+    }
 }

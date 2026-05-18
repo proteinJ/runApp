@@ -11,6 +11,7 @@ import lombok.*;
 public class Title {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "title_id")
     private Long id;
 
     private String name; // 칭호 이름 (예: "킹 오브 러너")
