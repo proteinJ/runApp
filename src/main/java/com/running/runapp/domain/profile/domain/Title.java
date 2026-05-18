@@ -1,13 +1,13 @@
 package com.running.runapp.domain.profile.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor
 public class Title {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

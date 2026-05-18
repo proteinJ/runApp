@@ -6,11 +6,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 
-public class TitleResponse {
+public class TitleRequest {
 
-    @Schema(description = "칭호 정보")
+    @Schema
     @Builder
-    public record TitleInfo(
+    public record addNewTitle(
             @Schema(description = "칭호 ID", example = "1")
             @NotNull
             @Positive(message = "칭호 ID는 1 이상인 양수이어야 합니다.")
@@ -46,16 +46,15 @@ public class TitleResponse {
             @Size(min = 1, max = 150, message = "칭호 획득 방법 및 설명은 1~150 글자 이내이어야 합니다.")
             String description
     ) {
-        public static TitleInfo from(Title title) {
-            return new TitleInfo(
-                    title.getId(),
-                    title.getName(),
-                    title.getTitleCode(),
-                    title.getRarity(),
-                    title.getExpBonusRatio(),
-                    title.getPointBonusRatio(),
-                    title.getDescription()
-            );
+        public Title toEntity() {
+            return Title.builder()
+                    .name(this.name)
+                    .titleCode(this.titleCode)
+                    .rarity(this.rarity)
+                    .expBonusRatio(this.expBonusRatio)
+                    .pointBonusRatio(this.pointBonusRatio)
+                    .description(this.description)
+                    .build();
         }
     }
 }

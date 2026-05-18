@@ -49,7 +49,10 @@ public enum ErrorCode {
     NOT_START_TIME_YET(HttpStatus.BAD_REQUEST, "G010", "아직 그룹러닝 시작 전입니다."),
 
     // Profile
-    PROFILE_NOT_FOUND(HttpStatus.NOT_FOUND, "P001", "존재하지 않는 프로필 입니다.");
+    PROFILE_NOT_FOUND(HttpStatus.NOT_FOUND, "P001", "존재하지 않는 프로필 입니다."),
+
+    // Title
+    DUPLICATE_TITLE_CODE(HttpStatus.BAD_REQUEST, "T001", "이미 존재하는 칭호 코드 입니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

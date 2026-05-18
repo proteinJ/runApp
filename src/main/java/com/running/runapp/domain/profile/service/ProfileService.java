@@ -26,6 +26,7 @@ public class ProfileService {
                 .totalDistance(profile.getTotalDistance())
                 .nickname(profile.getNickname())
                 .avgPace(profile.getAvgPace())
+                .equipedTitle(profile.getEquippedTitle())
                 .build();
     }
 }
