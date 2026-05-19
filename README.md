@@ -45,7 +45,7 @@
 동료 프론트엔드 개발자 및 백엔드 기여자를 위한 로컬 실행 가이드입니다.
 
 ### Prerequisites
-- JDK 17+
+- JDK 17+ 
 - MySQL 8.0+
 - Gradle
 
