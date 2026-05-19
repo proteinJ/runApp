@@ -41,7 +41,7 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_KEY }}
-          envs: DOCKER_USERNAME,DOCKER_PASSWORD
+          envs: DOCKER_USERNAME,DOCKER_PASSWORD,DB_URL,DB_USERNAME,DB_PASSWORD,DB_NAME,REDIS_HOST,REDIS_PORT,JWT_SECRET,JWT_ACCESS_TOKEN_TIME,JWT_REFRESH_TOKEN_TIME
           script: |
             echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
             docker pull $DOCKER_USERNAME/runapp-server
@@ -49,7 +49,25 @@ jobs:
             docker rm runapp || true
             docker run -d -p 8080:8080 --name runapp \
               --restart always \
+              -e DB_URL=$DB_URL \
+              -e DB_USERNAME=$DB_USERNAME \
+              -e DB_PASSWORD=$DB_PASSWORD \
+              -e DB_NAME=$DB_NAME \
+              -e REDIS_HOST=$REDIS_HOST \
+              -e REDIS_PORT=$REDIS_PORT \
+              -e JWT_SECRET=$JWT_SECRET \
+              -e JWT_ACCESS_TOKEN_TIME=$JWT_ACCESS_TOKEN_TIME \
+              -e JWT_REFRESH_TOKEN_TIME=$JWT_REFRESH_TOKEN_TIME \
               $DOCKER_USERNAME/runapp-server
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          REDIS_PORT: ${{ secrets.REDIS_PORT }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_ACCESS_TOKEN_TIME: ${{ secrets.JWT_ACCESS_TOKEN_TIME }}
+          JWT_REFRESH_TOKEN_TIME: ${{ secrets.JWT_REFRESH_TOKEN_TIME }}
