@@ -10,6 +10,7 @@ import com.running.runapp.global.common.annotaion.LoginMember;
 import com.running.runapp.global.error.BusinessException;
 import com.running.runapp.global.error.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Title", description = "칭호 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/title")
@@ -49,6 +51,18 @@ public class TitleController {
 
         return ResponseEntity.ok(ApiResponse.success("새로운 칭호 추가 성공", title));
     }
+
+    @Operation(summary = "칭호 정보 수정", description = "관리자용 칭호 정보 수정")
+    @PatchMapping("/update")
+    public ResponseEntity<ApiResponse<TitleResponse.TitleInfo>> updateTitleInfo(
+            @LoginMember Member me,
+            @RequestBody TitleRequest.updateTitleInfo dto
+    ) {
+        TitleResponse.TitleInfo title = titleService.updateTitleInfo(dto);
+
+        return ResponseEntity.ok(ApiResponse.success("칭호 정보 수정 성공", title));
+    }
+
 
     @Operation(summary = "칭호 삭제", description = "관리자용 칭호 삭제")
     @DeleteMapping("/delete")

@@ -29,4 +29,31 @@ public class Title {
     private Double pointBonusRatio; // 포인트 보너스 배수
 
     private String description; // 획득 방법 설명
+
+
+    public void updateInfo(String name, String titleCode, Rarity rarity,
+                           Double expBonusRatio, Double pointBonusRatio, String description) {
+
+        if (name != null && !name.isBlank()) {
+            this.name = name;
+        }
+        if (titleCode != null && !titleCode.isBlank()) {
+            this.titleCode = titleCode;
+        }
+        if (rarity != null) {
+            this.rarity = rarity;
+        }
+
+        // Double 타입의 null 체크 및 NaN(Not a Number) 방어 코드
+        if (expBonusRatio != null && !expBonusRatio.isNaN()) {
+            this.expBonusRatio = expBonusRatio;
+        }
+        if (pointBonusRatio != null && !pointBonusRatio.isNaN()) {
+            this.pointBonusRatio = pointBonusRatio;
+        }
+
+        if (description != null && !description.isBlank()) {
+            this.description = description;
+        }
+    }
 }

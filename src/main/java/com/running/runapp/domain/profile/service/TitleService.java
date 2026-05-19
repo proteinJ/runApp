@@ -48,14 +48,31 @@ public class TitleService {
     }
 
     @Transactional
+    public TitleResponse.TitleInfo updateTitleInfo(TitleRequest.updateTitleInfo dto) {
+        Title title = findTitleById(dto.id());
+
+        title.updateInfo(
+                dto.name(),
+                dto.titleCode(),
+                dto.rarity(),
+                dto.expBonusRatio(),
+                dto.pointBonusRatio(),
+                dto.description());
+
+        return TitleResponse.TitleInfo.from(title);
+    }
+
+    @Transactional
     public void deleteTitle(Long titleId) {
-        if (!titleRepository.existsById(titleId)) {
-            log.warn("칭호 삭제 실패 - 해당 아이디: {} 칭호 존재하지 않음", titleId);
-            throw new BusinessException(ErrorCode.TITLE_NOT_FOUND);
-        }
+        Title title = findTitleById(titleId);
 
-        log.info("칭호 삭제 완료 - ID: {}", titleId);
+        log.info("칭호 삭제 완료 - ID: {}", title.getId());
 
-        titleRepository.deleteById(titleId);
+        titleRepository.deleteById(title.getId());
+    }
+
+    private Title findTitleById(Long titleId) {
+        return titleRepository.findById(titleId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.TITLE_NOT_FOUND));
     }
 }
