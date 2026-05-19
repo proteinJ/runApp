@@ -14,7 +14,7 @@
 - **Java 17** / **Spring Boot 3.x**
 - **Spring Security** + **JWT** (Stateless 인증 아키텍처)
 - **WebSocket** (실시간 기능 연동)
- 
+  
 ### Database & ORM
 - **MySQL 8.0**
 - **Spring Data JPA** (데이터 영속성 관리)
