@@ -1,6 +1,5 @@
 package com.running.runapp.domain.profile.dto;
 
-import com.running.runapp.domain.profile.domain.Title;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -29,7 +28,7 @@ public class ProfileResponse {
 
             @Schema(description = "장착한 칭호", example = "런린이")
             @NotNull
-            Title equipedTitle
+            String equippedTitleName
     ) {}
 
     @Schema(description = "칭호 장착 반환값")

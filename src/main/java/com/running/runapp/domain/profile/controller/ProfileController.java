@@ -5,7 +5,6 @@ import com.running.runapp.domain.profile.domain.Follow;
 import com.running.runapp.domain.profile.domain.Profile;
 import com.running.runapp.domain.profile.dto.ProfileResponse;
 import com.running.runapp.domain.profile.dto.SocialResponse;
-import com.running.runapp.domain.profile.dto.TitleResponse;
 import com.running.runapp.domain.profile.repository.FollowRepository;
 import com.running.runapp.domain.profile.repository.ProfileRepository;
 import com.running.runapp.domain.profile.service.ProfileService;

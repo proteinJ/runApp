@@ -11,11 +11,6 @@ public class TitleRequest {
     @Schema
     @Builder
     public record addNewTitle(
-            @Schema(description = "칭호 ID", example = "1")
-            @NotNull
-            @Positive(message = "칭호 ID는 1 이상인 양수이어야 합니다.")
-            Long id,
-
             @Schema(description = "칭호 이름", example = "42.195")
             @NotBlank
             @Size(min = 1, max = 10, message = "칭호 이름은 1~10 글자 이내이어야 합니다.")
