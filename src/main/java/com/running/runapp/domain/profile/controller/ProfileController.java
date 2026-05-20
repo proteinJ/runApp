@@ -5,6 +5,7 @@ import com.running.runapp.domain.profile.domain.Follow;
 import com.running.runapp.domain.profile.domain.Profile;
 import com.running.runapp.domain.profile.dto.ProfileResponse;
 import com.running.runapp.domain.profile.dto.SocialResponse;
+import com.running.runapp.domain.profile.dto.TitleResponse;
 import com.running.runapp.domain.profile.repository.FollowRepository;
 import com.running.runapp.domain.profile.repository.ProfileRepository;
 import com.running.runapp.domain.profile.service.ProfileService;
@@ -15,10 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -39,6 +37,16 @@ public class ProfileController {
         ProfileResponse.MyProfile myProfileRes = profileService.getMyProfile(member);
 
         return ResponseEntity.ok(ApiResponse.success("내 프로필 조회 성공", myProfileRes));
+    }
+
+    @Operation(summary = "칭호 장착", description = "소유하고 있는 칭호 장착")
+    @PostMapping("/equip")
+    public ResponseEntity<ApiResponse<ProfileResponse.MyProfileTitle>> equipTitle(
+            @LoginMember Member me,
+            @RequestParam("titleId") Long titleId
+    ) {
+        ProfileResponse.MyProfileTitle myProfileTitleRes = profileService.equipProfileTitle(me, titleId);
+        return ResponseEntity.ok(ApiResponse.success("칭호 장착 성공", myProfileTitleRes));
     }
 
     @Operation(summary = "유저 검색", description = "닉네임으로 유저 검색")

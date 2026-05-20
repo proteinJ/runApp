@@ -2,8 +2,10 @@ package com.running.runapp.domain.profile.service;
 
 import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.domain.profile.domain.Profile;
+import com.running.runapp.domain.profile.domain.ProfileTitle;
 import com.running.runapp.domain.profile.dto.ProfileResponse;
 import com.running.runapp.domain.profile.repository.ProfileRepository;
+import com.running.runapp.domain.profile.repository.ProfileTitleRepository;
 import com.running.runapp.global.error.BusinessException;
 import com.running.runapp.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProfileService {
 
     private final ProfileRepository profileRepository;
+    private final ProfileTitleRepository profileTitleRepository;
 
     public ProfileResponse.MyProfile getMyProfile(Member member) {
         Profile profile = profileRepository.findByMember(member)
@@ -29,4 +32,21 @@ public class ProfileService {
                 .equipedTitle(profile.getEquippedTitle())
                 .build();
     }
+
+    @Transactional
+    public ProfileResponse.MyProfileTitle equipProfileTitle(Member member, Long targetTitleId) {
+
+        ProfileTitle myProfileTitle = profileTitleRepository.findWithProfileByMemberIdAndTitleId(member.getId(), targetTitleId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_YOUR_TITLE));
+
+        Profile profile = myProfileTitle.getProfile();
+
+        profile.equipTitle(myProfileTitle);
+
+        return ProfileResponse.MyProfileTitle.builder()
+                .titleId(myProfileTitle.getTitle().getId())
+                .name(myProfileTitle.getTitle().getName())
+                .build();
+    }
+
 }

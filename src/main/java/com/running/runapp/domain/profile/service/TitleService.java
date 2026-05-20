@@ -31,48 +31,5 @@ public class TitleService {
                 .toList();
     }
 
-    @Transactional
-    public TitleResponse.TitleInfo addNewTitle(TitleRequest.addNewTitle dto) {
-        if (titleRepository.existsByTitleCode(dto.titleCode())) {
-            log.warn("칭호 등록 실패 - 이미 존재하는 칭호 코드: {}", dto.titleCode());
-            throw new BusinessException(ErrorCode.DUPLICATE_TITLE_CODE);
-        }
 
-        Title savedTitle = titleRepository.save(dto.toEntity());
-
-        log.info("새로운 시스템 칭호 등록 완료 - ID: {}, Code: {}, Name: {}",
-                savedTitle.getId(), savedTitle.getTitleCode(), savedTitle.getName());
-
-        // 엔티티를 응답 DTO로 변환하여 최종 리턴
-        return TitleResponse.TitleInfo.from(savedTitle);
-    }
-
-    @Transactional
-    public TitleResponse.TitleInfo updateTitleInfo(TitleRequest.updateTitleInfo dto) {
-        Title title = findTitleById(dto.id());
-
-        title.updateInfo(
-                dto.name(),
-                dto.titleCode(),
-                dto.rarity(),
-                dto.expBonusRatio(),
-                dto.pointBonusRatio(),
-                dto.description());
-
-        return TitleResponse.TitleInfo.from(title);
-    }
-
-    @Transactional
-    public void deleteTitle(Long titleId) {
-        Title title = findTitleById(titleId);
-
-        log.info("칭호 삭제 완료 - ID: {}", title.getId());
-
-        titleRepository.deleteById(title.getId());
-    }
-
-    private Title findTitleById(Long titleId) {
-        return titleRepository.findById(titleId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.TITLE_NOT_FOUND));
-    }
 }

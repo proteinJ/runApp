@@ -31,4 +31,15 @@ public class ProfileResponse {
             @NotNull
             Title equipedTitle
     ) {}
+
+    @Schema(description = "칭호 장착 반환값")
+    @Builder
+    public record MyProfileTitle(
+            @Schema(description = "칭호 ID", example = "1")
+            Long titleId,
+
+            @Schema(description = "칭호 이름", example = "런린이")
+            String name
+    ) {
+    }
 }

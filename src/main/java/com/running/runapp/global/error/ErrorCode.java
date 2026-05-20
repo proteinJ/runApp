@@ -53,7 +53,8 @@ public enum ErrorCode {
 
     // Title
     DUPLICATE_TITLE_CODE(HttpStatus.BAD_REQUEST, "T001", "이미 존재하는 칭호 코드입니다."),
-    TITLE_NOT_FOUND(HttpStatus.NOT_FOUND, "T002", "존재하지 않는 칭호입니다.");
+    TITLE_NOT_FOUND(HttpStatus.NOT_FOUND, "T002", "존재하지 않는 칭호입니다."),
+    NOT_YOUR_TITLE(HttpStatus.BAD_REQUEST, "T003", "해당 ProfileTitle 소유권자가 아닙니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

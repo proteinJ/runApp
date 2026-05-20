@@ -2,6 +2,8 @@ package com.running.runapp.domain.profile.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.running.runapp.domain.member.domain.Member;
+import com.running.runapp.global.error.BusinessException;
+import com.running.runapp.global.error.ErrorCode;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -70,8 +72,12 @@ public class Profile {
     /**
      * 칭호 장착 메서드
      */
-    public void equipTitle(Title title) {
-        this.equippedTitle = title;
+    public void equipTitle(ProfileTitle profileTitle) {
+        if (!this.equals(profileTitle.getProfile())) {
+            throw new BusinessException(ErrorCode.NOT_YOUR_TITLE);
+        }
+
+        this.equippedTitle = profileTitle.getTitle();
     }
 
     /**
