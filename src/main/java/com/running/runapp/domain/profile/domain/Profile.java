@@ -131,6 +131,19 @@ public class Profile {
         }
         return false;
     }
+    // 경험치 증가 메서드
+    public Long addExp(Long gainedExp) {
+        return this.totalExp += gainedExp;
+    }
+
+    // 레벨 갱신 메서드
+    public boolean updateLevel(int finalLevel) {
+        if (this.level < finalLevel) {
+            this.level = finalLevel;
+            return true; // 레벨업 성공!
+        }
+        return false;
+    }
     public String getCoreColorCode() {
         return coreColorCode;
     }
