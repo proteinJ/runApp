@@ -68,6 +68,14 @@ public class Profile {
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL)
     private List<ProfileTitle> ownedTitles = new ArrayList<>();
 
+    @Column(nullable = false)
+    @Min(value = 1, message = "최소 레벨은 1레벨 입니다.")
+    @Max(value = 100, message = "초대 레벨은 100레벨 입니다.")
+    private int level = 1;
+
+    @Column(nullable = false)
+    private long totalExp = 0L;
+
 
     /**
      * 칭호 장착 메서드
@@ -106,4 +114,17 @@ public class Profile {
     }
 
 
+    // 경험치 증가 메서드
+    public Long addExp(Long gainedExp) {
+        return this.totalExp += gainedExp;
+    }
+
+    // 레벨 갱신 메서드
+    public boolean updateLevel(int finalLevel) {
+        if (this.level < finalLevel) {
+            this.level = finalLevel;
+            return true; // 레벨업 성공!
+        }
+        return false;
+    }
 }

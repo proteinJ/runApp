@@ -4,6 +4,7 @@ import com.running.runapp.domain.spot.dto.*;
 import com.running.runapp.domain.spot.service.SpotService;
 import com.running.runapp.global.common.ApiResponse;
 import com.running.runapp.global.security.PrincipalDetails;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 
+@Schema(name = "Spot")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/spots")

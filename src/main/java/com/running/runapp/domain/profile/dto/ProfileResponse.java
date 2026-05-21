@@ -41,4 +41,11 @@ public class ProfileResponse {
             String name
     ) {
     }
+
+    @Schema(description = "경험치 지급, 내부 전달용 DTO")
+    public record ExpRewardResult(
+            boolean isLevelUp,
+            int currentLevel,
+            long totalExp
+    ) {}
 }

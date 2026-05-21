@@ -6,6 +6,7 @@ import com.running.runapp.domain.profile.domain.ProfileTitle;
 import com.running.runapp.domain.profile.dto.ProfileResponse;
 import com.running.runapp.domain.profile.repository.ProfileRepository;
 import com.running.runapp.domain.profile.repository.ProfileTitleRepository;
+import com.running.runapp.global.common.LevelCalculator;
 import com.running.runapp.global.error.BusinessException;
 import com.running.runapp.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -34,9 +35,9 @@ public class ProfileService {
     }
 
     @Transactional
-    public ProfileResponse.MyProfileTitle equipProfileTitle(Member member, Long targetTitleId) {
+    public ProfileResponse.MyProfileTitle equipProfileTitle(Long memberId, Long targetTitleId) {
 
-        ProfileTitle myProfileTitle = profileTitleRepository.findWithProfileByMemberIdAndTitleId(member.getId(), targetTitleId)
+        ProfileTitle myProfileTitle = profileTitleRepository.findWithProfileByMemberIdAndTitleId(memberId, targetTitleId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_YOUR_TITLE));
 
         Profile profile = myProfileTitle.getProfile();
@@ -49,4 +50,17 @@ public class ProfileService {
                 .build();
     }
 
+    @Transactional
+    public ProfileResponse.ExpRewardResult rewardExp(Long memberId, Long gainedExp) {
+        Profile profile = profileRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PROFILE_NOT_FOUND));
+
+        long totalExp = profile.addExp(gainedExp);
+
+        int finalLevel = LevelCalculator.calculateLevelFromExp(profile.getTotalExp());
+
+        boolean isLevelUp = profile.updateLevel(finalLevel);
+
+        return new ProfileResponse.ExpRewardResult(isLevelUp, finalLevel, totalExp);
+    }
 }

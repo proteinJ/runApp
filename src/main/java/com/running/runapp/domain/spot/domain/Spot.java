@@ -36,6 +36,11 @@ public class Spot {
     @Max(10000)
     private Integer rewardAmount = 0;
 
+    @Column(name = "exp_amount")
+    @Min(0)
+    @Max(200)
+    private Long expAmount;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 
@@ -58,7 +63,7 @@ public class Spot {
         }
     }
 
-    // 기존의 DTO 기반 업데이트 메서드 (필요시 유지)
+    // 기존의 DTO 기반 업데이트 메서드
     public void update(SpotRequest.SpotUpdateRequest dto, Point newLocation) {
         if (newLocation != null) {
             this.location = newLocation;

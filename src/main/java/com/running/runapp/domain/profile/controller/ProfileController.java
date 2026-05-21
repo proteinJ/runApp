@@ -44,7 +44,7 @@ public class ProfileController {
             @LoginMember Member me,
             @RequestParam("titleId") Long titleId
     ) {
-        ProfileResponse.MyProfileTitle myProfileTitleRes = profileService.equipProfileTitle(me, titleId);
+        ProfileResponse.MyProfileTitle myProfileTitleRes = profileService.equipProfileTitle(me.getId(), titleId);
         return ResponseEntity.ok(ApiResponse.success("칭호 장착 성공", myProfileTitleRes));
     }
 
