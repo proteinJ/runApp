@@ -1,5 +1,6 @@
 package com.running.runapp.domain.spot.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.Builder;
@@ -29,12 +30,16 @@ public class SpotRequest {
             String name,
             String description,
 
-            @Min(0) @Max(10000)
+            @Min(0) @Max(100)
             Integer rewardAmount,
 
             Point location,
             double latitude,
-            double longitude
+            double longitude,
+
+            @Schema(description = "보상 경험치량")
+            @Min(0) @Max(200)
+            Long expAmount
     ) {
     }
 

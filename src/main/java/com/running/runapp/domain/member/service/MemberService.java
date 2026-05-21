@@ -7,7 +7,11 @@ import com.running.runapp.domain.member.dto.MemberRequest;
 import com.running.runapp.domain.member.repository.MemberRepository;
 import com.running.runapp.domain.member.repository.RefreshTokenRepository;
 import com.running.runapp.domain.profile.domain.Profile;
+import com.running.runapp.domain.profile.domain.ProfileTitle;
+import com.running.runapp.domain.profile.domain.Title;
 import com.running.runapp.domain.profile.repository.ProfileRepository;
+import com.running.runapp.domain.profile.repository.ProfileTitleRepository;
+import com.running.runapp.domain.profile.repository.TitleRepository;
 import com.running.runapp.global.error.BusinessException;
 import com.running.runapp.global.error.ErrorCode;
 import com.running.runapp.global.security.JwtProvider;
@@ -40,6 +44,8 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final TitleRepository titleRepository;
+    private final ProfileTitleRepository profileTitleRepository;
 
     /**
      * 회원가입
@@ -59,6 +65,7 @@ public class MemberService {
 
         Profile profile = Profile.builder()
                 .nickname(req.nickname())
+                .level(1)
                 .totalPoint(0)
                 .totalDistance(0.0)
                 .avgPace(0.0)
@@ -66,7 +73,17 @@ public class MemberService {
 
         member.setProfile(profile);
 
-        return memberRepository.save(member).getId();
+        Member savedMember = memberRepository.save(member);
+
+        Title defaultTitle = titleRepository.findById(1L)
+                .orElseThrow(() -> new BusinessException(ErrorCode.TITLE_NOT_FOUND));
+
+        ProfileTitle grantedTitle = ProfileTitle.grantTitle(profile, defaultTitle);
+        profileTitleRepository.save(grantedTitle);
+
+        profile.equipTitle(grantedTitle);
+
+        return savedMember.getId();
     }
 
     /**

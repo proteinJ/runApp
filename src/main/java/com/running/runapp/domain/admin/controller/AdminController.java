@@ -4,7 +4,15 @@ import com.running.runapp.domain.admin.dto.AdminMemberResponse;
 import com.running.runapp.domain.admin.dto.AdminSpotRequest;
 import com.running.runapp.domain.admin.dto.AdminSpotResponse;
 import com.running.runapp.domain.admin.service.AdminService;
+import com.running.runapp.domain.member.domain.Member;
+import com.running.runapp.domain.member.domain.Role;
+import com.running.runapp.domain.profile.dto.TitleRequest;
+import com.running.runapp.domain.profile.dto.TitleResponse;
 import com.running.runapp.global.common.ApiResponse;
+import com.running.runapp.global.common.annotaion.LoginMember;
+import com.running.runapp.global.error.BusinessException;
+import com.running.runapp.global.error.ErrorCode;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -79,5 +87,46 @@ public class AdminController {
     public ResponseEntity<?> deleteSpot(@PathVariable Long spotId) {
         Long deletedId = adminService.deleteSpot(spotId);
         return ResponseEntity.ok(ApiResponse.success("스팟 삭제 완료", deletedId));
+    }
+
+
+
+    // ===================== Title  =====================
+
+    @Operation(summary = "칭호 추가", description = "관리자용 칭호 추가")
+    @PostMapping("/title/add")
+    public ResponseEntity<ApiResponse<TitleResponse.TitleInfo>> addNewTitle(
+            @LoginMember Member me,
+            @RequestBody @Valid TitleRequest.addNewTitle dto
+    ) {
+        if (me.getRole() != Role.ADMIN) {
+            throw new BusinessException(ErrorCode.ACCESS_DENIED);
+        }
+
+        TitleResponse.TitleInfo title = adminService.addNewTitle(dto);
+
+        return ResponseEntity.ok(ApiResponse.success("새로운 칭호 추가 성공", title));
+    }
+
+    @Operation(summary = "칭호 정보 수정", description = "관리자용 칭호 정보 수정")
+    @PatchMapping("/title/update")
+    public ResponseEntity<ApiResponse<TitleResponse.TitleInfo>> updateTitleInfo(
+            @LoginMember Member me,
+            @RequestBody TitleRequest.updateTitleInfo dto
+    ) {
+        TitleResponse.TitleInfo title = adminService.updateTitleInfo(dto);
+
+        return ResponseEntity.ok(ApiResponse.success("칭호 정보 수정 성공", title));
+    }
+
+
+    @Operation(summary = "칭호 삭제", description = "관리자용 칭호 삭제")
+    @DeleteMapping("/title/delete")
+    public ResponseEntity<ApiResponse<String>> deleteTitle(
+            @LoginMember Member me,
+            @RequestParam("titleId") Long titleId
+    ) {
+        adminService.deleteTitle(titleId);
+        return ResponseEntity.ok(ApiResponse.success("칭호 삭제 성공"));
     }
 }

@@ -2,6 +2,8 @@ package com.running.runapp.domain.profile.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.running.runapp.domain.member.domain.Member;
+import com.running.runapp.global.error.BusinessException;
+import com.running.runapp.global.error.ErrorCode;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -66,12 +68,24 @@ public class Profile {
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL)
     private List<ProfileTitle> ownedTitles = new ArrayList<>();
 
+    @Column(nullable = false)
+    @Min(value = 1, message = "최소 레벨은 1레벨 입니다.")
+    @Max(value = 100, message = "초대 레벨은 100레벨 입니다.")
+    private int level = 1;
+
+    @Column(nullable = false)
+    private long totalExp = 0L;
+
 
     /**
      * 칭호 장착 메서드
      */
-    public void equipTitle(Title title) {
-        this.equippedTitle = title;
+    public void equipTitle(ProfileTitle profileTitle) {
+        if (!this.equals(profileTitle.getProfile())) {
+            throw new BusinessException(ErrorCode.NOT_YOUR_TITLE);
+        }
+
+        this.equippedTitle = profileTitle.getTitle();
     }
 
     /**
@@ -100,4 +114,17 @@ public class Profile {
     }
 
 
+    // 경험치 증가 메서드
+    public Long addExp(Long gainedExp) {
+        return this.totalExp += gainedExp;
+    }
+
+    // 레벨 갱신 메서드
+    public boolean updateLevel(int finalLevel) {
+        if (this.level < finalLevel) {
+            this.level = finalLevel;
+            return true; // 레벨업 성공!
+        }
+        return false;
+    }
 }

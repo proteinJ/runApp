@@ -4,6 +4,8 @@ import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.domain.point.PointHistory;
 import com.running.runapp.domain.point.PointHistoryRepository;
 import com.running.runapp.domain.profile.domain.Profile;
+import com.running.runapp.domain.profile.dto.ProfileResponse;
+import com.running.runapp.domain.profile.service.ProfileService;
 import com.running.runapp.domain.running.domain.RunStatus;
 import com.running.runapp.domain.running.domain.RunningRecord;
 import com.running.runapp.domain.running.repository.RunningRecordRepository;
@@ -40,6 +42,7 @@ public class SpotService {
     private final RunningRecordRepository runningRecordRepository;
     private final SpotVisitLogRepository spotVisitLogRepository;
     private final PointHistoryRepository pointHistoryRepository;
+    private final ProfileService profileService;
 
 
     /**
@@ -57,6 +60,7 @@ public class SpotService {
                 .name(dto.name())
                 .description(dto.description())
                 .rewardAmount(dto.rewardAmount())
+                .expAmount(dto.expAmount())
                 .location(point)
                 .latitude(dto.latitude())
                 .longitude(dto.longitude())
@@ -183,6 +187,10 @@ public class SpotService {
             throw new BusinessException(ErrorCode.PROFILE_NOT_FOUND);
         }
 
+        // 경험치(Exp) 지급
+        ProfileResponse.ExpRewardResult expRewardResult = profileService.rewardExp(member.getId(), spot.getExpAmount());
+
+
         // Points(Reward) 지급
         Integer updatedPointAmount = memberProfile.addPointAmount(spot.getRewardAmount());
 
@@ -210,7 +218,7 @@ public class SpotService {
 
 
         // 반환 dto 생성 및 반환
-        return SpotResponse.SpotCheckinResponse.of(spot, pointHistory, member);
+        return SpotResponse.SpotCheckinResponse.of(spot, pointHistory.getAmount(), updatedPointAmount, spotVisitLog.getId(), expRewardResult);
     }
 
 

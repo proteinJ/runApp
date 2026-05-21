@@ -15,4 +15,6 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
     List<Profile> findByNicknameContainingIgnoreCase(String nickname);
 
     Optional<Profile> findByMember(Member member);
+
+    Optional<Profile> findByMemberId(Long memberId);
 }

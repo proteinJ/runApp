@@ -1,8 +1,8 @@
 package com.running.runapp.domain.spot.dto;
 
-import com.running.runapp.domain.member.domain.Member;
-import com.running.runapp.domain.point.PointHistory;
+import com.running.runapp.domain.profile.dto.ProfileResponse;
 import com.running.runapp.domain.spot.domain.Spot;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.Builder;
@@ -47,18 +47,41 @@ public class SpotResponse {
 
     @Builder
     public record SpotCheckinResponse(
+            @Schema(description = "스팟 이름", example = "해운대 해수욕장")
             String spotName,
+
+            @Schema(description = "얻은 포인트", example = "10")
             Integer earnedPoints,
+
+            @Schema(description = "현재 보유 포인트", example = "310")
             Integer currentTotalPoints,
-            Long visitLogId
+
+            @Schema(description = "방문 기록 ID", example = "3")
+            String visitLogId,
+
+            @Schema(description = "얻은 경험치", example = "100")
+            Long earnedExp,
+
+            @Schema(description = "레벨업 유무(폭주 트리거용)", example = "true")
+            boolean isLevelUp,
+
+            @Schema(description = "현재 레벨", example = "15")
+            int currentLevel,
+
+            @Schema(description = "현재 총 경험치량(게이지 바 갱신용)", example = "300")
+            long totalExp
     ) {
-        public static SpotCheckinResponse of(Spot spot, PointHistory pointHistory, Member member) {
-            return SpotCheckinResponse.builder()
-                .spotName(spot.getName())
-                .earnedPoints(spot.getRewardAmount())
-                .currentTotalPoints(member.getProfile().getTotalPoint())
-                .visitLogId(pointHistory.getId())
-                .build();
+        public static SpotCheckinResponse of(Spot spot, Integer earnedPoint, Integer currentTotalPoints, String visitLogId, ProfileResponse.ExpRewardResult expResult) {
+            return new SpotCheckinResponse(
+                    spot.getName(),
+                    earnedPoint,
+                    currentTotalPoints,
+                    visitLogId,
+                    spot.getExpAmount(),
+                    expResult.isLevelUp(),
+                    expResult.currentLevel(),
+                    expResult.totalExp()
+            );
         }
     }
 }
