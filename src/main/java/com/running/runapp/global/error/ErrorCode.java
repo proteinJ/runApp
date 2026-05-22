@@ -54,7 +54,12 @@ public enum ErrorCode {
     // Title
     DUPLICATE_TITLE_CODE(HttpStatus.BAD_REQUEST, "T001", "이미 존재하는 칭호 코드입니다."),
     TITLE_NOT_FOUND(HttpStatus.NOT_FOUND, "T002", "존재하지 않는 칭호입니다."),
-    NOT_YOUR_TITLE(HttpStatus.BAD_REQUEST, "T003", "해당 ProfileTitle 소유권자가 아닙니다.");
+    NOT_YOUR_TITLE(HttpStatus.BAD_REQUEST, "T003", "해당 ProfileTitle 소유권자가 아닙니다."),
+
+    // Shop (상점 관련)
+    SHOP_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "SH001", "존재하지 않는 상품입니다."),
+    SHOP_ITEM_INACTIVE(HttpStatus.BAD_REQUEST, "SH002", "판매중이 아닌 상품입니다."),
+    INSUFFICIENT_POINTS(HttpStatus.BAD_REQUEST, "SH003", "포인트가 부족합니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
