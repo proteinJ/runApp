@@ -16,6 +16,9 @@ public class ShopItem {
     @Column(name = "item_id", updatable = false, nullable = false)
     private Long id;
 
+    @Column(name = "hex_color", length = 20)
+    private String hexColor;
+
     @Column(nullable = false, unique = true, length = 100)
     private String code; // ex) CHAR_RED
 
