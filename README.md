@@ -9,12 +9,12 @@
 - **주요 목적:** 러너들의 동기 부여를 위한 레벨과 칭호(Title) 시스템, 실시간 그룹 러닝 매칭 기능 제공.
 
 ## 🛠️ Tech Stack
-
+ 
 ### Backend
 - **Java 17** / **Spring Boot 3.x**
 - **Spring Security** + **JWT** (Stateless 인증 아키텍처)
 - **WebSocket** (실시간 기능 연동)
-
+  
 ### Database & ORM
 - **MySQL 8.0**
 - **Spring Data JPA** (데이터 영속성 관리)
@@ -45,7 +45,7 @@
 동료 프론트엔드 개발자 및 백엔드 기여자를 위한 로컬 실행 가이드입니다.
 
 ### Prerequisites
-- JDK 17+
+- JDK 17+ 
 - MySQL 8.0+
 - Gradle
 
@@ -54,4 +54,4 @@
 1. **Clone the repository**
    ```bash
    git clone [https://github.com/](https://github.com/)[github-id]/runapp-backend.git
-   cd runapp-backend
+   cd runapp-backend       
