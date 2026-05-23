@@ -38,6 +38,10 @@ public class Profile {
     @Column(name = "total_distance")
     private Double totalDistance = 0.0;
 
+    @Column(name = "core_color_code", length = 50)
+    @Builder.Default
+    private String coreColorCode = "CORE_BLACK";
+
     @Builder.Default
     @Column(name = "total_point", nullable = false, columnDefinition = "integer default 0")
     @Min(0)
@@ -126,5 +130,12 @@ public class Profile {
             return true; // 레벨업 성공!
         }
         return false;
+    }
+    public String getCoreColorCode() {
+        return coreColorCode;
+    }
+
+    public void setCoreColorCode(String coreColorCode) {
+        this.coreColorCode = coreColorCode;
     }
 }
