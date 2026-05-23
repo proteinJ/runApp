@@ -2,6 +2,8 @@ package com.running.runapp.domain.shop.service;
 
 import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.domain.member.repository.MemberRepository;
+import com.running.runapp.domain.profile.domain.Profile;
+import com.running.runapp.domain.profile.repository.ProfileRepository;
 import com.running.runapp.domain.shop.domain.ShopItem;
 import com.running.runapp.domain.shop.domain.ShopPurchase;
 import com.running.runapp.domain.shop.dto.ShopRequest;
@@ -24,6 +26,7 @@ public class ShopService {
     private final ShopItemRepository shopItemRepository;
     private final ShopPurchaseRepository shopPurchaseRepository;
     private final MemberRepository memberRepository;
+    private final ProfileRepository profileRepository;
 
     @Transactional(readOnly = true)
     public ShopResponse.ItemList listItems(ShopRequest.ItemListQuery query) {
@@ -51,6 +54,9 @@ public class ShopService {
         Member member = memberRepository.findById(me.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
+        Profile profile = profileRepository.findByMemberId(member.getId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.PROFILE_NOT_FOUND));
+
         ShopItem item = shopItemRepository.findById(request.itemId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.SHOP_ITEM_NOT_FOUND));
 
@@ -59,13 +65,13 @@ public class ShopService {
         }
 
         int price = item.getPrice();
-        int current = member.getTotalPoint() == null ? 0 : member.getTotalPoint();
+        int current = profile.getTotalPoint() == null ? 0 : profile.getTotalPoint();
 
         if (current < price) {
             throw new BusinessException(ErrorCode.INSUFFICIENT_POINTS);
         }
 
-        member.addPointAmount(-price);
+        profile.addPointAmount(-price);
 
         ShopPurchase saved = shopPurchaseRepository.save(
                 ShopPurchase.create(member, item, price)
@@ -76,7 +82,7 @@ public class ShopService {
                 .itemId(item.getId())
                 .itemName(item.getName())
                 .paidPoints(price)
-                .currentTotalPoints(member.getTotalPoint())
+                .currentTotalPoints(profile.getTotalPoint())
                 .purchasedAt(saved.getPurchasedAt())
                 .build();
     }
