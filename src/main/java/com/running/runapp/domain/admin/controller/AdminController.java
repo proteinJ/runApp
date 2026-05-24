@@ -2,7 +2,6 @@ package com.running.runapp.domain.admin.controller;
 
 import com.running.runapp.domain.admin.dto.AdminMemberResponse;
 import com.running.runapp.domain.admin.dto.AdminSpotRequest;
-import com.running.runapp.domain.admin.dto.AdminSpotResponse;
 import com.running.runapp.domain.admin.service.AdminService;
 import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.domain.member.domain.Role;
@@ -27,9 +26,14 @@ public class AdminController {
 
     private final AdminService adminService;
 
+    private void requireAdmin(Member me) {
+        if (me.getRole() != Role.ADMIN) {
+            throw new BusinessException(ErrorCode.ACCESS_DENIED);
+        }
+    }
+
     // ===================== Member =====================
 
-    // 회원 목록 조회 (페이징 + 검색)
     @GetMapping("/members")
     public ResponseEntity<?> getMembers(
             @RequestParam(required = false) String keyword,
@@ -39,57 +43,44 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.success("회원 목록 조회 완료", result));
     }
 
-    // 회원 상세 조회
     @GetMapping("/members/{memberId}")
     public ResponseEntity<?> getMemberDetail(@PathVariable Long memberId) {
         AdminMemberResponse.Detail result = adminService.getMemberDetail(memberId);
         return ResponseEntity.ok(ApiResponse.success("회원 상세 조회 완료", result));
     }
 
-    // ===================== Spot =====================
+    // ===================== Spot   ==== =====================
 
-    // 스팟 목록 조회 (페이징 + 검색)
-    @GetMapping("/spots")
-    public ResponseEntity<?> getSpots(
-            @RequestParam(required = false) String keyword,
-            Pageable pageable
-    ) {
-        Page<AdminSpotResponse.Summary> result = adminService.getSpots(keyword, pageable);
-        return ResponseEntity.ok(ApiResponse.success("스팟 목록 조회 완료", result));
-    }
-
-    // 스팟 상세 조회
-    @GetMapping("/spots/{spotId}")
-    public ResponseEntity<?> getSpotDetail(@PathVariable Long spotId) {
-        AdminSpotResponse.Detail result = adminService.getSpotDetail(spotId);
-        return ResponseEntity.ok(ApiResponse.success("스팟 상세 조회 완료", result));
-    }
-
-    // 스팟 생성
     @PostMapping("/spots")
-    public ResponseEntity<?> createSpot(@RequestBody @Valid AdminSpotRequest.Create dto) {
+    public ResponseEntity<?> createSpot(
+            @LoginMember Member me,
+            @RequestBody @Valid AdminSpotRequest.Create dto
+    ) {
+        requireAdmin(me);
         Long spotId = adminService.createSpot(dto);
         return ResponseEntity.ok(ApiResponse.success("스팟 생성 완료", spotId));
     }
 
-    // 스팟 수정
     @PatchMapping("/spots/{spotId}")
     public ResponseEntity<?> updateSpot(
+            @LoginMember Member me,
             @PathVariable Long spotId,
             @RequestBody @Valid AdminSpotRequest.Update dto
     ) {
+        requireAdmin(me);
         Long updatedId = adminService.updateSpot(spotId, dto);
         return ResponseEntity.ok(ApiResponse.success("스팟 수정 완료", updatedId));
     }
 
-    // 스팟 삭제
     @DeleteMapping("/spots/{spotId}")
-    public ResponseEntity<?> deleteSpot(@PathVariable Long spotId) {
+    public ResponseEntity<?> deleteSpot(
+            @LoginMember Member me,
+            @PathVariable Long spotId
+    ) {
+        requireAdmin(me);
         Long deletedId = adminService.deleteSpot(spotId);
         return ResponseEntity.ok(ApiResponse.success("스팟 삭제 완료", deletedId));
     }
-
-
 
     // ===================== Title  =====================
 
@@ -99,12 +90,8 @@ public class AdminController {
             @LoginMember Member me,
             @RequestBody @Valid TitleRequest.addNewTitle dto
     ) {
-        if (me.getRole() != Role.ADMIN) {
-            throw new BusinessException(ErrorCode.ACCESS_DENIED);
-        }
-
+        requireAdmin(me);
         TitleResponse.TitleInfo title = adminService.addNewTitle(dto);
-
         return ResponseEntity.ok(ApiResponse.success("새로운 칭호 추가 성공", title));
     }
 
@@ -114,11 +101,10 @@ public class AdminController {
             @LoginMember Member me,
             @RequestBody TitleRequest.updateTitleInfo dto
     ) {
+        requireAdmin(me);
         TitleResponse.TitleInfo title = adminService.updateTitleInfo(dto);
-
         return ResponseEntity.ok(ApiResponse.success("칭호 정보 수정 성공", title));
     }
-
 
     @Operation(summary = "칭호 삭제", description = "관리자용 칭호 삭제")
     @DeleteMapping("/title/delete")
@@ -126,6 +112,7 @@ public class AdminController {
             @LoginMember Member me,
             @RequestParam("titleId") Long titleId
     ) {
+        requireAdmin(me);
         adminService.deleteTitle(titleId);
         return ResponseEntity.ok(ApiResponse.success("칭호 삭제 성공"));
     }
