@@ -25,6 +25,13 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
+  devtools:
+    restart:
+      enabled: false
+
+  profiles:
+    active: local
+
 jwt:
   secret: ${JWT_SECRET}
   access-token-validity-in-milliseconds: ${JWT_ACCESS_TOKEN_TIME}

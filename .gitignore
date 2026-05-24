@@ -36,3 +36,5 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
+### CICD ###
+.deploy.ps1

@@ -53,7 +53,7 @@ public class SecurityConfig {
 
             // API별 접근 권한 설정
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/v1/member/join", "/api/v1/member/login", "/swagger-ui/**", "/v3/api-docs/**", "/ws/run/**").permitAll()
+                    .requestMatchers("/api/v1/member/join", "/api/v1/member/login", "/swagger-ui/**", "/v3/api-docs/**", "/ws/run/**", "/deploy").permitAll()
                     .requestMatchers("/api/v1/member/password", "/api/v1/groups/**").authenticated()
                     .anyRequest().authenticated()
             )
