@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [ develop ]
 
 jobs:
   ci:
@@ -33,11 +33,12 @@ jobs:
 
   deploy:
     needs: ci
+    if: ${{ success() }}
     runs-on: ubuntu-latest
     steps:
-    - name: Trigger local deploy
-      run: |
-        curl -X POST "${{ secrets.DEPLOY_URL }}" \
-          -H "X-Deploy-Secret: ${{ secrets.DEPLOY_SECRET }}" \
-          -H "Content-Type: application/json" \
-          --fail --max-time 30
+      - name: Trigger local deploy
+        run: |
+          curl -X POST "${{ secrets.DEPLOY_URL }}" \
+            -H "X-Deploy-Secret: ${{ secrets.DEPLOY_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --fail --max-time 30
