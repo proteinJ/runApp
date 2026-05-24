@@ -4,10 +4,15 @@ import com.running.runapp.domain.admin.dto.AdminMemberResponse;
 import com.running.runapp.domain.admin.dto.AdminSpotRequest;
 import com.running.runapp.domain.admin.dto.AdminSpotResponse;
 import com.running.runapp.domain.member.domain.Member;
+import com.running.runapp.domain.member.domain.Role;
+import com.running.runapp.domain.member.dto.MemberRequest;
 import com.running.runapp.domain.member.repository.MemberRepository;
+import com.running.runapp.domain.profile.domain.Profile;
+import com.running.runapp.domain.profile.domain.ProfileTitle;
 import com.running.runapp.domain.profile.domain.Title;
 import com.running.runapp.domain.profile.dto.TitleRequest;
 import com.running.runapp.domain.profile.dto.TitleResponse;
+import com.running.runapp.domain.profile.repository.ProfileRepository;
 import com.running.runapp.domain.profile.repository.ProfileTitleRepository;
 import com.running.runapp.domain.profile.repository.TitleRepository;
 import com.running.runapp.domain.spot.domain.Spot;
@@ -21,6 +26,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,8 +41,46 @@ public class AdminService {
     private final GeometryFactory geometryFactory;
     private final ProfileTitleRepository profileTitleRepository;
     private final TitleRepository titleRepository;
+    private final ProfileRepository profileRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // ===================== Member =====================
+
+    @Transactional
+    public Long join(MemberRequest.Join req) {
+        validateDuplicateMember(req);
+
+        String encodedPassword = passwordEncoder.encode(req.password());
+
+        Member member = Member.builder()
+                .email(req.email())
+                .password(encodedPassword)
+                .realname(req.realname())
+                .role(Role.ADMIN)
+                .build();
+
+        Profile profile = Profile.builder()
+                .nickname(req.nickname())
+                .level(1)
+                .totalPoint(0)
+                .totalDistance(0.0)
+                .avgPace(0.0)
+                .build();
+
+        member.setProfile(profile);
+
+        Member savedMember = memberRepository.save(member);
+
+        Title defaultTitle = titleRepository.findById(1L)
+                .orElseThrow(() -> new BusinessException(ErrorCode.TITLE_NOT_FOUND));
+
+        ProfileTitle grantedTitle = ProfileTitle.grantTitle(profile, defaultTitle);
+        profileTitleRepository.save(grantedTitle);
+
+        profile.equipTitle(grantedTitle);
+
+        return savedMember.getId();
+    }
 
     public Page<AdminMemberResponse.Summary> getMembers(String keyword, Pageable pageable) {
         Page<Member> page;
@@ -168,5 +212,16 @@ public class AdminService {
     private Title findTitleById(Long titleId) {
         return titleRepository.findById(titleId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.TITLE_NOT_FOUND));
+    }
+
+
+
+    private void validateDuplicateMember(MemberRequest.Join req) {
+        if (memberRepository.existsByEmail(req.email())) {
+            throw new BusinessException(ErrorCode.EMAIL_DUPLICATION);
+        }
+        if (profileRepository.findByNickname(req.nickname()).isPresent()) {
+            throw new BusinessException(ErrorCode.NICKNAME_DUPLICATION);
+        }
     }
 }
