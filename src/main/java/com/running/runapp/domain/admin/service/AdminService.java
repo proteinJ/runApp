@@ -64,6 +64,7 @@ public class AdminService {
                 .level(1)
                 .totalPoint(0)
                 .totalDistance(0.0)
+                .coreColorCode("CORE_RAINBOW")
                 .avgPace(0.0)
                 .build();
 
