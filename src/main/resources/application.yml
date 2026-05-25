@@ -1,14 +1,14 @@
 spring:
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${S_DB_URL}
+    username: ${S_DB_USERNAME}
+    password: ${S_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
     database-platform: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect # 혹은 최신 버전 반영
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
