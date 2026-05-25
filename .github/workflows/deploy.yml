@@ -2,11 +2,35 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [ develop ]
 
 jobs:
   ci:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_DB: testdb
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
 
@@ -22,22 +46,23 @@ jobs:
       - name: Build and Test
         run: ./gradlew clean test
         env:
-          DB_URL: ${{ secrets.DB_URL }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          REDIS_HOST: ${{ secrets.REDIS_HOST }}
-          REDIS_PORT: ${{ secrets.REDIS_PORT }}
+          DB_URL: jdbc:postgresql://localhost:5432/testdb
+          DB_USERNAME: test
+          DB_PASSWORD: test
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           JWT_ACCESS_TOKEN_TIME: ${{ secrets.JWT_ACCESS_TOKEN_TIME }}
           JWT_REFRESH_TOKEN_TIME: ${{ secrets.JWT_REFRESH_TOKEN_TIME }}
 
   deploy:
     needs: ci
+    if: ${{ success() }}
     runs-on: ubuntu-latest
     steps:
-    - name: Trigger local deploy
-      run: |
-        curl -X POST "${{ secrets.DEPLOY_URL }}" \
-          -H "X-Deploy-Secret: ${{ secrets.DEPLOY_SECRET }}" \
-          -H "Content-Type: application/json" \
-          --fail --max-time 30
+      - name: Trigger local deploy
+        run: |
+          curl -X POST "${{ secrets.DEPLOY_URL }}" \
+            -H "X-Deploy-Secret: ${{ secrets.DEPLOY_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --fail --max-time 30
