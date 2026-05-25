@@ -5,7 +5,7 @@ Write-Host "[$(Get-Date)] Deploy started..." -ForegroundColor Cyan
 
 # 1. Git pull
 Set-Location $PROJECT_DIR
-git pull origin main
+git pull origin develop
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Git pull FAILED!" -ForegroundColor Red
@@ -25,7 +25,28 @@ Get-Content "$PROJECT_DIR\.env" | ForEach-Object {
     }
 }
 
-# 3. Gradle 빌드
+# 3. Docker 컨테이너 확인 및 시작
+Write-Host "Checking Docker containers..." -ForegroundColor Yellow
+
+$postgres = docker ps --filter "name=postgres-container" --format "{{.Names}}"
+if (-not $postgres) {
+    Write-Host "Starting postgres-container..." -ForegroundColor Yellow
+    docker start postgres-container
+    Start-Sleep -Seconds 5
+} else {
+    Write-Host "postgres-container already running" -ForegroundColor Gray
+}
+
+$redis = docker ps --filter "name=redis-container" --format "{{.Names}}"
+if (-not $redis) {
+    Write-Host "Starting redis-container..." -ForegroundColor Yellow
+    docker start redis-container
+    Start-Sleep -Seconds 3
+} else {
+    Write-Host "redis-container already running" -ForegroundColor Gray
+}
+
+# 4. Gradle 빌드
 Write-Host "Building..." -ForegroundColor Yellow
 & "$PROJECT_DIR\gradlew.bat" clean bootJar
 
@@ -34,7 +55,7 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-# 4. 기존 프로세스 종료 (포트 8080으로 정확하게 찾기)
+# 5. 기존 프로세스 종료 (포트 8080으로 정확하게 찾기)
 Write-Host "Stopping old process..." -ForegroundColor Yellow
 $portProcess = Get-NetTCPConnection -LocalPort 8080 -ErrorAction SilentlyContinue |
     Where-Object State -eq "Listen" |
@@ -48,7 +69,7 @@ if ($portProcess) {
     Write-Host "No process found on port 8080" -ForegroundColor Gray
 }
 
-# 5. JAR 실행 (환경변수 직접 전달)
+# 6. JAR 실행 (환경변수 직접 전달)
 $jarPath = "$PROJECT_DIR\build\libs\$JAR_NAME"
 Write-Host "Starting: $jarPath" -ForegroundColor Yellow
 
@@ -58,13 +79,10 @@ $psi.Arguments = "-jar `"$jarPath`""
 $psi.WorkingDirectory = $PROJECT_DIR
 $psi.UseShellExecute = $true
 
-# 환경변수 전달
 foreach ($key in $envVars.Keys) {
     $psi.EnvironmentVariables[$key] = $envVars[$key]
 }
 
 [System.Diagnostics.Process]::Start($psi) | Out-Null
-
-#.
 
 Write-Host "[$(Get-Date)] Deploy complete!" -ForegroundColor Green
