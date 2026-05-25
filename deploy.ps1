@@ -65,4 +65,6 @@ foreach ($key in $envVars.Keys) {
 
 [System.Diagnostics.Process]::Start($psi) | Out-Null
 
+#.
+
 Write-Host "[$(Get-Date)] Deploy complete!" -ForegroundColor Green
