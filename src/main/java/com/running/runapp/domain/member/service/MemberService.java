@@ -3,6 +3,7 @@ package com.running.runapp.domain.member.service;
 import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.domain.member.domain.Role;
 import com.running.runapp.domain.member.domain.TokenDto;
+import com.running.runapp.domain.member.dto.LoginResponse;
 import com.running.runapp.domain.member.dto.MemberRequest;
 import com.running.runapp.domain.member.repository.MemberRepository;
 import com.running.runapp.domain.member.repository.RefreshTokenRepository;
@@ -91,7 +92,7 @@ public class MemberService {
      * 로그인
      */
     @Transactional
-    public TokenDto login(MemberRequest.Login req) {
+    public LoginResponse login(MemberRequest.Login req) {
         try {
             UsernamePasswordAuthenticationToken token =
                     new UsernamePasswordAuthenticationToken(req.email(), req.password());
@@ -107,7 +108,12 @@ public class MemberService {
 
             refreshTokenRepository.save(refreshToken);
 
-            return tokenDto;
+            Member member = memberRepository.findByEmail(req.email())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+
+            Profile profile = member.getProfile();
+
+            return LoginResponse.of(tokenDto, member, profile);
 
         } catch (BadCredentialsException e) {
             log.warn("로그인 실패(비밀번호 불일치): {}", req.email());
