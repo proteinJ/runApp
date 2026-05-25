@@ -1,6 +1,6 @@
 package com.running.runapp.domain.member.controller;
 
-import com.running.runapp.domain.member.domain.TokenDto;
+import com.running.runapp.domain.member.dto.LoginResponse;
 import com.running.runapp.domain.member.dto.MemberRequest;
 import com.running.runapp.domain.member.service.MemberService;
 import com.running.runapp.global.common.ApiResponse;
@@ -36,9 +36,9 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<TokenDto>> login(@RequestBody MemberRequest.Login dto) {
-        TokenDto tokenDto = memberService.login(dto);
-        return ResponseEntity.ok(ApiResponse.success("로그인 완료", tokenDto));
+    public ResponseEntity<ApiResponse<LoginResponse>> login(@RequestBody MemberRequest.Login dto) {
+        LoginResponse res = memberService.login(dto);
+        return ResponseEntity.ok(ApiResponse.success("로그인 완료", res));
     }
 
     @PostMapping("/logout")
