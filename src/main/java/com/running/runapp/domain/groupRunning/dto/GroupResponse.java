@@ -17,10 +17,13 @@ public class GroupResponse {
             int maxParticipants,
             LocalDateTime startTime,
             String status,
-            LocalDateTime createdAt // 최신순 정렬 확인용
+            LocalDateTime createdAt, // 최신순 정렬 확인용
+            boolean isParticipating
     ) {
         // Entity -> DTO 변환 메서드
-        public static GroupSummary from(GroupRunning group) {
+        public static GroupSummary from(GroupRunning group, Long memberId) {
+            boolean isParticipating = group.getParticipants().stream()
+                    .anyMatch(gm -> gm.getMember().getId().equals(memberId));
             return new GroupSummary(
                     group.getId(),
                     group.getTitle(),
@@ -28,8 +31,9 @@ public class GroupResponse {
                     group.getParticipants().size(),
                     group.getMaxParticipants(),
                     group.getStartTime(),
-                    group.getDynamicStatus().name(), // 동적으로 바뀌게
-                    group.getCreatedAt()
+                    group.getDynamicStatus().name(),
+                    group.getCreatedAt(),
+                    isParticipating
             );
         }
     }

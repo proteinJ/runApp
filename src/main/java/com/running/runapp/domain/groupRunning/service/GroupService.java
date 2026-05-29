@@ -9,7 +9,6 @@ import com.running.runapp.domain.groupRunning.dto.GroupResponse;
 import com.running.runapp.domain.groupRunning.repository.GroupMemberRepository;
 import com.running.runapp.domain.groupRunning.repository.GroupRunningRepository;
 import com.running.runapp.domain.member.domain.Member;
-import com.running.runapp.domain.member.repository.MemberRepository;
 import com.running.runapp.global.error.BusinessException;
 import com.running.runapp.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +25,6 @@ public class GroupService {
 
     private final GroupRunningRepository groupRunningRepository;
     private final GroupMemberRepository groupMemberRepository;
-    private final MemberRepository memberRepository;
 
     private GroupRunning getGroupRunning(Long groupId) {
         return groupRunningRepository.findById(groupId)
@@ -185,9 +183,18 @@ public class GroupService {
     /**
      * 그룹 목록 조회
      */
-    public Slice<GroupResponse.GroupSummary> findAllGroups(Pageable pageable) {
-        return groupRunningRepository.findAllByFilter(pageable);
+    public Slice<GroupResponse.GroupSummary> findAllGroups(Pageable pageable, Long memberId) {
+        return groupRunningRepository.findAllByFilter(pageable, memberId);
     }
 
 
+    // 단일 그룹러닝 모집 상세 조회
+    public GroupResponse.GroupDetail getGroupDetailInfo(Long groupId) {
+
+
+        GroupRunning groupRunning = groupRunningRepository.findById(groupId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.GROUP_NOT_FOUND));
+
+        return GroupResponse.GroupDetail.from(groupRunning);
+    }
 }

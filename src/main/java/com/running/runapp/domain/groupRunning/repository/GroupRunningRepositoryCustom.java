@@ -5,5 +5,5 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 public interface GroupRunningRepositoryCustom {
-    Slice<GroupResponse.GroupSummary> findAllByFilter(Pageable pageable);
+    Slice<GroupResponse.GroupSummary> findAllByFilter(Pageable pageable, Long memberId);
 }
