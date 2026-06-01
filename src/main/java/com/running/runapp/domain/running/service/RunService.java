@@ -27,13 +27,14 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class RunService {
 
     private final RunningRecordRepository runningRecordRepository;
     private final SpotVisitLogRepository spotVisitLogRepository;
 
     // ✅ 러닝 시작
+    @Transactional
     public RunResponse.RunStartResponse start(Member member, RunRequest.RunStartRequest request) {
         RunningRecord record = RunningRecord.create(member, request.getStartTime());
         runningRecordRepository.save(record);
@@ -47,12 +48,22 @@ public class RunService {
     }
 
     // ✅ 러닝 종료
-    public RunResponse.RunFinishResponse finish(Member member, Long runId, RunRequest.RunFinishRequest request) {
-        RunningRecord record = runningRecordRepository.findByIdAndMember_Id(runId, member.getId())
+    @Transactional
+    public RunResponse.RunFinishResponse finish(Long memberId, Long runId, RunRequest.RunFinishRequest request) {
+        RunningRecord record = runningRecordRepository.findByIdAndMember_Id(runId, memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ACCESS_DENIED));
 
         if (record.getStatus().equals(RunStatus.FINISHED)) {
             throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
+        }
+
+        if (request.getPath() == null || request.getPath().size() < 2) {
+            record.finish(request.getEndTime(), 0.0, null);
+            return RunResponse.RunFinishResponse.builder()
+                    .runId(record.getId())
+                    .totalDistanceKm(0.0)
+                    .earnedPoints(0)
+                    .build();
         }
 
         LineString lineString = GeometryUtils.toLineString(request.getPath());
@@ -63,7 +74,7 @@ public class RunService {
         record.finish(request.getEndTime(), calculatedDistanceMeter, lineString);
 
         Integer earnedPoints = spotVisitLogRepository
-                .sumEarnedPointsByRunIdAndMemberId(record.getId(), member.getId());
+                .sumEarnedPointsByRunIdAndMemberId(record.getId(), memberId);
 
         return RunResponse.RunFinishResponse.builder()
                 .runId(record.getId())

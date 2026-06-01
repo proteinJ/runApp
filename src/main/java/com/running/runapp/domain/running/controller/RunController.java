@@ -45,7 +45,7 @@ public class RunController {
             @PathVariable Long runId,
             @Valid @RequestBody RunRequest.RunFinishRequest request
     ) {
-        return ResponseEntity.ok(ApiResponse.success("러닝 종료", runService.finish(me, runId, request)));
+        return ResponseEntity.ok(ApiResponse.success("러닝 종료", runService.finish(me.getId(), runId, request)));
     }
 
     @Operation(summary = "내 러닝 목록 조회", description = "내 러닝 목록을 조회합니다.")
