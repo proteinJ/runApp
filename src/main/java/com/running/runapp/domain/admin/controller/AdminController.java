@@ -204,4 +204,14 @@ public class AdminController {
         adminService.deleteTitle(titleId);
         return ResponseEntity.ok(ApiResponse.success("칭호 삭제 성공"));
     }
+
+    @Operation(summary = "칭호 지급", description = "관리자용 유저에게 칭호 지급")
+    @PostMapping("/title/grant")
+    public ResponseEntity<ApiResponse<TitleResponse.TitleInfo>> grantTitleToUser(
+            @LoginMember Member me,
+            TitleRequest.addTitleToUser dto
+    ) {
+        TitleResponse.TitleInfo titleInfo = adminService.grantTitleToUser(me.getProfile(), dto.titleCode());
+        return ResponseEntity.ok(ApiResponse.success("칭호 획득 완료!", titleInfo));
+    }
 }

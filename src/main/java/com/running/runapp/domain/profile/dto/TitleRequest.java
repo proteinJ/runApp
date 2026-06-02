@@ -84,4 +84,8 @@ public class TitleRequest {
             String description
     ) {
     }
+
+    public record addTitleToUser(
+         String titleCode
+    ) {}
 }

@@ -18,13 +18,15 @@ public class GroupRunningRepositoryCustomImpl implements GroupRunningRepositoryC
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Slice<GroupResponse.GroupSummary> findAllByFilter(Pageable pageable) {
+    public Slice<GroupResponse.GroupSummary> findAllByFilter(Pageable pageable, Long memberId) {
         List<GroupRunning> content = queryFactory
                 .selectFrom(groupRunning)
                 .join(groupRunning.host).fetchJoin()
+                .leftJoin(groupRunning.participants).fetchJoin()
                 .orderBy(groupRunning.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
+                .distinct()
                 .fetch();
 
         boolean hasNext = false;
@@ -34,7 +36,7 @@ public class GroupRunningRepositoryCustomImpl implements GroupRunningRepositoryC
         }
 
         List<GroupResponse.GroupSummary> dtos = content.stream()
-                .map(GroupResponse.GroupSummary::from)
+                .map(g -> GroupResponse.GroupSummary.from(g, memberId))
                 .toList();
 
         return new SliceImpl<>(dtos, pageable, hasNext);

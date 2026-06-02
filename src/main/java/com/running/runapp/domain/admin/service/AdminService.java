@@ -283,7 +283,24 @@ public class AdminService {
     }
 
 
+    // ===================== Title =====================
 
+    @Transactional
+    public TitleResponse.TitleInfo grantTitleToUser(Profile profile, String titleCode) {
+
+        Title title = titleRepository.findByTitleCode(titleCode)
+                .orElseThrow(() -> new
+                        BusinessException(ErrorCode.TITLE_NOT_FOUND));
+
+        ProfileTitle profileTitle = ProfileTitle.grantTitle(profile, title);
+        profileTitleRepository.save(profileTitle);
+
+        return TitleResponse.TitleInfo.from(title);
+    }
+
+
+
+    // ===================== 편의 메서드 =====================
     private void validateDuplicateMember(MemberRequest.Join req) {
         if (memberRepository.existsByEmail(req.email())) {
             throw new BusinessException(ErrorCode.EMAIL_DUPLICATION);

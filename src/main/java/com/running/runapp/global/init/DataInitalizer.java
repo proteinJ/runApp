@@ -29,15 +29,42 @@ public class DataInitalizer implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         if (titleRepository.count() == 0) {
-            Title title = Title.builder()
+            titleRepository.save(Title.builder()
                     .name("새싹 러너")
                     .description("새로운 출발과 함께 러닝이라는 재미를 느껴볼까? 당신의 열정이 너무 뜨거워!")
                     .titleCode("TITLE_001_START")
                     .rarity(Rarity.NORMAL)
                     .expBonusRatio(0.0)
                     .pointBonusRatio(0.0)
-                    .build();
-            titleRepository.save(title);
+                    .build());
+
+            titleRepository.save(Title.builder()
+                    .name("런린이")
+                    .description("첫 번째 러닝을 완료했어요! 이제 진짜 러너의 시작!")
+                    .titleCode("TITLE_002")
+                    .rarity(Rarity.NORMAL)
+                    .expBonusRatio(0.0)
+                    .pointBonusRatio(0.0)
+                    .build());
+
+            titleRepository.save(Title.builder()
+                    .name("스피드 킹")
+                    .description("5km를 평균 페이스 4분대로 완주! 당신은 진짜 스피드 킹!")
+                    .titleCode("TITLE_003")
+                    .rarity(Rarity.RARE)
+                    .expBonusRatio(0.0)
+                    .pointBonusRatio(0.0)
+                    .build());
+
+            titleRepository.save(Title.builder()
+                    .name("마라토너")
+                    .description("누적 거리 42.195km 달성! 마라톤 완주자의 기록을 넘어섰어요!")
+                    .titleCode("TITLE_004")
+                    .rarity(Rarity.EPIC)
+                    .expBonusRatio(0.0)
+                    .pointBonusRatio(0.0)
+                    .build());
+
             log.info("[Init] 기본 칭호 초기화 완료!");
         }
 

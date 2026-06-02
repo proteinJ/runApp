@@ -6,6 +6,7 @@ import com.running.runapp.domain.point.PointHistoryRepository;
 import com.running.runapp.domain.profile.domain.Profile;
 import com.running.runapp.domain.profile.dto.ProfileResponse;
 import com.running.runapp.domain.profile.service.ProfileService;
+import com.running.runapp.domain.profile.service.TitleService;
 import com.running.runapp.domain.running.domain.RunStatus;
 import com.running.runapp.domain.running.domain.RunningRecord;
 import com.running.runapp.domain.running.repository.RunningRecordRepository;
@@ -187,9 +188,10 @@ public class SpotService {
             throw new BusinessException(ErrorCode.PROFILE_NOT_FOUND);
         }
 
+        // #################### [ 보상 지급 ] ########################
+
         // 경험치(Exp) 지급
         ProfileResponse.ExpRewardResult expRewardResult = profileService.rewardExp(member.getId(), spot.getExpAmount());
-
 
         // Points(Reward) 지급
         Integer updatedPointAmount = memberProfile.addPointAmount(spot.getRewardAmount());

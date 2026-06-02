@@ -1,5 +1,6 @@
 package com.running.runapp.domain.running.repository;
 
+import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.domain.running.domain.RunStatus;
 import com.running.runapp.domain.running.domain.RunningRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -34,4 +35,18 @@ public interface RunningRecordRepository extends JpaRepository<RunningRecord, Lo
             @Param("startInclusive") LocalDateTime startInclusive,
             @Param("endExclusive") LocalDateTime endExclusive
     );
+
+    boolean existsByMemberAndStatus(Member member, RunStatus runStatus);
+
+    @Query(value = """
+      SELECT EXISTS (
+          SELECT 1 FROM running_record
+          WHERE member_id = :memberId
+            AND status = 'FINISHED'
+            AND total_distance >= 5000
+            AND EXTRACT(EPOCH FROM (end_time - start_time)) / (total_distance / 1000.0) <=
+  240
+      )
+  """, nativeQuery = true)
+    boolean existsSpeedKingRecord(@Param("memberId") Long memberId);
 }

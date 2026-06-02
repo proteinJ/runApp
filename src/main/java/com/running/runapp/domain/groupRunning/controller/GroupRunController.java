@@ -6,6 +6,7 @@ import com.running.runapp.domain.groupRunning.service.GroupService;
 import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.global.common.ApiResponse;
 import com.running.runapp.global.common.annotaion.LoginMember;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -111,12 +112,25 @@ public class GroupRunController {
     }
 
     // 그룹 목록 조회
+    @Operation(summary = "그룹 러닝 목록 조회", description = "사용자들이 작성한 그룹러닝 모집글 목록을 조회")
     @GetMapping
     public ResponseEntity<ApiResponse<Slice<GroupResponse.GroupSummary>>> groupList(
-            @PageableDefault(size = 5, sort = "startTime", direction = Sort.Direction.DESC) Pageable pageable
-            ) {
-        Slice<GroupResponse.GroupSummary> groups = groupService.findAllGroups(pageable);
+            @PageableDefault(size = 5, sort = "startTime", direction = Sort.Direction.DESC) Pageable pageable,
+            @LoginMember Member member
+    ) {
+        Slice<GroupResponse.GroupSummary> groups = groupService.findAllGroups(pageable, member.getId());
 
         return ResponseEntity.ok(ApiResponse.success("그룹 목록 조회 완료", groups));
+    }
+
+    // 그룹러닝 상세 페이지
+    @Operation(summary = "그룹 러닝 상세 조회", description = "그룹 러닝 목록에서 하나 선택 시 보여지는 상세 정보")
+    @GetMapping("/{groupId}")
+    public ResponseEntity<ApiResponse<GroupResponse.GroupDetail>> groupDetailInfo(
+            @LoginMember Member me,
+            @PathVariable Long groupId
+    ) {
+        GroupResponse.GroupDetail groupDetail = groupService.getGroupDetailInfo(groupId);
+        return ResponseEntity.ok(ApiResponse.success("그룹 상세 정보 조회 완료", groupDetail));
     }
 }

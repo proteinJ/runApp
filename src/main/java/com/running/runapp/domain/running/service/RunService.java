@@ -1,7 +1,7 @@
-// RunService.java
 package com.running.runapp.domain.running.service;
 
 import com.running.runapp.domain.member.domain.Member;
+import com.running.runapp.domain.profile.service.TitleService;
 import com.running.runapp.domain.running.domain.RunStatus;
 import com.running.runapp.domain.running.domain.RunningRecord;
 import com.running.runapp.domain.running.dto.RunRequest;
@@ -27,13 +27,15 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class RunService {
 
     private final RunningRecordRepository runningRecordRepository;
     private final SpotVisitLogRepository spotVisitLogRepository;
+    private final TitleService titleService;
 
     // ✅ 러닝 시작
+    @Transactional
     public RunResponse.RunStartResponse start(Member member, RunRequest.RunStartRequest request) {
         RunningRecord record = RunningRecord.create(member, request.getStartTime());
         runningRecordRepository.save(record);
@@ -47,12 +49,22 @@ public class RunService {
     }
 
     // ✅ 러닝 종료
+    @Transactional
     public RunResponse.RunFinishResponse finish(Member member, Long runId, RunRequest.RunFinishRequest request) {
         RunningRecord record = runningRecordRepository.findByIdAndMember_Id(runId, member.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.ACCESS_DENIED));
 
         if (record.getStatus().equals(RunStatus.FINISHED)) {
             throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
+        }
+
+        if (request.getPath() == null || request.getPath().size() < 2) {
+            record.finish(request.getEndTime(), 0.0, null);
+            return RunResponse.RunFinishResponse.builder()
+                    .runId(record.getId())
+                    .totalDistanceKm(0.0)
+                    .earnedPoints(0)
+                    .build();
         }
 
         LineString lineString = GeometryUtils.toLineString(request.getPath());
@@ -64,6 +76,9 @@ public class RunService {
 
         Integer earnedPoints = spotVisitLogRepository
                 .sumEarnedPointsByRunIdAndMemberId(record.getId(), member.getId());
+
+        // 칭호 지급 조건 확인 및 처리
+        titleService.checkAndGrantTitles(member.getProfile());
 
         return RunResponse.RunFinishResponse.builder()
                 .runId(record.getId())
