@@ -6,8 +6,12 @@ import jakarta.validation.constraints.Size;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 public interface TitleRepository extends JpaRepository<Title, Long> {
     boolean existsByTitleCode(@NotBlank @Size(min = 1, max = 15, message = "칭호 코드는 1~15 글자 이내이어야 합니다.") String s);
 
     boolean existsById(@NonNull Long titleId);
+
+    Optional<Title> findByTitleCode(String titleCode);
 }
