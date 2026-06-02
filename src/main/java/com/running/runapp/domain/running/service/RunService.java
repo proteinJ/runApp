@@ -1,7 +1,7 @@
-// RunService.java
 package com.running.runapp.domain.running.service;
 
 import com.running.runapp.domain.member.domain.Member;
+import com.running.runapp.domain.profile.service.TitleService;
 import com.running.runapp.domain.running.domain.RunStatus;
 import com.running.runapp.domain.running.domain.RunningRecord;
 import com.running.runapp.domain.running.dto.RunRequest;
@@ -32,6 +32,7 @@ public class RunService {
 
     private final RunningRecordRepository runningRecordRepository;
     private final SpotVisitLogRepository spotVisitLogRepository;
+    private final TitleService titleService;
 
     // ✅ 러닝 시작
     @Transactional
@@ -49,8 +50,8 @@ public class RunService {
 
     // ✅ 러닝 종료
     @Transactional
-    public RunResponse.RunFinishResponse finish(Long memberId, Long runId, RunRequest.RunFinishRequest request) {
-        RunningRecord record = runningRecordRepository.findByIdAndMember_Id(runId, memberId)
+    public RunResponse.RunFinishResponse finish(Member member, Long runId, RunRequest.RunFinishRequest request) {
+        RunningRecord record = runningRecordRepository.findByIdAndMember_Id(runId, member.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.ACCESS_DENIED));
 
         if (record.getStatus().equals(RunStatus.FINISHED)) {
@@ -74,7 +75,10 @@ public class RunService {
         record.finish(request.getEndTime(), calculatedDistanceMeter, lineString);
 
         Integer earnedPoints = spotVisitLogRepository
-                .sumEarnedPointsByRunIdAndMemberId(record.getId(), memberId);
+                .sumEarnedPointsByRunIdAndMemberId(record.getId(), member.getId());
+
+        // 칭호 지급 조건 확인 및 처리
+        titleService.checkAndGrantTitles(member.getProfile());
 
         return RunResponse.RunFinishResponse.builder()
                 .runId(record.getId())

@@ -1,5 +1,6 @@
 package com.running.runapp.domain.profile.repository;
 
+import com.running.runapp.domain.profile.domain.Profile;
 import com.running.runapp.domain.profile.domain.ProfileTitle;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +16,6 @@ public interface ProfileTitleRepository extends JpaRepository<ProfileTitle, Long
             "WHERE p.member.id = :memberId AND pt.title.id = :titleId"
     )
     Optional<ProfileTitle> findWithProfileByMemberIdAndTitleId(@Param("memberId") Long memberId, @Param("titleId") Long titleId);
+
+    boolean existsByProfileAndTitleTitleCode(Profile profile, String titleCode);
 }
