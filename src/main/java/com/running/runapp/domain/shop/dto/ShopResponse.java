@@ -20,6 +20,9 @@ public class ShopResponse {
             @Schema(description = "상품명", example = "빨간색 코어")
             String name,
 
+            @Schema(description = "HEX", example = "#E53935")
+            String hexColor,
+
             @Schema(description = "가격(포인트)", example = "500")
             Integer price,
 
@@ -41,8 +44,14 @@ public class ShopResponse {
             @Schema(description = "상품 ID", example = "1")
             Long itemId,
 
+            @Schema(description = "상품 코드", example = "CORE_RED")
+            String itemCode,
+
             @Schema(description = "상품명", example = "빨간색 코어")
             String itemName,
+
+            @Schema(description = "HEX", example = "#E53935")
+            String hexColor,
 
             @Schema(description = "지불한 포인트", example = "500")
             Integer paidPoints,

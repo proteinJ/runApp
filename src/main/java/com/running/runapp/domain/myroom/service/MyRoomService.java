@@ -32,6 +32,16 @@ public class MyRoomService {
         return item.getCode() != null && item.getCode().startsWith("CORE_");
     }
 
+    private static String normalizeCoreColorCode(String colorCode) {
+        if (colorCode == null || colorCode.isBlank()) {
+            return "CORE_ORANGE";
+        }
+        if (colorCode.startsWith("CHAR_")) {
+            return "CORE_" + colorCode.substring("CHAR_".length());
+        }
+        return colorCode;
+    }
+
     @Transactional(readOnly = true)
     public MyRoomResponse.Result getMyRoom(Member me) {
         Member member = memberRepository.findById(me.getId())
@@ -51,9 +61,7 @@ public class MyRoomService {
         Set<Long> ownedSet = new HashSet<>(ownedItemIds);
 
         String currentColorCode = profile.getCoreColorCode();
-        if (currentColorCode == null || currentColorCode.isBlank()) {
-            currentColorCode = "CORE_ORANGE";
-        }
+        currentColorCode = normalizeCoreColorCode(currentColorCode);
 
         Title equippedTitle = profile.getEquippedTitle();
         String equippedTitleName = (equippedTitle == null) ? null : equippedTitle.getName();
@@ -86,7 +94,9 @@ public class MyRoomService {
             throw new BusinessException(ErrorCode.PROFILE_NOT_FOUND);
         }
 
-        ShopItem item = shopItemRepository.findByCode(request.colorCode())
+        String colorCode = normalizeCoreColorCode(request.colorCode());
+
+        ShopItem item = shopItemRepository.findByCode(colorCode)
                 .orElseThrow(() -> new BusinessException(ErrorCode.SHOP_ITEM_NOT_FOUND));
 
         if (!isCoreColorItem(item)) {

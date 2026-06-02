@@ -20,10 +20,10 @@ public class ShopItem {
     private String hexColor;
 
     @Column(nullable = false, unique = true, length = 100)
-    private String code; // ex) CHAR_RED
+    private String code; // ex) CORE_RED
 
     @Column(nullable = false, length = 100)
-    private String name; // ex) 빨간색 캐릭터
+    private String name; // ex) 빨간색 코어
 
     @Column(nullable = false)
     private Integer price; // 포인트 가격
