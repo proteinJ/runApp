@@ -70,7 +70,7 @@ public class MemberService {
                 .totalPoint(0)
                 .totalDistance(0.0)
                 .avgPace(0.0)
-                .coreColorCode("CORE_BLACK")
+                .coreColorCode("CORE_ORANGE")
                 .build();
 
         member.setProfile(profile);

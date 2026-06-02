@@ -14,13 +14,13 @@ public class ShopResponse {
             @Schema(description = "상품 ID", example = "1")
             Long itemId,
 
-            @Schema(description = "상품 코드", example = "CHAR_RED")
+            @Schema(description = "상품 코드", example = "CORE_RED")
             String code,
 
-            @Schema(description = "상품명", example = "빨간색 캐릭터")
+            @Schema(description = "상품명", example = "빨간색 코어")
             String name,
 
-            @Schema(description = "가격(포인트)", example = "1000")
+            @Schema(description = "가격(포인트)", example = "500")
             Integer price,
 
             @Schema(description = "판매중 여부", example = "true")
@@ -41,10 +41,10 @@ public class ShopResponse {
             @Schema(description = "상품 ID", example = "1")
             Long itemId,
 
-            @Schema(description = "상품명", example = "빨간색 캐릭터")
+            @Schema(description = "상품명", example = "빨간색 코어")
             String itemName,
 
-            @Schema(description = "지불한 포인트", example = "1000")
+            @Schema(description = "지불한 포인트", example = "500")
             Integer paidPoints,
 
             @Schema(description = "구매 후 보유 포인트", example = "250")

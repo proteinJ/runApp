@@ -52,7 +52,7 @@ public class MyRoomService {
 
         String currentColorCode = profile.getCoreColorCode();
         if (currentColorCode == null || currentColorCode.isBlank()) {
-            currentColorCode = "CORE_BLACK";
+            currentColorCode = "CORE_ORANGE";
         }
 
         Title equippedTitle = profile.getEquippedTitle();
