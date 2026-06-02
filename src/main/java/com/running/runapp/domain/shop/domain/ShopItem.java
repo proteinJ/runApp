@@ -30,4 +30,16 @@ public class ShopItem {
 
     @Column(nullable = false)
     private Boolean active; // 판매중 여부
+
+    public void updateItemInfo(String code, String name, String hexColor, Integer price, Boolean active) {
+        if (code != null) this.code = code;
+        if (name != null) this.name = name;
+        if (hexColor != null) this.hexColor = hexColor;
+        if (price != null) this.price = price;
+        if (active != null) this.active = active;
+    }
+
+    public void updateActive(Boolean active) {
+        if (active != null) this.active = active;
+    }
 }
