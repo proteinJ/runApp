@@ -1,8 +1,14 @@
 package com.running.runapp.domain.admin.service;
 
+import com.running.runapp.domain.admin.dto.AdminGroupRequest;
+import com.running.runapp.domain.admin.dto.AdminGroupResponse;
 import com.running.runapp.domain.admin.dto.AdminMemberResponse;
+import com.running.runapp.domain.admin.dto.AdminShopRequest;
+import com.running.runapp.domain.admin.dto.AdminShopResponse;
 import com.running.runapp.domain.admin.dto.AdminSpotRequest;
 import com.running.runapp.domain.admin.dto.AdminSpotResponse;
+import com.running.runapp.domain.groupRunning.domain.GroupRunning;
+import com.running.runapp.domain.groupRunning.repository.GroupRunningRepository;
 import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.domain.member.domain.Role;
 import com.running.runapp.domain.member.dto.MemberRequest;
@@ -15,6 +21,8 @@ import com.running.runapp.domain.profile.dto.TitleResponse;
 import com.running.runapp.domain.profile.repository.ProfileRepository;
 import com.running.runapp.domain.profile.repository.ProfileTitleRepository;
 import com.running.runapp.domain.profile.repository.TitleRepository;
+import com.running.runapp.domain.shop.domain.ShopItem;
+import com.running.runapp.domain.shop.repository.ShopItemRepository;
 import com.running.runapp.domain.spot.domain.Spot;
 import com.running.runapp.domain.spot.repository.SpotRepository;
 import com.running.runapp.global.error.BusinessException;
@@ -26,9 +34,12 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +54,8 @@ public class AdminService {
     private final TitleRepository titleRepository;
     private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ShopItemRepository shopItemRepository;
+    private final GroupRunningRepository groupRunningRepository;
 
     // ===================== Member =====================
 
@@ -169,6 +182,60 @@ public class AdminService {
         spotRepository.delete(spot);
         return spotId;
     }
+
+    // ===================== Shop =====================
+
+    public List<AdminShopResponse.Item> getShopItems() {
+        return shopItemRepository.findAll(Sort.by(Sort.Direction.ASC, "id"))
+                .stream()
+                .map(AdminShopResponse.Item::from)
+                .toList();
+    }
+
+    @Transactional
+    public AdminShopResponse.Item updateShopItem(Long itemId, AdminShopRequest.UpdateItem dto) {
+        ShopItem item = shopItemRepository.findById(itemId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.SHOP_ITEM_NOT_FOUND));
+
+        if (dto.code() != null && !dto.code().equals(item.getCode())
+                && shopItemRepository.findByCode(dto.code()).isPresent()) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
+        }
+
+        item.updateItemInfo(
+                dto.code(),
+                dto.name(),
+                dto.hexColor(),
+                dto.price(),
+                dto.active()
+        );
+
+        return AdminShopResponse.Item.from(item);
+    }
+
+    @Transactional
+    public AdminShopResponse.Item updateShopItemActive(Long itemId, AdminShopRequest.UpdateItemActive dto) {
+        ShopItem item = shopItemRepository.findById(itemId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.SHOP_ITEM_NOT_FOUND));
+
+        item.updateActive(dto.active());
+
+        return AdminShopResponse.Item.from(item);
+    }
+
+    // ===================== GroupRunning =====================
+
+    @Transactional
+    public AdminGroupResponse.StatusResult updateGroupStatus(Long groupId, AdminGroupRequest.UpdateStatus dto) {
+        GroupRunning groupRunning = groupRunningRepository.findById(groupId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.GROUP_NOT_FOUND));
+
+        groupRunning.setStatus(dto.status());
+
+        return AdminGroupResponse.StatusResult.from(groupRunning);
+    }
+
+    // ===================== Title =====================
 
     @Transactional
     public TitleResponse.TitleInfo addNewTitle(TitleRequest.addNewTitle dto) {
