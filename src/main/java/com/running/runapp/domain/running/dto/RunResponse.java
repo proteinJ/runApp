@@ -40,6 +40,9 @@ public class RunResponse {
 
         @Schema(description = "획득 포인트", example = "100")
         private Integer earnedPoints;
+
+        @Schema(description = "평균 페이스", example = "4.00")
+        private Double avgPace;
     }
 
     @Getter
@@ -78,11 +81,15 @@ public class RunResponse {
         @Schema(description = "총 거리(km, 소수 2자리)", example = "3.25")
         private Double totalDistanceKm;
 
+        @Schema(description = "평균 페이스", example = "4.00")
+        private Double avgPace;
+
         public static MyRunSummaryResponse from(RunningRecord run) {
             return MyRunSummaryResponse.builder()
                     .runId(run.getId())
                     .startTime(run.getStartTime())
                     .totalDistanceKm(UnitUtils.metersToKm(run.getTotalDistance()))
+                    .avgPace(run.getAvgPace())
                     .build();
         }
     }

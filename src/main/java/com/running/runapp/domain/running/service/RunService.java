@@ -1,6 +1,6 @@
 package com.running.runapp.domain.running.service;
 
-import com.running.runapp.domain.member.domain.Member;
+ import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.domain.profile.service.TitleService;
 import com.running.runapp.domain.running.domain.RunStatus;
 import com.running.runapp.domain.running.domain.RunningRecord;
@@ -23,6 +23,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
+
 
 @Slf4j
 @Service
@@ -84,6 +85,7 @@ public class RunService {
                 .runId(record.getId())
                 .totalDistanceKm(UnitUtils.metersToKm(record.getTotalDistance()))
                 .earnedPoints(earnedPoints == null ? 0 : earnedPoints)
+                .avgPace(record.getAvgPace())
                 .build();
     }
 
