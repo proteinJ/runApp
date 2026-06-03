@@ -12,7 +12,7 @@ public class MyRoomRequest {
     @Schema(name = "ChangeCoreColorRequest", description = "코어 컬러 변경 요청")
     public record ChangeCoreColor(
             @NotBlank
-            @Schema(description = "변경할 코어 컬러 코드", example = "CORE_RED")
+            @Schema(description = "변경할 코어 컬러 코드", example = "CORE_ORANGE")
             String colorCode
     ) {}
 }

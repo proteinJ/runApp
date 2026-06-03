@@ -46,8 +46,18 @@ public class LoginResponse {
                 .accessTokenExpiresIn(tokenDto.getAccessTokenExpiresIn())
                 .nickname(profile.getNickname())
                 .role(member.getRole().name())
-                .coreColorCode(profile.getCoreColorCode())
+                .coreColorCode(normalizeCoreColorCode(profile.getCoreColorCode()))
                 .equippedTitleCode(profile.getEquippedTitle().getTitleCode())
                 .build();
+    }
+
+    private static String normalizeCoreColorCode(String colorCode) {
+        if (colorCode == null || colorCode.isBlank()) {
+            return "CORE_ORANGE";
+        }
+        if (colorCode.startsWith("CHAR_")) {
+            return "CORE_" + colorCode.substring("CHAR_".length());
+        }
+        return colorCode;
     }
 }

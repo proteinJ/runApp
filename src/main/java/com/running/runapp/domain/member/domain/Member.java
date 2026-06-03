@@ -32,7 +32,7 @@ public class Member {
     private String imageUrl;
 
     // 관리자 페이지에서 수정 시 사용하는 필드들
-    private String description; // 👈 추가: AdminService에서 사용
+    private String description;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

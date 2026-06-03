@@ -20,14 +20,26 @@ public class ShopItem {
     private String hexColor;
 
     @Column(nullable = false, unique = true, length = 100)
-    private String code; // ex) CHAR_RED
+    private String code; // ex) CORE_RED
 
     @Column(nullable = false, length = 100)
-    private String name; // ex) 빨간색 캐릭터
+    private String name; // ex) 빨간색 코어
 
     @Column(nullable = false)
     private Integer price; // 포인트 가격
 
     @Column(nullable = false)
     private Boolean active; // 판매중 여부
+
+    public void updateItemInfo(String code, String name, String hexColor, Integer price, Boolean active) {
+        if (code != null) this.code = code;
+        if (name != null) this.name = name;
+        if (hexColor != null) this.hexColor = hexColor;
+        if (price != null) this.price = price;
+        if (active != null) this.active = active;
+    }
+
+    public void updateActive(Boolean active) {
+        if (active != null) this.active = active;
+    }
 }

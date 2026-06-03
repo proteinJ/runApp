@@ -28,6 +28,10 @@ public class ShopService {
     private final MemberRepository memberRepository;
     private final ProfileRepository profileRepository;
 
+    private static boolean isCoreColorItem(ShopItem item) {
+        return item.getCode() != null && item.getCode().startsWith("CORE_");
+    }
+
     @Transactional(readOnly = true)
     public ShopResponse.ItemList listItems(ShopRequest.ItemListQuery query) {
         boolean onlyActive = query != null && Boolean.TRUE.equals(query.onlyActive());
@@ -37,10 +41,12 @@ public class ShopService {
                 : shopItemRepository.findAll();
 
         List<ShopResponse.Item> dto = items.stream()
+                .filter(ShopService::isCoreColorItem)
                 .map(i -> ShopResponse.Item.builder()
                         .itemId(i.getId())
                         .code(i.getCode())
                         .name(i.getName())
+                        .hexColor(i.getHexColor())
                         .price(i.getPrice())
                         .active(i.getActive())
                         .build()
@@ -59,6 +65,10 @@ public class ShopService {
 
         ShopItem item = shopItemRepository.findById(request.itemId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.SHOP_ITEM_NOT_FOUND));
+
+        if (!isCoreColorItem(item)) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
+        }
 
         if (!Boolean.TRUE.equals(item.getActive())) {
             throw new BusinessException(ErrorCode.SHOP_ITEM_INACTIVE);
@@ -80,7 +90,9 @@ public class ShopService {
         return ShopResponse.PurchaseResult.builder()
                 .purchaseId(saved.getId())
                 .itemId(item.getId())
+                .itemCode(item.getCode())
                 .itemName(item.getName())
+                .hexColor(item.getHexColor())
                 .paidPoints(price)
                 .currentTotalPoints(profile.getTotalPoint())
                 .purchasedAt(saved.getPurchasedAt())

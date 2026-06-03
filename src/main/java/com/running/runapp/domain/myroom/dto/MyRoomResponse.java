@@ -13,13 +13,13 @@ public class MyRoomResponse {
             @Schema(description = "회원 ID", example = "1")
             Long memberId,
 
-            @Schema(description = "닉네임", example = "세찬짱")
+            @Schema(description = "닉네임", example = "세찬")
             String nickname,
 
             @Schema(description = "장착 칭호", example = "Dawn Runner")
             String equippedTitle,
 
-            @Schema(description = "현재 코어 컬러 코드", example = "CORE_RED")
+            @Schema(description = "현재 코어 컬러 코드", example = "CORE_ORANGE")
             String currentColorCode,
 
             @Schema(description = "코어 컬러 목록(팔레트)")
@@ -29,13 +29,13 @@ public class MyRoomResponse {
     @Builder
     @Schema(name = "MyRoomColorItem", description = "코어 컬러 아이템")
     public record ColorItem(
-            @Schema(description = "컬러 코드", example = "CORE_RED")
+            @Schema(description = "컬러 코드", example = "CORE_ORANGE")
             String code,
 
-            @Schema(description = "표시 이름", example = "빨간색 코어")
+            @Schema(description = "표시 이름", example = "주황색 코어")
             String name,
 
-            @Schema(description = "HEX", example = "#C85A3E")
+            @Schema(description = "HEX", example = "#F57C00")
             String hex,
 
             @Schema(description = "보유 여부(구매했는지)", example = "true")
@@ -45,7 +45,7 @@ public class MyRoomResponse {
     @Builder
     @Schema(name = "ChangeCoreColorResult", description = "코어 컬러 변경 응답")
     public record ChangeCoreColorResult(
-            @Schema(description = "변경된 코어 컬러 코드", example = "CORE_BLUE")
+            @Schema(description = "변경된 코어 컬러 코드", example = "CORE_ORANGE")
             String currentColorCode
     ) {}
 }
