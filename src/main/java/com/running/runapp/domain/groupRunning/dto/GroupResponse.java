@@ -1,26 +1,44 @@
 package com.running.runapp.domain.groupRunning.dto;
 
 import com.running.runapp.domain.groupRunning.domain.GroupRunning;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Schema(description = "그룹 러닝 응답 DTO")
 public class GroupResponse {
 
-
-    // 1. 그룹러닝 요약 목록 조회용
+    @Schema(description = "그룹 러닝 목록 요약")
     public record GroupSummary(
+            @Schema(description = "그룹 ID", example = "1")
             Long groupId,
+
+            @Schema(description = "모집글 제목", example = "한강 저녁 러닝 같이 달려요!")
             String title,
+
+            @Schema(description = "방장 닉네임", example = "달리기왕")
             String hostNickname,
+
+            @Schema(description = "현재 참여 인원", example = "2")
             int currentParticipants,
+
+            @Schema(description = "최대 참여 인원 (2~5)", example = "4")
             int maxParticipants,
+
+            @Schema(description = "러닝 시작 시간", example = "2026-06-10T19:00:00")
             LocalDateTime startTime,
+
+            @Schema(description = "그룹 상태", example = "RECRUITING",
+                    allowableValues = {"RECRUITING", "RUNNING", "COMPLETED", "CANCELED"})
             String status,
-            LocalDateTime createdAt, // 최신순 정렬 확인용
+
+            @Schema(description = "모집글 생성 시간", example = "2026-06-05T12:00:00")
+            LocalDateTime createdAt,
+
+            @Schema(description = "내가 이 그룹에 참여 중인지 여부", example = "false")
             boolean isParticipating
     ) {
-        // Entity -> DTO 변환 메서드
         public static GroupSummary from(GroupRunning group, Long memberId) {
             boolean isParticipating = group.getParticipants().stream()
                     .anyMatch(gm -> gm.getMember().getId().equals(memberId));
@@ -38,21 +56,52 @@ public class GroupResponse {
         }
     }
 
-    // 2. 상세 조회 결과용
+    @Schema(description = "그룹 러닝 상세 정보")
     public record GroupDetail(
+            @Schema(description = "그룹 ID", example = "1")
             Long groupId,
+
+            @Schema(description = "모집글 제목", example = "한강 저녁 러닝 같이 달려요!")
             String title,
+
+            @Schema(description = "방장 닉네임", example = "달리기왕")
             String hostNickname,
+
+            @Schema(description = "그룹 상태", example = "RECRUITING",
+                    allowableValues = {"RECRUITING", "RUNNING", "COMPLETED", "CANCELED"})
             String status,
-            // 필요하다면 참여자 명단이나 러닝 코스 정보 등을 추가
+
+            @Schema(description = "현재 참여 인원", example = "2")
+            int currentParticipants,
+
+            @Schema(description = "최대 참여 인원 (2~5)", example = "4")
+            int maxParticipants,
+
+            @Schema(description = "러닝 장소명", example = "반포 한강공원")
+            String location,
+
+            @Schema(description = "러닝 장소 주소", example = "서울특별시 서초구 반포동 1")
+            String address,
+
+            @Schema(description = "내가 이 그룹에 참여 중인지 여부", example = "true")
+            boolean isParticipating,
+
+            @Schema(description = "참여자 닉네임 목록", example = "[\"달리기왕\", \"마라토너\"]")
             List<String> participantNicknames
     ) {
-        public static GroupDetail from(GroupRunning group) {
+        public static GroupDetail from(GroupRunning group, Long memberId) {
+            boolean isParticipating = group.getParticipants().stream()
+                    .anyMatch(gm -> gm.getMember().getId().equals(memberId));
             return new GroupDetail(
                     group.getId(),
                     group.getTitle(),
                     group.getHost().getProfile().getNickname(),
                     group.getDynamicStatus().name(),
+                    group.getParticipants().size(),
+                    group.getMaxParticipants(),
+                    group.getLocation(),
+                    group.getAddress(),
+                    isParticipating,
                     group.getParticipants().stream()
                             .map(p -> p.getMember().getProfile().getNickname())
                             .toList()

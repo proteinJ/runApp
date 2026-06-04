@@ -16,14 +16,40 @@ public class MyRoomResponse {
             @Schema(description = "닉네임", example = "세찬")
             String nickname,
 
-            @Schema(description = "장착 칭호", example = "Dawn Runner")
+            @Schema(description = "현재 장착 칭호명", example = "새싹 러너")
             String equippedTitle,
 
             @Schema(description = "현재 코어 컬러 코드", example = "CORE_ORANGE")
             String currentColorCode,
 
             @Schema(description = "코어 컬러 목록(팔레트)")
-            List<ColorItem> colors
+            List<ColorItem> colors,
+
+            @Schema(description = "전체 칭호 목록 (보유 여부 포함)")
+            List<TitleItem> titles
+    ) {}
+
+    @Builder
+    @Schema(name = "MyRoomTitleItem", description = "칭호 아이템")
+    public record TitleItem(
+            @Schema(description = "칭호 ID", example = "1")
+            Long titleId,
+
+            @Schema(description = "칭호 코드", example = "TITLE_001_START")
+            String titleCode,
+
+            @Schema(description = "칭호 이름", example = "새싹 러너")
+            String name,
+
+            @Schema(description = "등급", example = "NORMAL",
+                    allowableValues = {"NORMAL", "RARE", "EPIC", "LEGENDARY"})
+            String rarity,
+
+            @Schema(description = "획득 조건 설명", example = "러닝을 처음 시작한 당신에게!")
+            String description,
+
+            @Schema(description = "보유 여부(획득했는지)", example = "true")
+            boolean owned
     ) {}
 
     @Builder

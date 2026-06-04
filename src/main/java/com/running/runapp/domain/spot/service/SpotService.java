@@ -1,19 +1,19 @@
 package com.running.runapp.domain.spot.service;
 
 import com.running.runapp.domain.member.domain.Member;
+import com.running.runapp.domain.member.repository.MemberRepository;
 import com.running.runapp.domain.point.PointHistory;
 import com.running.runapp.domain.point.PointHistoryRepository;
 import com.running.runapp.domain.profile.domain.Profile;
 import com.running.runapp.domain.profile.dto.ProfileResponse;
 import com.running.runapp.domain.profile.service.ProfileService;
-import com.running.runapp.domain.profile.service.TitleService;
 import com.running.runapp.domain.running.domain.RunStatus;
 import com.running.runapp.domain.running.domain.RunningRecord;
 import com.running.runapp.domain.running.repository.RunningRecordRepository;
-import com.running.runapp.domain.member.repository.MemberRepository;
 import com.running.runapp.domain.spot.domain.Spot;
 import com.running.runapp.domain.spot.domain.SpotVisitLog;
-import com.running.runapp.domain.spot.dto.*;
+import com.running.runapp.domain.spot.dto.SpotRequest;
+import com.running.runapp.domain.spot.dto.SpotResponse;
 import com.running.runapp.domain.spot.repository.SpotRepository;
 import com.running.runapp.domain.spot.repository.SpotVisitLogRepository;
 import com.running.runapp.global.error.BusinessException;
@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.running.runapp.global.common.LocationUtils.calculateDistance;
+
+
 
 @Service
 @RequiredArgsConstructor
@@ -146,42 +148,45 @@ public class SpotService {
 
         // 상태 확인: 이 기록의 상태가 여전히 RUNNING(진행 중)인가?
         if (runningRecord.getStatus() != RunStatus.RUNNING) {
-            throw new BusinessException(ErrorCode.CHEKIN_ONLY_RUN);
+            throw new BusinessException(ErrorCode.NOT_RUNNING_STATUS);
         }
 
         // 시간 확인: 너무 오래된 기록(예: 어제 시작하고 안 끈 기록) - Fail
 
-        // 사용자가 이미 해당 Spot을 CheckIn한 경우(24시간 쿨타임) - Fail
-        pointHistoryRepository.findTopByMemberAndSpotAndTypeOrderByCreatedAtDesc(
-                member, spot, PointHistory.PointType.EARN
-        ).ifPresent(lastHistory -> {
-            LocalDateTime lastCheckinTime = lastHistory.getCreatedAt();
-            if (lastCheckinTime.isAfter(LocalDateTime.now().minusHours(24))) {
-                throw new BusinessException(ErrorCode.DUPLICATE_CHECKIN);
-            }
-        });
+        // 사용자가 이미 해당 Spot을 CheckIn한 경우(24시간 쿨타임) - 어드민은 무제한 체크인
+        boolean isAdmin = member.getRole() == com.running.runapp.domain.member.domain.Role.ADMIN;
+        if (!isAdmin) {
+            pointHistoryRepository.findTopByMemberAndSpotAndTypeOrderByCreatedAtDesc(
+                    member, spot, PointHistory.PointType.EARN
+            ).ifPresent(lastHistory -> {
+                LocalDateTime lastCheckinTime = lastHistory.getCreatedAt();
+                if (lastCheckinTime.isAfter(LocalDateTime.now().minusHours(24))) {
+                    throw new BusinessException(ErrorCode.DUPLICATE_CHECKIN);
+                }
+            });
 
-
-        // ################## 🚩 2. [ 러닝 기록 검증 ] ########################
-        spotVisitLogRepository.findFirstByMemberAndSpotOrderByVisitedAtDesc(member, spot).ifPresent(lastVisitLog -> {
-            LocalDateTime lastCheckinTime = lastVisitLog.getVisitedAt();
-            if (lastCheckinTime.isAfter(LocalDateTime.now().minusHours(24))) {
-                throw new BusinessException(ErrorCode.DUPLICATE_CHECKIN);
-            }
-        });
+            // ################## 🚩 2. [ 중복 방문 검증 ] ########################
+            spotVisitLogRepository.findFirstByMemberAndSpotOrderByVisitedAtDesc(member, spot).ifPresent(lastVisitLog -> {
+                LocalDateTime lastCheckinTime = lastVisitLog.getVisitedAt();
+                if (lastCheckinTime.isAfter(LocalDateTime.now().minusHours(24))) {
+                    throw new BusinessException(ErrorCode.DUPLICATE_CHECKIN);
+                }
+            });
+        }
 
 
         // #################### 🚩 3. [ 거리 검증 ] ########################
 
-        log.info("DTO 위도: {}, 경도: {}", dto.latitude(), dto.longitude());
-        log.info("스팟 위도: {}, 경도: {}", spot.getLatitude(), spot.getLongitude());
+        log.info("체크인 요청 - DTO 위도: {}, 경도: {}", dto.latitude(), dto.longitude());
+        log.info("체크인 요청 - 스팟 위도: {}, 경도: {}", spot.getLatitude(), spot.getLongitude());
 
-        // LocationUtils에 있는 하버사인 공식을 활용한 거리 계산 메서드(calculateDistance)
         double distance = calculateDistance(
                 dto.latitude(), dto.longitude(), spot.getLatitude(), spot.getLongitude()
         );
 
-        if (distance > 30.0) { throw new BusinessException(ErrorCode.OUT_OF_RANGE); }
+        log.info("체크인 요청 - 계산된 거리: {}m (기준: 50m)", distance);
+
+        if (distance > 50.0) { throw new BusinessException(ErrorCode.OUT_OF_RANGE); }
 
         Profile memberProfile = member.getProfile();
         if (memberProfile == null) {

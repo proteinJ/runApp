@@ -6,6 +6,8 @@ import com.running.runapp.domain.myroom.dto.MyRoomRequest;
 import com.running.runapp.domain.myroom.dto.MyRoomResponse;
 import com.running.runapp.domain.profile.domain.Profile;
 import com.running.runapp.domain.profile.domain.Title;
+import com.running.runapp.domain.profile.repository.ProfileTitleRepository;
+import com.running.runapp.domain.profile.repository.TitleRepository;
 import com.running.runapp.domain.shop.domain.ShopItem;
 import com.running.runapp.domain.shop.repository.ShopItemRepository;
 import com.running.runapp.domain.shop.repository.ShopPurchaseRepository;
@@ -27,6 +29,8 @@ public class MyRoomService {
     private final MemberRepository memberRepository;
     private final ShopItemRepository shopItemRepository;
     private final ShopPurchaseRepository shopPurchaseRepository;
+    private final TitleRepository titleRepository;
+    private final ProfileTitleRepository profileTitleRepository;
 
     private static boolean isCoreColorItem(ShopItem item) {
         return item.getCode() != null && item.getCode().startsWith("CORE_");
@@ -76,12 +80,29 @@ public class MyRoomService {
                 )
                 .toList();
 
+        // 전체 칭호 목록 + 보유 여부
+        List<Title> allTitles = titleRepository.findAll();
+        Set<Long> ownedTitleIds = new HashSet<>(profileTitleRepository.findTitleIdsByProfileId(profile.getId()));
+
+        List<MyRoomResponse.TitleItem> titles = allTitles.stream()
+                .map(t -> MyRoomResponse.TitleItem.builder()
+                        .titleId(t.getId())
+                        .titleCode(t.getTitleCode())
+                        .name(t.getName())
+                        .rarity(t.getRarity() != null ? t.getRarity().name() : null)
+                        .description(t.getDescription())
+                        .owned(ownedTitleIds.contains(t.getId()))
+                        .build()
+                )
+                .toList();
+
         return MyRoomResponse.Result.builder()
                 .memberId(member.getId())
                 .nickname(profile.getNickname())
                 .equippedTitle(equippedTitleName)
                 .currentColorCode(currentColorCode)
                 .colors(colors)
+                .titles(titles)
                 .build();
     }
 

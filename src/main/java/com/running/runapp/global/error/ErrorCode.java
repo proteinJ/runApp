@@ -7,9 +7,9 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {
-    INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "C001", " 올바르지 않은 입력값입니다."),
-    METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "C002", " 잘못된 HTTP 메서드 호출입니다."),
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "C003", " 서버 내부 오류가 발생했습니다."),
+    INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "CM001", " 올바르지 않은 입력값입니다."),
+    METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "CM002", " 잘못된 HTTP 메서드 호출입니다."),
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "CM003", " 서버 내부 오류가 발생했습니다."),
 
     // Member (회원 관련)
     EMAIL_DUPLICATION(HttpStatus.BAD_REQUEST, "M001", " 이미 존재하는 이메일입니다."),
@@ -34,7 +34,6 @@ public enum ErrorCode {
     DUPLICATE_CHECKIN(HttpStatus.BAD_REQUEST, "C003", "24시간 이내에 이미 체크인 하셨습니다."),
     OUT_OF_RANGE(HttpStatus.BAD_REQUEST, "C004", "반경(30m) 밖에서 체크인 할 수 없습니다."),
     NOT_RUNNING_STATUS(HttpStatus.BAD_REQUEST, "C005", "러닝중에만 체크인 할 수 있습니다."),
-    CHEKIN_ONLY_RUN(HttpStatus.BAD_REQUEST, "C005", "러닝중에만 체크인 할 수 있습니다."),
 
     // GroupRunning (그룹 러닝 관련)
     GROUP_NOT_FOUND(HttpStatus.NOT_FOUND, "G001", "존재하지 않는 Group 입니다"),

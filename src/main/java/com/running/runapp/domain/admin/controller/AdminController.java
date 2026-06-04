@@ -1,12 +1,6 @@
 package com.running.runapp.domain.admin.controller;
 
-import com.running.runapp.domain.admin.dto.AdminGroupRequest;
-import com.running.runapp.domain.admin.dto.AdminGroupResponse;
-import com.running.runapp.domain.admin.dto.AdminMemberResponse;
-import com.running.runapp.domain.admin.dto.AdminShopRequest;
-import com.running.runapp.domain.admin.dto.AdminShopResponse;
-import com.running.runapp.domain.admin.dto.AdminSpotRequest;
-import com.running.runapp.domain.admin.dto.AdminSpotResponse;
+import com.running.runapp.domain.admin.dto.*;
 import com.running.runapp.domain.admin.service.AdminService;
 import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.domain.member.domain.Role;
@@ -44,16 +38,22 @@ public class AdminController {
     // 회원 목록 조회
     @GetMapping("/members")
     public ResponseEntity<?> getMembers(
+            @LoginMember Member me,
             @RequestParam(required = false) String keyword,
             Pageable pageable
     ) {
+        requireAdmin(me);
         Page<AdminMemberResponse.Summary> result = adminService.getMembers(keyword, pageable);
         return ResponseEntity.ok(ApiResponse.success("회원 목록 조회 완료", result));
     }
 
     // 회원 상세 조회
     @GetMapping("/members/{memberId}")
-    public ResponseEntity<?> getMemberDetail(@PathVariable Long memberId) {
+    public ResponseEntity<?> getMemberDetail(
+            @LoginMember Member me,
+            @PathVariable Long memberId
+    ) {
+        requireAdmin(me);
         AdminMemberResponse.Detail result = adminService.getMemberDetail(memberId);
         return ResponseEntity.ok(ApiResponse.success("회원 상세 조회 완료", result));
     }
@@ -209,8 +209,9 @@ public class AdminController {
     @PostMapping("/title/grant")
     public ResponseEntity<ApiResponse<TitleResponse.TitleInfo>> grantTitleToUser(
             @LoginMember Member me,
-            TitleRequest.addTitleToUser dto
+            @RequestBody @Valid TitleRequest.addTitleToUser dto
     ) {
+        requireAdmin(me);
         TitleResponse.TitleInfo titleInfo = adminService.grantTitleToUser(me.getProfile(), dto.titleCode());
         return ResponseEntity.ok(ApiResponse.success("칭호 획득 완료!", titleInfo));
     }

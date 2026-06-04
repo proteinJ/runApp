@@ -145,7 +145,7 @@ public class GroupService {
             throw new BusinessException(ErrorCode.NOT_START_TIME_YET);
         }
 
-        return GroupResponse.GroupDetail.from(groupRunning);
+        return GroupResponse.GroupDetail.from(groupRunning, member.getId());
     }
 
     /**
@@ -176,7 +176,7 @@ public class GroupService {
         // 실시간 위치 추적을 위해 Redis에 쌓아두었던 이 방의 데이터를 삭제해서 메모리 확보
         // redisTemplate.delete("group_location:" + groupId);
 
-        return GroupResponse.GroupDetail.from(groupRunning);
+        return GroupResponse.GroupDetail.from(groupRunning, member.getId());
     }
 
 
@@ -189,12 +189,10 @@ public class GroupService {
 
 
     // 단일 그룹러닝 모집 상세 조회
-    public GroupResponse.GroupDetail getGroupDetailInfo(Long groupId) {
-
-
+    public GroupResponse.GroupDetail getGroupDetailInfo(Long groupId, Long memberId) {
         GroupRunning groupRunning = groupRunningRepository.findById(groupId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.GROUP_NOT_FOUND));
 
-        return GroupResponse.GroupDetail.from(groupRunning);
+        return GroupResponse.GroupDetail.from(groupRunning, memberId);
     }
 }

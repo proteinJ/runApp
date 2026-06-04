@@ -77,19 +77,17 @@ public class GroupRunning extends BaseTimeEntity {
     }
 
     public void updateInfo(GroupRequest.UpdateExtraRequest dto) {
-        if (title != null) this.title = dto.title();
-        if (content != null) this.content = dto.content();
-        if (startTime != null) this.startTime = dto.startTime();
-        if (endTime != null) this.endTime = dto.endTime();
-        if (distance != null) this.distance = dto.distance();
-        if (address != null) this.address = dto.address();
-        if (location != null) this.location = dto.location();
-        if (maxParticipants != null) {
-            // 현재 참여 인원보다 적게 && 최대 인원보다 많게 수정하려는지 체크 로직 추가
-            if (this.maxParticipants < dto.maxParticipants() && dto.maxParticipants() > 2) {
+        if (dto.title() != null) this.title = dto.title();
+        if (dto.content() != null) this.content = dto.content();
+        if (dto.startTime() != null) this.startTime = dto.startTime();
+        if (dto.endTime() != null) this.endTime = dto.endTime();
+        if (dto.distance() != null) this.distance = dto.distance();
+        if (dto.address() != null) this.address = dto.address();
+        if (dto.location() != null) this.location = dto.location();
+        if (dto.maxParticipants() != null) {
+            if (dto.maxParticipants() < this.participants.size()) {
                 throw new BusinessException(ErrorCode.INVALID_PARTICIPANTS_COUNT);
             }
-
             this.maxParticipants = dto.maxParticipants();
         }
     }

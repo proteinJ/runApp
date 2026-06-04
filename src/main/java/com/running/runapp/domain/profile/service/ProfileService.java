@@ -26,7 +26,7 @@ public class ProfileService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.PROFILE_NOT_FOUND));
 
         return ProfileResponse.MyProfile.builder()
-                .level(0)
+                .level(profile.getLevel())
                 .totalDistance(profile.getTotalDistance())
                 .nickname(profile.getNickname())
                 .avgPace(profile.getAvgPace())
