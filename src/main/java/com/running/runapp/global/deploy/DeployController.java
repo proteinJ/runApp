@@ -1,12 +1,12 @@
 package com.running.runapp.global.deploy;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
-@Profile("local")
 public class DeployController {
 
     @Value("${DEPLOY_SECRET}")
@@ -27,9 +27,16 @@ public class DeployController {
                         "-ExecutionPolicy", "Bypass",
                         "-File", "C:\\Users\\sshuser\\IdeaProjects\\runApp\\deploy.ps1"
                 );
-                pb.start();
+                pb.redirectErrorStream(true);
+                Process process = pb.start();
+                int exitCode = process.waitFor();
+                if (exitCode == 0) {
+                    log.info("Deploy script completed successfully");
+                } else {
+                    log.error("Deploy script failed with exit code: {}", exitCode);
+                }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Deploy script execution failed", e);
             }
         }).start();
 
