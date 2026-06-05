@@ -69,20 +69,16 @@ if ($portProcess) {
     Write-Host "No process found on port 8080" -ForegroundColor Gray
 }
 
-# 6. JAR 실행 (환경변수 직접 전달)
-$jarPath = "$PROJECT_DIR\build\libs\$JAR_NAME"
-Write-Host "Starting: $jarPath" -ForegroundColor Yellow
+# 6. JAR 실행
+  $jarPath = "$PROJECT_DIR\build\libs\$JAR_NAME"
+  Write-Host "Starting: $jarPath" -ForegroundColor Yellow
 
-$psi = New-Object System.Diagnostics.ProcessStartInfo
-$psi.FileName = "java"
-$psi.Arguments = "-jar `"$jarPath`""
-$psi.WorkingDirectory = $PROJECT_DIR
-$psi.UseShellExecute = $true
+  $psi = New-Object System.Diagnostics.ProcessStartInfo
+  $psi.FileName = "java"
+  $psi.Arguments = "-jar `"$jarPath`""
+  $psi.WorkingDirectory = $PROJECT_DIR
+  $psi.UseShellExecute = $true
 
-foreach ($key in $envVars.Keys) {
-    $psi.EnvironmentVariables[$key] = $envVars[$key]
-}
+  [System.Diagnostics.Process]::Start($psi) | Out-Null
 
-[System.Diagnostics.Process]::Start($psi) | Out-Null
-
-Write-Host "[$(Get-Date)] Deploy complete!" -ForegroundColor Green
+  Write-Host "[$(Get-Date)] Deploy complete!" -ForegroundColor Green
