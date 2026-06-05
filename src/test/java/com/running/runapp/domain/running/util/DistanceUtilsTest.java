@@ -13,7 +13,7 @@ class DistanceUtilsTest {
 
     @Test
     void path가_null이면_0() {
-        RunRequest.RunFinishRequest dto = new RunRequest.RunFinishRequest(LocalDateTime.now(), null);
+        RunRequest.RunFinishRequest dto = new RunRequest.RunFinishRequest(LocalDateTime.now(), LocalDateTime.now(), null);
 
         double dist = DistanceUtils.totalDistanceMeter(dto);
         assertEquals(0.0, dist, 0.0001);
@@ -22,7 +22,7 @@ class DistanceUtilsTest {
     @Test
     void path가_1개면_0() {
         List<LatLng> path = List.of(new LatLng(0.0, 0.0));
-        RunRequest.RunFinishRequest dto = new RunRequest.RunFinishRequest(LocalDateTime.now(), path);
+        RunRequest.RunFinishRequest dto = new RunRequest.RunFinishRequest(LocalDateTime.now(), LocalDateTime.now(), path);
 
         double dist = DistanceUtils.totalDistanceMeter(dto);
         assertEquals(0.0, dist, 0.0001);
@@ -34,7 +34,7 @@ class DistanceUtilsTest {
                 new LatLng(0.0, 0.0),
                 new LatLng(1.0, 0.0)
         );
-        RunRequest.RunFinishRequest dto = new RunRequest.RunFinishRequest(LocalDateTime.now(), path);
+        RunRequest.RunFinishRequest dto = new RunRequest.RunFinishRequest(LocalDateTime.now(), LocalDateTime.now(), path);
 
         double dist = DistanceUtils.totalDistanceMeter(dto);
         assertTrue(dist > 110_000 && dist < 112_500, "dist=" + dist);
@@ -47,7 +47,7 @@ class DistanceUtilsTest {
                 new LatLng(1.0, 0.0),
                 new LatLng(1.0, 1.0)
         );
-        RunRequest.RunFinishRequest dto = new RunRequest.RunFinishRequest(LocalDateTime.now(), path);
+        RunRequest.RunFinishRequest dto = new RunRequest.RunFinishRequest(LocalDateTime.now(), LocalDateTime.now(), path);
 
         double dist = DistanceUtils.totalDistanceMeter(dto);
 
@@ -70,11 +70,11 @@ class DistanceUtilsTest {
         );
 
         double straightDist = DistanceUtils.totalDistanceMeter(
-                new RunRequest.RunFinishRequest(LocalDateTime.now(), straight)
+                new RunRequest.RunFinishRequest(LocalDateTime.now(), LocalDateTime.now(), straight)
         );
 
         double curvedDist = DistanceUtils.totalDistanceMeter(
-                new RunRequest.RunFinishRequest(LocalDateTime.now(), curved)
+                new RunRequest.RunFinishRequest(LocalDateTime.now(), LocalDateTime.now(), curved)
         );
 
         System.out.println("straight=" + straightDist + ", curved=" + curvedDist);
