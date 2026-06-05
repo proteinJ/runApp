@@ -9,9 +9,7 @@ import com.running.runapp.domain.profile.repository.FollowRepository;
 import com.running.runapp.domain.profile.repository.ProfileRepository;
 import com.running.runapp.global.error.BusinessException;
 import com.running.runapp.global.error.ErrorCode;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -110,17 +108,15 @@ public class FollowService {
     }
 
     public void deleteFollow(Member me, String followId) {
-        // 1. 해당 친구 관계가 존재하는지 확인
         Follow follow = followRepository.findById(followId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 친구 관계입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.ACCESS_DENIED));
 
-        // 2. 삭제하려는 사람이 팔로워거나 팔로잉인 경우에만 삭제 가능
-        if (!follow.getFollower().getId().equals(me.getId()) &&
-                !follow.getFollowing().getId().equals(me.getId())) {
-            throw new AccessDeniedException("해당 관계를 삭제할 권한이 없습니다.");
+        Long myProfileId = me.getProfile().getId();
+        if (!follow.getFollower().getId().equals(myProfileId) &&
+                !follow.getFollowing().getId().equals(myProfileId)) {
+            throw new BusinessException(ErrorCode.ACCESS_DENIED);
         }
 
-        // 3. DB에서 삭제
         followRepository.delete(follow);
     }
 }
