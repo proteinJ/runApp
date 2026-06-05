@@ -1,12 +1,11 @@
 package com.running.runapp.domain.profile.service;
 
-import com.running.runapp.domain.profile.domain.Follow;
 import com.running.runapp.domain.member.domain.Member;
+import com.running.runapp.domain.profile.domain.Follow;
+import com.running.runapp.domain.profile.domain.Profile;
 import com.running.runapp.domain.profile.dto.SocialRequest;
 import com.running.runapp.domain.profile.dto.SocialResponse;
 import com.running.runapp.domain.profile.repository.FollowRepository;
-import com.running.runapp.domain.member.repository.MemberRepository;
-import com.running.runapp.domain.profile.domain.Profile;
 import com.running.runapp.domain.profile.repository.ProfileRepository;
 import com.running.runapp.global.error.BusinessException;
 import com.running.runapp.global.error.ErrorCode;
@@ -56,7 +55,7 @@ public class FollowService {
 
     // 친구 신청 수락
     public void accept(Member me, String followId) {
-        Follow follow = followRepository.findByIdAndFollowing_Id(followId, me.getId())
+        Follow follow = followRepository.findByIdAndFollowing_Id(followId, me.getProfile().getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.ACCESS_DENIED));
 
         if (!follow.isPending()) {
@@ -68,7 +67,7 @@ public class FollowService {
 
     // 친구 신청 거절
     public void reject(Member me, String followId) {
-        Follow follow = followRepository.findByIdAndFollowing_Id(followId, me.getId())
+        Follow follow = followRepository.findByIdAndFollowing_Id(followId, me.getProfile().getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.ACCESS_DENIED));
 
         if (!follow.isPending()) {
@@ -77,6 +76,39 @@ public class FollowService {
 
         followRepository.delete(follow);
     }
+    @Transactional(readOnly = true)
+    public List<SocialResponse.FollowMemberSummary> getPendingRequests(Long memberId) {
+        return followRepository.findPendingRequestsByMemberId(memberId).stream()
+                .map(f -> new SocialResponse.FollowMemberSummary(
+                        f.getId(),
+                        f.getFollower().getMember().getId(),
+                        f.getFollower().getNickname()
+                ))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<SocialResponse.FollowMemberSummary> getFollowers(Long memberId) {
+        return followRepository.findFollowersByMemberId(memberId).stream()
+                .map(f -> new SocialResponse.FollowMemberSummary(
+                        f.getId(),
+                        f.getFollower().getMember().getId(),
+                        f.getFollower().getNickname()
+                ))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<SocialResponse.FollowMemberSummary> getFollowings(Long memberId) {
+        return followRepository.findFollowingsByMemberId(memberId).stream()
+                .map(f -> new SocialResponse.FollowMemberSummary(
+                        f.getId(),
+                        f.getFollowing().getMember().getId(),
+                        f.getFollowing().getNickname()
+                ))
+                .toList();
+    }
+
     public void deleteFollow(Member me, String followId) {
         // 1. 해당 친구 관계가 존재하는지 확인
         Follow follow = followRepository.findById(followId)

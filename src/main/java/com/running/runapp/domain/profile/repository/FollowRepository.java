@@ -38,4 +38,16 @@ public interface FollowRepository extends JpaRepository<Follow, String> {
           and (f.follower.id = :me or f.following.id = :me)
     """)
     List<Long> findFriendIds(@Param("me") Long me, @Param("status") FollowStatus status);
+
+    // 받은 친구 신청 목록 (PENDING)
+    @Query("select f from Follow f join fetch f.follower fr join fetch fr.member where f.following.member.id = :memberId and f.status = 'PENDING'")
+    List<Follow> findPendingRequestsByMemberId(@Param("memberId") Long memberId);
+
+    // 나를 팔로우하는 사람들 (팔로워)
+    @Query("select f from Follow f join fetch f.follower fr join fetch fr.member where f.following.member.id = :memberId and f.status = 'ACCEPTED'")
+    List<Follow> findFollowersByMemberId(@Param("memberId") Long memberId);
+
+    // 내가 팔로우하는 사람들 (팔로잉)
+    @Query("select f from Follow f join fetch f.following fg join fetch fg.member where f.follower.member.id = :memberId and f.status = 'ACCEPTED'")
+    List<Follow> findFollowingsByMemberId(@Param("memberId") Long memberId);
 }
