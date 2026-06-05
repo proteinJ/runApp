@@ -66,6 +66,10 @@ public class GroupRunning extends BaseTimeEntity {
 
     private String address;
 
+    private Double lat;
+
+    private Double lon;
+
 
     public void addParticipants(Member member) {
         GroupMember participant = GroupMember.builder()

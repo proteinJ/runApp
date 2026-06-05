@@ -97,7 +97,13 @@ public class GroupResponse {
                     LocalDateTime startTime,
 
             @Schema(description = "러닝 종료 예정 시간", example = "2026-06-10T20:00:00")
-            LocalDateTime endTime
+            LocalDateTime endTime,
+
+            @Schema(description = "러닝 장소 위도", example = "37.5133")
+            Double lat,
+
+            @Schema(description = "러닝 장소 경도", example = "126.9947")
+            Double lon
     ) {
         public static GroupDetail from(GroupRunning group, Long memberId) {
             boolean isParticipating = group.getParticipants().stream()
@@ -116,7 +122,9 @@ public class GroupResponse {
                             .map(p -> p.getMember().getProfile().getNickname())
                             .toList(),
                     group.getStartTime(),
-                    group.getEndTime()
+                    group.getEndTime(),
+                    group.getLat(),
+                    group.getLon()
             );
         }
     }

@@ -34,7 +34,13 @@ public class GroupRequest {
             String location,
 
             @Schema(description = "러닝 장소 주소", example = "서울특별시 서초구 반포동 1")
-            String address
+            String address,
+
+            @Schema(description = "러닝 장소 위도", example = "37.5133")
+            Double lat,
+
+            @Schema(description = "러닝 장소 경도", example = "126.9947")
+            Double lon
     ) {
         public GroupRunning toEntity(Member host) {
             return GroupRunning.builder()
@@ -48,6 +54,8 @@ public class GroupRequest {
                     .location(this.location())
                     .address(this.address())
                     .distance(this.distance())
+                    .lat(this.lat())
+                    .lon(this.lon())
                     .build();
         }
     }
