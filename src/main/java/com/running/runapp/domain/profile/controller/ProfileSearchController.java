@@ -6,6 +6,7 @@ import com.running.runapp.domain.profile.dto.SocialResponse;
 import com.running.runapp.domain.profile.repository.FollowRepository;
 import com.running.runapp.domain.profile.domain.Profile;
 import com.running.runapp.domain.profile.repository.ProfileRepository;
+import com.running.runapp.domain.running.dto.UnitUtils;
 import com.running.runapp.global.common.ApiResponse;
 import com.running.runapp.global.common.annotaion.LoginMember;
 import lombok.RequiredArgsConstructor;
@@ -33,11 +34,15 @@ public class ProfileSearchController {
         List<Profile> profiles = profileRepository.findByNicknameContainingIgnoreCase(nickname);
 
         List<SocialResponse.SearchMemberSummary> result = profiles.stream()
-                .filter(m -> !m.getId().equals(me.getId()))
+                .filter(m -> !m.getMember().getId().equals(me.getId()))
                 .map(m -> new SocialResponse.SearchMemberSummary(
-                        m.getId(),
+                        m.getMember().getId(),
                         m.getNickname(),
-                        relationStatus(me.getId(), m.getId())
+                        m.getLevel(),
+                        UnitUtils.metersToKm(m.getTotalDistance()),
+                        m.getAvgPace(),
+                        m.getEquippedTitle() != null ? m.getEquippedTitle().getName() : null,
+                        relationStatus(me.getId(), m.getMember().getId())
                 ))
                 .toList();
 

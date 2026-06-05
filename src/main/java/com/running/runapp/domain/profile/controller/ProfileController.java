@@ -8,6 +8,7 @@ import com.running.runapp.domain.profile.dto.SocialResponse;
 import com.running.runapp.domain.profile.repository.FollowRepository;
 import com.running.runapp.domain.profile.repository.ProfileRepository;
 import com.running.runapp.domain.profile.service.ProfileService;
+import com.running.runapp.domain.running.dto.UnitUtils;
 import com.running.runapp.global.common.ApiResponse;
 import com.running.runapp.global.common.annotaion.LoginMember;
 import io.swagger.v3.oas.annotations.Operation;
@@ -57,11 +58,15 @@ public class ProfileController {
         List<Profile> profiles = profileRepository.findByNicknameContainingIgnoreCase(nickname);
 
         List<SocialResponse.SearchMemberSummary> result = profiles.stream()
-                .filter(m -> !m.getId().equals(member.getId()))
+                .filter(m -> !m.getMember().getId().equals(member.getId()))
                 .map(m -> new SocialResponse.SearchMemberSummary(
-                        m.getId(),
+                        m.getMember().getId(),
                         m.getNickname(),
-                        relationStatus(member.getId(), m.getId())
+                        m.getLevel(),
+                        UnitUtils.metersToKm(m.getTotalDistance()),
+                        m.getAvgPace(),
+                        m.getEquippedTitle() != null ? m.getEquippedTitle().getName() : null,
+                        relationStatus(member.getId(), m.getMember().getId())
                 ))
                 .toList();
 

@@ -11,6 +11,10 @@ public class SocialResponse {
     public record SearchMemberSummary(
             Long memberId,
             String nickname,
+            Integer level,
+            Double totalDistance,
+            Double avgPace,
+            String equippedTitleName,
             String relationStatus // NONE, PENDING_SENT, PENDING_RECEIVED, FRIEND
     ) {}
 
