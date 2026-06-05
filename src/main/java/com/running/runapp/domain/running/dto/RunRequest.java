@@ -33,6 +33,10 @@ public class RunRequest {
         @Schema(description = "러닝 종료 시간", example = "2026-05-14T10:30:00")
         private LocalDateTime endTime;
 
+        @NotNull
+        @Schema(description = "GPS 기반 실제 러닝 시작 시간 (페이스 계산용)", example = "2026-05-14T10:00:05")
+        private LocalDateTime realStartTime;
+
         @Schema(
                 description = "러닝 경로 좌표 리스트 (최소 2개)",
                 example = "[{\"lat\":35.1126,\"lng\":128.9655},{\"lat\":35.1128,\"lng\":128.9657}]"

@@ -37,7 +37,10 @@ public class GroupResponse {
             LocalDateTime createdAt,
 
             @Schema(description = "내가 이 그룹에 참여 중인지 여부", example = "false")
-            boolean isParticipating
+            boolean isParticipating,
+
+            @Schema(description = "러닝 장소명", example = "반포 한강공원")
+            String location
     ) {
         public static GroupSummary from(GroupRunning group, Long memberId) {
             boolean isParticipating = group.getParticipants().stream()
@@ -51,7 +54,8 @@ public class GroupResponse {
                     group.getStartTime(),
                     group.getDynamicStatus().name(),
                     group.getCreatedAt(),
-                    isParticipating
+                    isParticipating,
+                    group.getLocation()
             );
         }
     }
@@ -87,7 +91,13 @@ public class GroupResponse {
             boolean isParticipating,
 
             @Schema(description = "참여자 닉네임 목록", example = "[\"달리기왕\", \"마라토너\"]")
-            List<String> participantNicknames
+            List<String> participantNicknames,
+
+            @Schema(description = "러닝 시작 시간", example = "2026-06-10T19:00:00")
+                    LocalDateTime startTime,
+
+            @Schema(description = "러닝 종료 예정 시간", example = "2026-06-10T20:00:00")
+            LocalDateTime endTime
     ) {
         public static GroupDetail from(GroupRunning group, Long memberId) {
             boolean isParticipating = group.getParticipants().stream()
@@ -104,7 +114,9 @@ public class GroupResponse {
                     isParticipating,
                     group.getParticipants().stream()
                             .map(p -> p.getMember().getProfile().getNickname())
-                            .toList()
+                            .toList(),
+                    group.getStartTime(),
+                    group.getEndTime()
             );
         }
     }

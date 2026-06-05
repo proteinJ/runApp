@@ -6,6 +6,7 @@ import com.running.runapp.domain.profile.domain.ProfileTitle;
 import com.running.runapp.domain.profile.dto.ProfileResponse;
 import com.running.runapp.domain.profile.repository.ProfileRepository;
 import com.running.runapp.domain.profile.repository.ProfileTitleRepository;
+import com.running.runapp.domain.running.dto.UnitUtils;
 import com.running.runapp.global.common.LevelCalculator;
 import com.running.runapp.global.error.BusinessException;
 import com.running.runapp.global.error.ErrorCode;
@@ -27,7 +28,7 @@ public class ProfileService {
 
         return ProfileResponse.MyProfile.builder()
                 .level(profile.getLevel())
-                .totalDistance(profile.getTotalDistance())
+                .totalDistance(UnitUtils.metersToKm(profile.getTotalDistance()))
                 .nickname(profile.getNickname())
                 .avgPace(profile.getAvgPace())
                 .equippedTitleName(profile.getEquippedTitle().getName())

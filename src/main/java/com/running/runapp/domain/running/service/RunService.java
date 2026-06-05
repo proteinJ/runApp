@@ -19,7 +19,6 @@ import org.locationtech.jts.geom.LineString;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
@@ -60,20 +59,19 @@ public class RunService {
         }
 
         if (request.getPath() == null || request.getPath().size() < 2) {
-            record.finish(request.getEndTime(), 0.0, null);
-            return RunResponse.RunFinishResponse.builder()
-                    .runId(record.getId())
-                    .totalDistanceKm(0.0)
-                    .earnedPoints(0)
-                    .build();
+            throw new BusinessException(ErrorCode.RUN_DISTANCE_TOO_SHORT);
+        }
+
+        double calculatedDistanceMeter = DistanceUtils.totalDistanceMeter(request);
+        if (calculatedDistanceMeter < 150.0) {
+            throw new BusinessException(ErrorCode.RUN_DISTANCE_TOO_SHORT);
         }
 
         LineString lineString = GeometryUtils.toLineString(request.getPath());
+        record.finish(request.getEndTime(), calculatedDistanceMeter, lineString, request.getRealStartTime());
 
-        // meter로 계산
-        double calculatedDistanceMeter = DistanceUtils.totalDistanceMeter(request);
-
-        record.finish(request.getEndTime(), calculatedDistanceMeter, lineString);
+        long finishedCount = runningRecordRepository.countByMember_IdAndStatus(member.getId(), RunStatus.FINISHED);
+        member.getProfile().updateRunStats(calculatedDistanceMeter, record.getAvgPace(), finishedCount);
 
         Integer earnedPoints = spotVisitLogRepository
                 .sumEarnedPointsByRunIdAndMemberId(record.getId(), member.getId());
@@ -140,23 +138,17 @@ public class RunService {
             totalDistanceMeter += distMeter;
             bestDistanceMeter = Math.max(bestDistanceMeter, distMeter);
 
-            if (r.getStartTime() != null && r.getEndTime() != null) {
-                long sec = Duration.between(r.getStartTime(), r.getEndTime()).getSeconds();
-                if (sec <= 0) continue;
-
-                double km = distMeter / 1000.0;
-                if (km >= MIN_PACE_DISTANCE_KM) {
-                    paceSum += (sec / km); // sec/km
-                    paceCount++;
-                }
+            double km = distMeter / 1000.0;
+            Double pace = r.getAvgPace(); // min/km
+            if (km >= MIN_PACE_DISTANCE_KM && pace != null && pace > 0) {
+                paceSum += pace;
+                paceCount++;
             }
         }
 
         double avgDistanceMeter = (totalRuns == 0) ? 0.0 : (totalDistanceMeter / totalRuns);
 
-        // ✅ 페이스: 없으면 null
-        Integer avgPaceSecPerKm = (paceCount == 0) ? null : (int) Math.round(paceSum / paceCount);
-        String avgPaceText = UnitUtils.secondsToPaceText(avgPaceSecPerKm);
+        Double avgPace = (paceCount == 0) ? null : paceSum / paceCount;
 
         Integer earnedPoints = spotVisitLogRepository.sumEarnedPointsByMemberAndMonth(
                 member.getId(),
@@ -171,8 +163,7 @@ public class RunService {
                 .totalDistanceKm(UnitUtils.metersToKm(totalDistanceMeter))
                 .avgDistanceKm(UnitUtils.metersToKm(avgDistanceMeter))
                 .bestDistanceKm(UnitUtils.metersToKm(bestDistanceMeter))
-                .avgPaceSecPerKm(avgPaceSecPerKm)
-                .avgPaceText(avgPaceText)
+                .avgPace(avgPace)
                 .earnedPoints(earnedPoints == null ? 0 : earnedPoints)
                 .build();
     }

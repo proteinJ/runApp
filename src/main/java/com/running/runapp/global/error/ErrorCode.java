@@ -58,7 +58,10 @@ public enum ErrorCode {
     // Shop (상점 관련)
     SHOP_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "SH001", "존재하지 않는 상품입니다."),
     SHOP_ITEM_INACTIVE(HttpStatus.BAD_REQUEST, "SH002", "판매중이 아닌 상품입니다."),
-    INSUFFICIENT_POINTS(HttpStatus.BAD_REQUEST, "SH003", "포인트가 부족합니다.");
+    INSUFFICIENT_POINTS(HttpStatus.BAD_REQUEST, "SH003", "포인트가 부족합니다."),
+
+    // Running (러닝 관련)
+    RUN_DISTANCE_TOO_SHORT(HttpStatus.BAD_REQUEST, "R001", "최소 0.15km 이상 달려야 기록이 저장됩니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

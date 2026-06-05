@@ -53,6 +53,15 @@ public class RunResponse {
         @Schema(description = "러닝 ID", example = "10")
         private Long runId;
 
+        @Schema(description = "총 거리(km, 소수 2자리)", example = "3.25")
+        private Double totalDistanceKm;
+
+        @Schema(description = "총 러닝 시간(초)", example = "1230")
+        private Integer totalTimeSeconds;
+
+        @Schema(description = "평균 페이스(분/km)", example = "6.00")
+        private Double avgPace;
+
         @Schema(
                 description = "러닝 경로 좌표 리스트",
                 example = "[{\"lat\":35.1126,\"lng\":128.9655},{\"lat\":35.1128,\"lng\":128.9657}]"
@@ -60,8 +69,16 @@ public class RunResponse {
         private List<LatLng> path;
 
         public static RunDetailResponse from(RunningRecord record) {
+            int totalTimeSeconds = 0;
+            if (record.getStartTime() != null && record.getEndTime() != null) {
+                totalTimeSeconds = (int) java.time.Duration.between(record.getStartTime(), record.getEndTime()).getSeconds();
+            }
+
             return RunDetailResponse.builder()
                     .runId(record.getId())
+                    .totalDistanceKm(UnitUtils.metersToKm(record.getTotalDistance()))
+                    .totalTimeSeconds(totalTimeSeconds)
+                    .avgPace(record.getAvgPace())
                     .path(GeometryUtils.toLatLngList(record.getPath()))
                     .build();
         }
@@ -118,11 +135,8 @@ public class RunResponse {
         @Schema(description = "최장 거리(km)", example = "10.00")
         private Double bestDistanceKm;
 
-        @Schema(description = "평균 페이스(초/km)", example = "360")
-        private Integer avgPaceSecPerKm;
-
-        @Schema(description = "평균 페이스 표시(mm:ss)", example = "06:00")
-        private String avgPaceText;
+        @Schema(description = "평균 페이스(분/km)", example = "6.00")
+        private Double avgPace;
 
         @Schema(description = "획득 포인트 합", example = "250")
         private Integer earnedPoints;

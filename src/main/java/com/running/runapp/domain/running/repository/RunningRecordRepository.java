@@ -4,6 +4,7 @@ import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.domain.running.domain.RunStatus;
 import com.running.runapp.domain.running.domain.RunningRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -37,6 +38,12 @@ public interface RunningRecordRepository extends JpaRepository<RunningRecord, Lo
     );
 
     boolean existsByMemberAndStatus(Member member, RunStatus runStatus);
+
+    long countByMember_IdAndStatus(Long memberId, RunStatus status);
+
+    @Modifying
+    @Query("delete from RunningRecord r where r.status = :status and r.startTime < :before")
+    int deleteByStatusAndStartTimeBefore(@Param("status") RunStatus status, @Param("before") LocalDateTime before);
 
     @Query(value = """
       SELECT EXISTS (

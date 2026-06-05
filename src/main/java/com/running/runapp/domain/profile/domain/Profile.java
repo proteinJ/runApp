@@ -118,6 +118,14 @@ public class Profile {
     }
 
 
+    public void updateRunStats(double addedDistanceMeter, Double runPace, long totalFinishedRuns) {
+        this.totalDistance = (this.totalDistance == null ? 0.0 : this.totalDistance) + addedDistanceMeter;
+        if (runPace != null && runPace > 0 && totalFinishedRuns > 0) {
+            double prevSum = (this.avgPace == null || this.avgPace == 0.0 ? 0.0 : this.avgPace) * (totalFinishedRuns - 1);
+            this.avgPace = (prevSum + runPace) / totalFinishedRuns;
+        }
+    }
+
     // 경험치 증가 메서드
     public Long addExp(Long gainedExp) {
         return this.totalExp += gainedExp;

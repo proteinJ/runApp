@@ -53,33 +53,26 @@ public class RunningRecord {
                 .build();
     }
 
-    // 종료 메서드 실행 시 페이스를 '자동'으로 계산하도록 업데이트
-    public void finish(LocalDateTime endTime, Double totalDistanceMeter, LineString path) {
+    public void finish(LocalDateTime endTime, Double totalDistanceMeter, LineString path, LocalDateTime realStartTime) {
         this.endTime = endTime;
         this.totalDistance = totalDistanceMeter;
         this.path = path;
         this.status = RunStatus.FINISHED;
-
-        // 평균 페이스 자동 계산 로직 적용
-        this.avgPace = calculatePace(totalDistanceMeter);
+        this.avgPace = calculatePace(totalDistanceMeter, realStartTime, endTime);
     }
 
-    // 내부 헬퍼 메서드로 페이스 계산 (엔티티 밖으로 로직이 새지 않게 보호)
-    private Double calculatePace(Double totalDistanceMeter) {
-        if (this.startTime == null || this.endTime == null || totalDistanceMeter == null || totalDistanceMeter <= 0) {
+    private Double calculatePace(Double totalDistanceMeter, LocalDateTime realStartTime, LocalDateTime endTime) {
+        if (realStartTime == null || endTime == null || totalDistanceMeter == null || totalDistanceMeter <= 0) {
             return 0.0;
         }
 
-        // 1. 걸린 시간(초) 계산
-        long totalSeconds = Duration.between(this.startTime, this.endTime).getSeconds();
+        long totalSeconds = Duration.between(realStartTime, endTime).getSeconds();
+        if (totalSeconds <= 0) {
+            return 0.0;
+        }
 
-        // 2. 초 단위를 '분' 단위 실수로 변경 (예: 90초 -> 1.5분)
         double totalMinutes = totalSeconds / 60.0;
-
-        // 3. 미터를 킬로미터(km)로 변경
         double totalDistanceKm = totalDistanceMeter / 1000.0;
-
-        // 4. 페이스 = 분 / km
         return totalMinutes / totalDistanceKm;
     }
     
