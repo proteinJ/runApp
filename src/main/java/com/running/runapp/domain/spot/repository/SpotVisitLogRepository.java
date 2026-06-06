@@ -17,6 +17,18 @@ public interface SpotVisitLogRepository extends JpaRepository<SpotVisitLog, Long
     Optional<SpotVisitLog> findFirstByMemberAndSpotOrderByVisitedAtDesc(Member member, Spot spot);
 
     @Query("""
+        SELECT l FROM SpotVisitLog l
+        JOIN FETCH l.spot
+        WHERE l.member.id = :memberId
+          AND l.visitedAt > :cutoff
+        ORDER BY l.visitedAt DESC
+    """)
+    List<SpotVisitLog> findActiveCooldownsByMemberId(
+            @Param("memberId") Long memberId,
+            @Param("cutoff") LocalDateTime cutoff
+    );
+
+    @Query("""
         select coalesce(sum(l.spot.rewardAmount), 0)
         from SpotVisitLog l
         where l.runningRecord.id = :runId

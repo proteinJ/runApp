@@ -41,6 +41,14 @@ public class SpotController {
         return ResponseEntity.ok(ApiResponse.success("체크인 완료", spotCheckinResponse));
     }
 
+    @GetMapping("/cooldowns")
+    public ResponseEntity<ApiResponse<List<SpotResponse.CooldownInfo>>> getCooldowns(
+            @AuthenticationPrincipal PrincipalDetails principal
+    ) {
+        List<SpotResponse.CooldownInfo> cooldowns = spotService.getCooldowns(principal.getMemberId());
+        return ResponseEntity.ok(ApiResponse.success("체크인 쿨타임 조회 완료", cooldowns));
+    }
+
     @GetMapping("/nearby")
     public ResponseEntity<ApiResponse<List<SpotResponse.SummaryInfo>>> getNearbySpots(
             @ModelAttribute SpotRequest.NearbySpotsRequest dto,

@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.Builder;
 
+import java.time.LocalDateTime;
+
 
 public class SpotResponse {
 
@@ -44,6 +46,19 @@ public class SpotResponse {
 //            List<String> tags
     ) {}
 
+
+    public record CooldownInfo(
+            @Schema(description = "스팟 ID", example = "1")
+            Long spotId,
+            @Schema(description = "스팟 이름", example = "구서역")
+            String spotName,
+            @Schema(description = "마지막 체크인 시각")
+            LocalDateTime lastCheckinAt,
+            @Schema(description = "쿨타임 종료 시각 (lastCheckinAt + 24h)")
+            LocalDateTime cooldownEndsAt,
+            @Schema(description = "남은 초 (카운트다운용)", example = "72000")
+            long remainingSeconds
+    ) {}
 
     @Builder
     public record SpotCheckinResponse(

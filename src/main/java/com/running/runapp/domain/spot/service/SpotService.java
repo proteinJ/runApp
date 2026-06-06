@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -258,6 +259,37 @@ public class SpotService {
                 .collect(Collectors.toList());
     }
 
+
+
+    /**
+     * 체크인 쿨타임 목록 조회
+     */
+    @Transactional(readOnly = true)
+    public List<SpotResponse.CooldownInfo> getCooldowns(Long memberId) {
+        LocalDateTime cutoff = LocalDateTime.now().minusHours(24);
+        List<SpotVisitLog> logs = spotVisitLogRepository.findActiveCooldownsByMemberId(memberId, cutoff);
+
+        return logs.stream()
+                .collect(Collectors.toMap(
+                        l -> l.getSpot().getId(),
+                        l -> l,
+                        (a, b) -> a.getVisitedAt().isAfter(b.getVisitedAt()) ? a : b
+                ))
+                .values().stream()
+                .map(l -> {
+                    LocalDateTime endsAt = l.getVisitedAt().plusHours(24);
+                    long remaining = java.time.Duration.between(LocalDateTime.now(), endsAt).getSeconds();
+                    return new SpotResponse.CooldownInfo(
+                            l.getSpot().getId(),
+                            l.getSpot().getName(),
+                            l.getVisitedAt(),
+                            endsAt,
+                            remaining
+                    );
+                })
+                .sorted(Comparator.comparing(SpotResponse.CooldownInfo::cooldownEndsAt))
+                .toList();
+    }
 
 
     /**
