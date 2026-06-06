@@ -57,7 +57,11 @@ public class SpotResponse {
             @Schema(description = "쿨타임 종료 시각 (lastCheckinAt + 24h)")
             LocalDateTime cooldownEndsAt,
             @Schema(description = "남은 초 (카운트다운용)", example = "72000")
-            long remainingSeconds
+            long remainingSeconds,
+            @Schema(description = "체크인 시 획득 포인트", example = "10")
+            Integer rewardAmount,
+            @Schema(description = "체크인 시 획득 경험치", example = "100")
+            Long expAmount
     ) {}
 
     @Builder

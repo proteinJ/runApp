@@ -284,7 +284,9 @@ public class SpotService {
                             l.getSpot().getName(),
                             l.getVisitedAt(),
                             endsAt,
-                            remaining
+                            remaining,
+                            l.getSpot().getRewardAmount(),
+                            l.getSpot().getExpAmount()
                     );
                 })
                 .sorted(Comparator.comparing(SpotResponse.CooldownInfo::cooldownEndsAt))
