@@ -16,7 +16,8 @@ public interface SpotRepository extends JpaRepository<Spot, Long> {
     boolean existsByName(String name);
 
     @Query(value = "SELECT s.spot_id, s.name, s.reward_amount, s.latitude, s.longitude, " +
-            "EXISTS (SELECT 1 FROM spot_visit_log v WHERE v.spot_id = s.spot_id AND v.member_id = :memberId) as visited " +
+            "NOT EXISTS (SELECT 1 FROM spot_visit_log v WHERE v.spot_id = s.spot_id AND v.member_id = :memberId " +
+            "AND v.visited_at > NOW() AT TIME ZONE 'Asia/Seoul' - INTERVAL '24 hours') as can_check_in " +
             "FROM spot s " +
             "WHERE ST_DWithin(s.location, ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326)::geography, :distance) " +
             "ORDER BY ST_Distance(s.location, ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326)::geography) ASC",
