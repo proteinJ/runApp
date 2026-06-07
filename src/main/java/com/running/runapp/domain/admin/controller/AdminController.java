@@ -4,6 +4,7 @@ import com.running.runapp.domain.admin.dto.*;
 import com.running.runapp.domain.admin.service.AdminService;
 import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.domain.member.domain.Role;
+import com.running.runapp.domain.notice.dto.NoticeResponse;
 import com.running.runapp.domain.profile.dto.TitleRequest;
 import com.running.runapp.domain.profile.dto.TitleResponse;
 import com.running.runapp.global.common.ApiResponse;
@@ -203,6 +204,40 @@ public class AdminController {
         requireAdmin(me);
         adminService.deleteTitle(titleId);
         return ResponseEntity.ok(ApiResponse.success("칭호 삭제 성공"));
+    }
+
+    // ===================== Notice =====================
+
+    @Operation(summary = "공지사항 생성")
+    @PostMapping("/notices")
+    public ResponseEntity<ApiResponse<NoticeResponse.Detail>> createNotice(
+            @LoginMember Member me,
+            @RequestBody @Valid AdminNoticeRequest.create dto
+    ) {
+        requireAdmin(me);
+        return ResponseEntity.ok(ApiResponse.success("공지사항 생성 완료", adminService.createNotice(dto)));
+    }
+
+    @Operation(summary = "공지사항 수정")
+    @PatchMapping("/notices/{noticeId}")
+    public ResponseEntity<ApiResponse<NoticeResponse.Detail>> updateNotice(
+            @LoginMember Member me,
+            @PathVariable Long noticeId,
+            @RequestBody AdminNoticeRequest.update dto
+    ) {
+        requireAdmin(me);
+        return ResponseEntity.ok(ApiResponse.success("공지사항 수정 완료", adminService.updateNotice(noticeId, dto)));
+    }
+
+    @Operation(summary = "공지사항 삭제")
+    @DeleteMapping("/notices/{noticeId}")
+    public ResponseEntity<ApiResponse<Void>> deleteNotice(
+            @LoginMember Member me,
+            @PathVariable Long noticeId
+    ) {
+        requireAdmin(me);
+        adminService.deleteNotice(noticeId);
+        return ResponseEntity.ok(ApiResponse.success("공지사항 삭제 완료"));
     }
 
     @Operation(summary = "칭호 지급", description = "관리자용 유저에게 칭호 지급")

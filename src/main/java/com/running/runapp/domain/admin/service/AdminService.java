@@ -3,10 +3,14 @@ package com.running.runapp.domain.admin.service;
 import com.running.runapp.domain.admin.dto.AdminGroupRequest;
 import com.running.runapp.domain.admin.dto.AdminGroupResponse;
 import com.running.runapp.domain.admin.dto.AdminMemberResponse;
+import com.running.runapp.domain.admin.dto.AdminNoticeRequest;
 import com.running.runapp.domain.admin.dto.AdminShopRequest;
 import com.running.runapp.domain.admin.dto.AdminShopResponse;
 import com.running.runapp.domain.admin.dto.AdminSpotRequest;
 import com.running.runapp.domain.admin.dto.AdminSpotResponse;
+import com.running.runapp.domain.notice.domain.Notice;
+import com.running.runapp.domain.notice.dto.NoticeResponse;
+import com.running.runapp.domain.notice.repository.NoticeRepository;
 import com.running.runapp.domain.groupRunning.domain.GroupRunning;
 import com.running.runapp.domain.groupRunning.repository.GroupRunningRepository;
 import com.running.runapp.domain.member.domain.Member;
@@ -56,6 +60,7 @@ public class AdminService {
     private final PasswordEncoder passwordEncoder;
     private final ShopItemRepository shopItemRepository;
     private final GroupRunningRepository groupRunningRepository;
+    private final NoticeRepository noticeRepository;
 
     // ===================== Member =====================
 
@@ -299,6 +304,33 @@ public class AdminService {
     }
 
 
+
+    // ===================== Notice =====================
+
+    @Transactional
+    public NoticeResponse.Detail createNotice(AdminNoticeRequest.create dto) {
+        Notice notice = Notice.builder()
+                .title(dto.title())
+                .content(dto.content())
+                .isPinned(dto.isPinned() != null && dto.isPinned())
+                .build();
+        return NoticeResponse.Detail.from(noticeRepository.save(notice));
+    }
+
+    @Transactional
+    public NoticeResponse.Detail updateNotice(Long noticeId, AdminNoticeRequest.update dto) {
+        Notice notice = noticeRepository.findById(noticeId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOTICE_NOT_FOUND));
+        notice.update(dto.title(), dto.content(), dto.isPinned());
+        return NoticeResponse.Detail.from(notice);
+    }
+
+    @Transactional
+    public void deleteNotice(Long noticeId) {
+        Notice notice = noticeRepository.findById(noticeId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOTICE_NOT_FOUND));
+        noticeRepository.delete(notice);
+    }
 
     // ===================== 편의 메서드 =====================
     private void validateDuplicateMember(MemberRequest.Join req) {
