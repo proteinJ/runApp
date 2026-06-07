@@ -166,6 +166,15 @@ public class MemberService {
         logout(bearerToken);
     }
 
+    @Transactional
+    public void withdraw(Member member, String bearerToken, MemberRequest.Withdraw dto) {
+        if (!passwordEncoder.matches(dto.password(), member.getPassword())) {
+            throw new BusinessException(ErrorCode.INVALID_PASSWORD);
+        }
+        logout(bearerToken);
+        memberRepository.delete(member);
+    }
+
     /**
      * 중복 검증
      */

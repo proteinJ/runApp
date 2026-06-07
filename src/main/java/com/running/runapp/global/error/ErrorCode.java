@@ -16,6 +16,10 @@ public enum ErrorCode {
     NICKNAME_DUPLICATION(HttpStatus.BAD_REQUEST, "M002", "이미 존재하는 닉네임입니다."),
     INVALID_LOGIN_CREDENTIALS(HttpStatus.BAD_REQUEST, "M003", " 이메일 또는 비밀번호가 일치하지 않습니다."),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "M004", " 존재하지 않는 회원입니다."),
+    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "M005", "비밀번호가 올바르지 않습니다."),
+
+    // Notice (공지사항 관련)
+    NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, "N001", "공지사항을 찾을 수 없습니다."),
 
     // Auth (인증 관련)
     AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "A001", " 인증에 실패하였습니다."),

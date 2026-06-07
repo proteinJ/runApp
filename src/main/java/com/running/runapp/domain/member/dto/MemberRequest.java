@@ -49,4 +49,10 @@ public class MemberRequest {
         @Schema(name = "새로운 비밀번호", example = "mskim5322@naver.com")
         @NotBlank @Size(min = 8) String newPassword
     ) {}
+
+    @Schema(description = "회원 탈퇴 요청")
+    public record Withdraw(
+        @Schema(description = "현재 비밀번호 (본인 확인용)", example = "password1234")
+        @NotBlank String password
+    ) {}
 }

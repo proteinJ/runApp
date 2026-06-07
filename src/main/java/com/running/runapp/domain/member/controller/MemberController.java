@@ -1,9 +1,11 @@
 package com.running.runapp.domain.member.controller;
 
+import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.domain.member.dto.LoginResponse;
 import com.running.runapp.domain.member.dto.MemberRequest;
 import com.running.runapp.domain.member.service.MemberService;
 import com.running.runapp.global.common.ApiResponse;
+import com.running.runapp.global.common.annotaion.LoginMember;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,6 +48,17 @@ public class MemberController {
         memberService.logout(bearerToken);
 
         return ResponseEntity.ok(ApiResponse.success("로그아웃 완료"));
+    }
+
+    @Operation(summary = "회원 탈퇴", description = "비밀번호 확인 후 계정 삭제")
+    @DeleteMapping("/me")
+    public ResponseEntity<ApiResponse<Void>> withdraw(
+            @LoginMember Member member,
+            @Parameter(hidden = true) @RequestHeader("Authorization") String bearerToken,
+            @RequestBody @Valid MemberRequest.Withdraw dto
+    ) {
+        memberService.withdraw(member, bearerToken, dto);
+        return ResponseEntity.ok(ApiResponse.success("회원 탈퇴가 완료되었습니다."));
     }
 
     @Operation(summary = "비밀번호 변경", description = "기존 비번 확인 후 새 비번으로 변경 (변경 후 토큰 만료)")
