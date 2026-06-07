@@ -5,6 +5,7 @@ import com.running.runapp.domain.member.domain.Role;
 import com.running.runapp.domain.member.domain.TokenDto;
 import com.running.runapp.domain.member.dto.LoginResponse;
 import com.running.runapp.domain.member.dto.MemberRequest;
+import com.running.runapp.domain.member.dto.MemberResponse;
 import com.running.runapp.domain.member.repository.MemberRepository;
 import com.running.runapp.domain.member.repository.RefreshTokenRepository;
 import com.running.runapp.domain.profile.domain.Profile;
@@ -173,6 +174,10 @@ public class MemberService {
         }
         logout(bearerToken);
         memberRepository.delete(member);
+    }
+
+    public MemberResponse.Me getMe(Member member) {
+        return MemberResponse.Me.from(member);
     }
 
     /**

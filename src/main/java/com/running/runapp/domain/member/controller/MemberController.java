@@ -3,6 +3,7 @@ package com.running.runapp.domain.member.controller;
 import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.domain.member.dto.LoginResponse;
 import com.running.runapp.domain.member.dto.MemberRequest;
+import com.running.runapp.domain.member.dto.MemberResponse;
 import com.running.runapp.domain.member.service.MemberService;
 import com.running.runapp.global.common.ApiResponse;
 import com.running.runapp.global.common.annotaion.LoginMember;
@@ -48,6 +49,12 @@ public class MemberController {
         memberService.logout(bearerToken);
 
         return ResponseEntity.ok(ApiResponse.success("로그아웃 완료"));
+    }
+
+    @Operation(summary = "내 정보 조회", description = "현재 로그인한 회원 정보 반환")
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<MemberResponse.Me>> getMe(@LoginMember Member member) {
+        return ResponseEntity.ok(ApiResponse.success("회원 정보 조회 성공", memberService.getMe(member)));
     }
 
     @Operation(summary = "회원 탈퇴", description = "비밀번호 확인 후 계정 삭제")

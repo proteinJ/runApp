@@ -43,16 +43,16 @@ public class MemberRequest {
 
     @Schema(description = "비밀번호 변경 요청")
     public record PasswordChange (
-        @Schema(name = "이전 비밀번호", example = "username1234@naver.com")
+        @Schema(name = "oldPassword", example = "username1234@naver.com")
         @NotBlank String oldPassword,
 
-        @Schema(name = "새로운 비밀번호", example = "mskim5322@naver.com")
+        @Schema(name = "newPassword", example = "mskim5322@naver.com")
         @NotBlank @Size(min = 8) String newPassword
     ) {}
 
     @Schema(description = "회원 탈퇴 요청")
     public record Withdraw(
-        @Schema(description = "현재 비밀번호 (본인 확인용)", example = "password1234")
+        @Schema(name = "password", description = "현재 비밀번호 (본인 확인용)", example = "password1234")
         @NotBlank String password
     ) {}
 }
