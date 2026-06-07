@@ -12,6 +12,7 @@ import com.running.runapp.global.common.annotaion.LoginMember;
 import com.running.runapp.global.error.BusinessException;
 import com.running.runapp.global.error.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Admin", description = "어드민 전용 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/admin")
