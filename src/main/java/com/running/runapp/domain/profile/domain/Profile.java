@@ -128,6 +128,7 @@ public class Profile {
 
     // 경험치 증가 메서드
     public Long addExp(Long gainedExp) {
+        if (gainedExp == null || gainedExp <= 0) return this.totalExp;
         return this.totalExp += gainedExp;
     }
 

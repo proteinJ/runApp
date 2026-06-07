@@ -205,6 +205,7 @@ public class SpotService {
         // Point 획득 기록 생성 (By Builder)
         PointHistory pointHistory = PointHistory.builder()
                 .member(member)
+                .spot(spot)
                 .amount(spot.getRewardAmount())
                 .type(PointHistory.PointType.EARN)
                 .description(spot.getName() + " 방문 체크인")
