@@ -1,7 +1,6 @@
 package com.running.runapp.domain.groupRunning.repository;
 
 import com.running.runapp.domain.groupRunning.domain.GroupMember;
-import com.running.runapp.domain.groupRunning.domain.GroupRunning;
 import com.running.runapp.domain.member.domain.Member;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> {
@@ -27,5 +27,8 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
     boolean existsByGroupRunningIdAndMember(Long groupRunningId, Member member);
 
     Optional<GroupMember> findByGroupRunningIdAndMember(Long groupRunningId, Member member);
+
+    @Query("SELECT gm FROM GroupMember gm JOIN FETCH gm.member m JOIN FETCH m.profile WHERE gm.groupRunning.id = :groupId")
+    List<GroupMember> findMembersWithProfileByGroupId(@Param("groupId") Long groupId);
 }
 

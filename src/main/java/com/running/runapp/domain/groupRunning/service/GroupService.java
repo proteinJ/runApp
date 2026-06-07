@@ -9,6 +9,7 @@ import com.running.runapp.domain.groupRunning.dto.GroupResponse;
 import com.running.runapp.domain.groupRunning.repository.GroupMemberRepository;
 import com.running.runapp.domain.groupRunning.repository.GroupRunningRepository;
 import com.running.runapp.domain.member.domain.Member;
+import com.running.runapp.domain.profile.dto.ProfileResponse;
 import com.running.runapp.global.error.BusinessException;
 import com.running.runapp.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 
 @Service
@@ -194,5 +197,15 @@ public class GroupService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.GROUP_NOT_FOUND));
 
         return GroupResponse.GroupDetail.from(groupRunning, memberId);
+    }
+
+    public List<ProfileResponse.MemberColor> getGroupMemberColors(Long groupId) {
+        return groupMemberRepository.findMembersWithProfileByGroupId(groupId).stream()
+                .map(gm -> new ProfileResponse.MemberColor(
+                        gm.getMember().getId(),
+                        gm.getMember().getProfile().getNickname(),
+                        gm.getMember().getProfile().getCoreColorCode()
+                ))
+                .toList();
     }
 }

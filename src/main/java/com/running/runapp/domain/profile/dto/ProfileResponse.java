@@ -42,6 +42,18 @@ public class ProfileResponse {
     ) {
     }
 
+    @Schema(description = "캐릭터 색상 정보")
+    public record MemberColor(
+            @Schema(description = "회원 ID", example = "1")
+            Long memberId,
+
+            @Schema(description = "닉네임", example = "러너123")
+            String nickname,
+
+            @Schema(description = "캐릭터 색상 코드", example = "CORE_ORANGE")
+            String coreColorCode
+    ) {}
+
     @Schema(description = "경험치 지급, 내부 전달용 DTO")
     public record ExpRewardResult(
             boolean isLevelUp,

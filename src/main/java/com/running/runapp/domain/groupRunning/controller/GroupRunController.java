@@ -4,8 +4,11 @@ import com.running.runapp.domain.groupRunning.dto.GroupRequest;
 import com.running.runapp.domain.groupRunning.dto.GroupResponse;
 import com.running.runapp.domain.groupRunning.service.GroupService;
 import com.running.runapp.domain.member.domain.Member;
+import com.running.runapp.domain.profile.dto.ProfileResponse;
 import com.running.runapp.global.common.ApiResponse;
 import com.running.runapp.global.common.annotaion.LoginMember;
+
+import java.util.List;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -166,6 +169,15 @@ public class GroupRunController {
     ) {
         Slice<GroupResponse.GroupSummary> groups = groupService.findAllGroups(pageable, member.getId());
         return ResponseEntity.ok(ApiResponse.success("그룹 목록 조회 완료", groups));
+    }
+
+    @Operation(summary = "그룹 참여자 캐릭터 색상 조회", description = "WebSocket 연결 전/후 그룹 참여자들의 캐릭터 색상 정보를 일괄 조회합니다.")
+    @GetMapping("/{groupId}/members/colors")
+    public ResponseEntity<ApiResponse<List<ProfileResponse.MemberColor>>> getGroupMemberColors(
+            @Parameter(description = "그룹 ID", example = "1") @PathVariable Long groupId
+    ) {
+        List<ProfileResponse.MemberColor> colors = groupService.getGroupMemberColors(groupId);
+        return ResponseEntity.ok(ApiResponse.success("그룹 참여자 색상 조회 완료", colors));
     }
 
     @Operation(

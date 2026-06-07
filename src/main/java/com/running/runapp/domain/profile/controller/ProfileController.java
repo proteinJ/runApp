@@ -73,6 +73,18 @@ public class ProfileController {
         return ResponseEntity.ok(ApiResponse.success("유저 검색 완료", result));
     }
 
+    @Operation(
+            summary = "회원 캐릭터 색상 배치 조회",
+            description = "전체 채널에서 WebSocket으로 수신한 주변 유저 ID 목록을 기반으로 캐릭터 색상을 일괄 조회합니다. `?memberIds=1,2,3` 형태로 전달하세요."
+    )
+    @GetMapping("/colors")
+    public ResponseEntity<ApiResponse<List<ProfileResponse.MemberColor>>> getMemberColors(
+            @RequestParam List<Long> memberIds
+    ) {
+        List<ProfileResponse.MemberColor> colors = profileService.getMemberColors(memberIds);
+        return ResponseEntity.ok(ApiResponse.success("캐릭터 색상 조회 완료", colors));
+    }
+
     private String relationStatus(Long me, Long other) {
         List<Follow> relations = followRepository.findRelationBetween(me, other);
         if (relations.isEmpty()) return "NONE";

@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
@@ -49,6 +51,16 @@ public class ProfileService {
                 .titleId(myProfileTitle.getTitle().getId())
                 .name(myProfileTitle.getTitle().getName())
                 .build();
+    }
+
+    public List<ProfileResponse.MemberColor> getMemberColors(List<Long> memberIds) {
+        return profileRepository.findByMemberIdIn(memberIds).stream()
+                .map(p -> new ProfileResponse.MemberColor(
+                        p.getMember().getId(),
+                        p.getNickname(),
+                        p.getCoreColorCode()
+                ))
+                .toList();
     }
 
     @Transactional

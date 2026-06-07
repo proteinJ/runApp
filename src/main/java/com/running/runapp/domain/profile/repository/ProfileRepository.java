@@ -20,4 +20,7 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
     Optional<Profile> findByMember(Member member);
 
     Optional<Profile> findByMemberId(Long memberId);
+
+    @Query("SELECT p FROM Profile p WHERE p.member.id IN :memberIds")
+    List<Profile> findByMemberIdIn(@Param("memberIds") List<Long> memberIds);
 }
