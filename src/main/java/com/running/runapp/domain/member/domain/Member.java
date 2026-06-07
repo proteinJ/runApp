@@ -52,6 +52,9 @@ public class Member {
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
     private Profile profile;
 
+    @Builder.Default
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<SocialAccount> socialAccounts = new java.util.ArrayList<>();
 
     // Member와 Profile 양방향 연결 메서드
     public void setProfile(Profile profile) {

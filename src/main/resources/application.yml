@@ -46,3 +46,7 @@ jwt:
   secret: ${JWT_SECRET}
   access-token-validity-in-milliseconds: ${JWT_ACCESS_TOKEN_TIME}
   refresh-token-validity-in-milliseconds: ${JWT_REFRESH_TOKEN_TIME}
+
+kakao:
+  client-id: ${bcb235643a01538feaac40d0f2c53f4b}
+  client-secret: ${KAKAO_CLIENT_SECRET:} # 있으면 사용, 없으면 빈값

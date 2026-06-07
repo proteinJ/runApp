@@ -37,4 +37,6 @@ out/
 !**/src/test/**/out/
 
 ### CICD ###
-.deploy.ps1
+.deploy.ps1.DS_Store
+Baton_runapp_frontend/
+.DS_Store

@@ -73,3 +73,7 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+dependencies {
+    implementation "io.netty:netty-resolver-dns-native-macos:4.1.116.Final:osx-aarch_64"
+}

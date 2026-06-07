@@ -83,6 +83,42 @@ public class JwtProvider {
                 .accessTokenExpiresIn(accessTokenExpiresIn.getTime())
                 .build();
     }
+    public TokenDto createTokenForSocial(Long memberId, String email, String roleOrAuthority) {
+
+        String authority = roleOrAuthority;
+        if (authority != null && !authority.startsWith("ROLE_")) {
+            authority = "ROLE_" + authority; // USER -> ROLE_USER
+        }
+
+        if (authority == null || authority.isBlank()) {
+            authority = "ROLE_USER";
+        }
+
+        long now = (new Date()).getTime();
+
+        Date accessTokenExpiresIn = new Date(now + accessTokenValidityInMilliseconds);
+        Date refreshTokenExpiresIn = new Date(now + refreshTokenValidityInMilliseconds);
+        String accessToken = Jwts.builder()
+                .setSubject(email)
+                .claim("memberId", memberId)
+                .claim(AUTHORITIES_KEY, authority)
+                .setExpiration(accessTokenExpiresIn)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+
+        String refreshToken = Jwts.builder()
+                .setExpiration(refreshTokenExpiresIn)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+
+        return TokenDto.builder()
+                .grantType("Bearer")
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .accessTokenExpiresIn(accessTokenExpiresIn.getTime())
+                .build();
+
+    }
 
     /**
      * 토큰 정보 추출
