@@ -28,10 +28,8 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setCharacterEncoding("UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 설정
 
-        // 우리가 만든 ApiResponse 형식으로 에러 메시지 구성
         ApiResponse<String> errorResponse = ApiResponse.error(
-                ErrorCode.MEMBER_NOT_FOUND.getMessage(), // 혹은 별도의 UNAUTHORIZED 에러코드 사용
-                "인증이 필요한 서비스입니다."
+                ErrorCode.AUTHENTICATION_FAILED.getMessage()
         );
 
         // JSON으로 변환하여 응답 바디에 쓰기
