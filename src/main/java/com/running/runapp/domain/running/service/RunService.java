@@ -59,11 +59,13 @@ public class RunService {
         }
 
         if (request.getPath() == null || request.getPath().size() < 2) {
+            runningRecordRepository.delete(record);
             throw new BusinessException(ErrorCode.RUN_DISTANCE_TOO_SHORT);
         }
 
         double calculatedDistanceMeter = DistanceUtils.totalDistanceMeter(request);
         if (calculatedDistanceMeter < 150.0) {
+            runningRecordRepository.delete(record);
             throw new BusinessException(ErrorCode.RUN_DISTANCE_TOO_SHORT);
         }
 
