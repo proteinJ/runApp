@@ -1,5 +1,7 @@
 package com.running.runapp.global.security;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
+    public static final String JWT_ERROR_CODE_ATTR = "JWT_ERROR_CODE";
 
     private final JwtProvider jwtProvider;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -38,10 +41,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         log.info("### 추출된 토큰: {}", jwt);
 
         if (StringUtils.hasText(jwt)) {
-            boolean valid = jwtProvider.validateToken(jwt);
-            log.info("### validateToken 결과: {}", valid);
+            try {
+                jwtProvider.validateTokenOrThrow(jwt);
 
-            if (valid) {
                 String logout = (String) redisTemplate.opsForValue().get(jwt);
                 log.info("### Redis logout 조회 결과: {}", logout);
 
@@ -50,10 +52,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                     log.info("### 인증객체 세팅 완료: principal={}", authentication.getPrincipal());
                 } else {
-                    log.warn("### 로그아웃 처리된 토큰으로 판단 -> 인증 세팅 안 함");
+                    log.warn("### 로그아웃 처리된 토큰 -> A003");
+                    request.setAttribute(JWT_ERROR_CODE_ATTR, "A003");
                 }
-            } else {
-                log.warn("### 토큰 검증 실패 -> 인증 세팅 안 함");
+            } catch (ExpiredJwtException e) {
+                log.warn("### 만료된 토큰 -> A002");
+                request.setAttribute(JWT_ERROR_CODE_ATTR, "A002");
+            } catch (JwtException e) {
+                log.warn("### 유효하지 않은 토큰 -> A003");
+                request.setAttribute(JWT_ERROR_CODE_ATTR, "A003");
             }
         } else {
             log.warn("### 토큰 없음 -> 인증 세팅 안 함");

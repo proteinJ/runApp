@@ -75,6 +75,10 @@ public class SocialAuthService {
         profile.setMember(member);
         profileRepository.save(profile);
 
+        if (member.getRealname() == null || member.getRealname().isBlank()) {
+            member.updateRealname(profileNickname);
+        }
+
         titleRepository.findById(1L).ifPresent(defaultTitle -> {
             ProfileTitle grantedTitle = ProfileTitle.grantTitle(profile, defaultTitle);
             profileTitleRepository.save(grantedTitle);
@@ -99,7 +103,7 @@ public class SocialAuthService {
         Member member = Member.builder()
                 .email(generatedEmail)
                 .password("{noop}SOCIAL")
-                .realname(null)
+                .realname(profileNickname)
                 .role(Role.USER)
                 .build();
 

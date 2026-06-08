@@ -1,31 +1,38 @@
 package com.running.runapp.global.common;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor
 @Getter
 public class ApiResponse<T> {
-    private boolean success;
-    private String message;
-    private T data;
+    private final boolean success;
+    private final String message;
+    private final T data;
+    private final String code;
 
-    // Success Response - Yes Data
+    private ApiResponse(boolean success, String message, T data, String code) {
+        this.success = success;
+        this.message = message;
+        this.data = data;
+        this.code = code;
+    }
+
     public static <T> ApiResponse<T> success(String message, T data) {
-        return new ApiResponse<>(true, message, data);
+        return new ApiResponse<>(true, message, data, null);
     }
 
-    // Success Response - No Data
     public static <T> ApiResponse<T> success(String message) {
-        return new ApiResponse<>(true, message, null);
+        return new ApiResponse<>(true, message, null, null);
     }
 
-    // Fail Response
     public static <T> ApiResponse<T> error(String message, T data) {
-        return new ApiResponse<>(false, message, data);
+        return new ApiResponse<>(false, message, data, null);
     }
 
     public static <T> ApiResponse<T> error(String message) {
-        return new ApiResponse<>(false, message, null);
+        return new ApiResponse<>(false, message, null, null);
+    }
+
+    public static <T> ApiResponse<T> error(String message, String code) {
+        return new ApiResponse<>(false, message, null, code);
     }
 }

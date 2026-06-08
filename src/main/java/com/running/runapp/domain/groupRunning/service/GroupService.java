@@ -97,7 +97,13 @@ public class GroupService {
             throw new BusinessException(ErrorCode.DUPLICATE_GROUP_TIME);
         }
 
-        // ########### [조건3] 이미 이 그룹에 들어가 있는지 확인 ###########
+        // ########### [조건3] 최대 인원 초과 확인 ###########
+        int currentCount = groupMemberRepository.countByGroupRunningId(groupRunning.getId());
+        if (currentCount >= groupRunning.getMaxParticipants()) {
+            throw new BusinessException(ErrorCode.INVALID_PARTICIPANTS_COUNT);
+        }
+
+        // ########### [조건4] 이미 이 그룹에 들어가 있는지 확인 ###########
         if (groupMemberRepository.existsByGroupRunningIdAndMember(groupRunning.getId(), member)) {
             throw new BusinessException(ErrorCode.ALREADY_JOINED_GROUP);
         }

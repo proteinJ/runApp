@@ -47,6 +47,10 @@ public class Member {
         this.password = password;
     }
 
+    public void updateRealname(String realname) {
+        this.realname = realname;
+    }
+
 
     // FK
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)

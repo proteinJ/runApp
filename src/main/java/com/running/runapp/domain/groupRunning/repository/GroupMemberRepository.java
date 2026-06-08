@@ -24,6 +24,8 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
     )
     boolean hasOverlappingSchedule(Member member, LocalDateTime startTime, LocalDateTime endTime);
 
+    int countByGroupRunningId(Long groupRunningId);
+
     boolean existsByGroupRunningIdAndMember(Long groupRunningId, Member member);
 
     Optional<GroupMember> findByGroupRunningIdAndMember(Long groupRunningId, Member member);

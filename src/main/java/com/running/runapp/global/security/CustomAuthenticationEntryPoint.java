@@ -23,16 +23,20 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        // 응답 헤더 설정
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 설정
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-        ApiResponse<String> errorResponse = ApiResponse.error(
-                ErrorCode.AUTHENTICATION_FAILED.getMessage()
-        );
+        String jwtErrorCode = (String) request.getAttribute(JwtAuthenticationFilter.JWT_ERROR_CODE_ATTR);
+        String code = (jwtErrorCode != null) ? jwtErrorCode : ErrorCode.AUTHENTICATION_FAILED.getCode();
 
-        // JSON으로 변환하여 응답 바디에 쓰기
+        ErrorCode errorCode = switch (code) {
+            case "A002" -> ErrorCode.TOKEN_EXPIRED;
+            case "A003" -> ErrorCode.INVALID_TOKEN;
+            default    -> ErrorCode.AUTHENTICATION_FAILED;
+        };
+
+        ApiResponse<Void> errorResponse = ApiResponse.error(errorCode.getMessage(), errorCode.getCode());
         response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
     }
 }

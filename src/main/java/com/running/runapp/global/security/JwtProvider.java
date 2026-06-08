@@ -156,22 +156,22 @@ public class JwtProvider {
     }
 
     /**
-     * 토큰 유효성 검사
+     * 토큰 유효성 검사 (boolean 반환 — 하위 호환용)
      */
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            validateTokenOrThrow(token);
             return true;
-        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            log.info("잘못된 JWT 서명입니다.");
-        } catch (ExpiredJwtException e) {
-            log.info("만료된 JWT 토큰입니다.");
-        } catch (UnsupportedJwtException e) {
-            log.info("지원되지 않는 JWT 토큰입니다.");
-        } catch (IllegalArgumentException e) {
-            log.info("JWT 토큰이 잘못되었습니다.");
+        } catch (Exception e) {
+            return false;
         }
-        return false;
+    }
+
+    /**
+     * 토큰 유효성 검사 — 실패 시 JwtException 계열 예외 throw
+     */
+    public void validateTokenOrThrow(String token) {
+        Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
     }
 
     /**
