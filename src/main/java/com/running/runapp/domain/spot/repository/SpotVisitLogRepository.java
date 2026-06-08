@@ -61,6 +61,25 @@ public interface SpotVisitLogRepository extends JpaRepository<SpotVisitLog, Stri
         Integer getTotalPoints();
     }
 
+    interface OccupierCandidateRow {
+        Long getMemberId();
+        Long getCheckinCount();
+    }
+
+    @Query("""
+        select
+            l.member.id as memberId,
+            count(l.id) as checkinCount
+        from SpotVisitLog l
+        where l.spot.id = :spotId
+        group by l.member.id
+        order by count(l.id) desc, l.member.id asc
+    """)
+    List<OccupierCandidateRow> findOccupierCandidatesBySpotId(
+            @Param("spotId") Long spotId,
+            Pageable pageable
+    );
+
     @Query("""
         select
             l.member.id as memberId,

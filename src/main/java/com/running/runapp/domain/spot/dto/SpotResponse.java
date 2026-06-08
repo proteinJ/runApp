@@ -12,13 +12,20 @@ import java.time.LocalDateTime;
 
 public class SpotResponse {
 
+    @Schema(name = "SpotSummaryInfo", description = "주변 스팟 요약 응답")
     public record SummaryInfo (
+            @Schema(description = "스팟 ID", example = "32")
             Long id,
+            @Schema(description = "스팟 이름", example = "구서역 GS 편의점")
             String name,
+            @Schema(description = "체크인 기본 보상 포인트", example = "100")
             @Min(0) @Max(10000)
             Integer rewardAmount,
+            @Schema(description = "스팟 위도", example = "35.246509")
             Double latitude,
+            @Schema(description = "스팟 경도", example = "129.091786")
             Double longitude,
+            @Schema(description = "현재 로그인 회원의 체크인 가능 여부", example = "true")
             boolean canCheckIn
     ) {
         public static SummaryInfo from(Spot spot) {
@@ -33,15 +40,26 @@ public class SpotResponse {
         }
     }
 
+    @Schema(name = "SpotDetailInfo", description = "스팟 상세 및 현재 점령 정보 응답")
     public record DetailInfo (
+            @Schema(description = "스팟 ID", example = "32")
             Long id,
+            @Schema(description = "스팟 이름", example = "구서역 GS 편의점")
             String name,
+            @Schema(description = "스팟 설명", example = "구서역 근처 체크인 스팟")
             String description,
 
+            @Schema(description = "체크인 기본 보상 포인트", example = "100")
             @Min(0) @Max(10000)
             Integer rewardAmount,
+            @Schema(description = "스팟 위도", example = "35.246509")
             Double latitude,
-            Double longitude
+            @Schema(description = "스팟 경도", example = "129.091786")
+            Double longitude,
+            @Schema(description = "현재 점령자 회원 ID. 점령자가 없으면 null", example = "1")
+            Long occupierMemberId,
+            @Schema(description = "현재 점령자의 해당 스팟 누적 체크인 수", example = "3")
+            Integer occupierCheckinCount
 //            String imageUrl,
 //            List<String> tags
     ) {}
@@ -65,14 +83,15 @@ public class SpotResponse {
     ) {}
 
     @Builder
+    @Schema(name = "SpotCheckinResponse", description = "스팟 체크인 및 점령/탈환 결과 응답")
     public record SpotCheckinResponse(
             @Schema(description = "스팟 이름", example = "해운대 해수욕장")
             String spotName,
 
-            @Schema(description = "얻은 포인트", example = "10")
+            @Schema(description = "체크인으로 얻은 기본 포인트. 점령/탈환 보너스는 occupationBonusPoints에 별도 표시됩니다.", example = "100")
             Integer earnedPoints,
 
-            @Schema(description = "현재 보유 포인트", example = "310")
+            @Schema(description = "체크인 기본 포인트와 점령/탈환 보너스까지 반영된 현재 보유 포인트", example = "300")
             Integer currentTotalPoints,
 
             @Schema(description = "방문 기록 ID", example = "3")
@@ -88,9 +107,29 @@ public class SpotResponse {
             int currentLevel,
 
             @Schema(description = "현재 총 경험치량(게이지 바 갱신용)", example = "300")
-            long totalExp
+            long totalExp,
+
+            @Schema(description = "이번 체크인으로 점령자 변경 및 보너스 지급이 발생했는지 여부", example = "true")
+            boolean occupationChanged,
+
+            @Schema(
+                    description = "점령 이벤트 타입. SPOT_OCCUPY는 첫 점령, SPOT_STEAL은 탈환, 변경 없음은 null",
+                    example = "SPOT_STEAL",
+                    allowableValues = {"SPOT_OCCUPY", "SPOT_STEAL"}
+            )
+            String occupationType,
+
+            @Schema(description = "점령/탈환 보너스 포인트. 첫 점령은 50, 탈환은 100, 변경 없음은 0", example = "100")
+            Integer occupationBonusPoints,
+
+            @Schema(description = "체크인 처리 후 현재 점령자 회원 ID. 점령자가 없으면 null", example = "2")
+            Long occupierMemberId,
+
+            @Schema(description = "체크인 처리 후 현재 점령자의 해당 스팟 누적 체크인 수", example = "4")
+            Integer occupierCheckinCount
     ) {
-        public static SpotCheckinResponse of(Spot spot, Integer earnedPoint, Integer currentTotalPoints, String visitLogId, ProfileResponse.ExpRewardResult expResult) {
+        public static SpotCheckinResponse of(Spot spot, Integer earnedPoint, Integer currentTotalPoints, String visitLogId,
+                                             ProfileResponse.ExpRewardResult expResult, OccupationResult occupationResult) {
             return new SpotCheckinResponse(
                     spot.getName(),
                     earnedPoint,
@@ -99,7 +138,48 @@ public class SpotResponse {
                     spot.getExpAmount(),
                     expResult.isLevelUp(),
                     expResult.currentLevel(),
-                    expResult.totalExp()
+                    expResult.totalExp(),
+                    occupationResult.changed(),
+                    occupationResult.type(),
+                    occupationResult.bonusPoints(),
+                    occupationResult.occupierMemberId(),
+                    occupationResult.occupierCheckinCount()
+            );
+        }
+    }
+
+    @Schema(name = "OccupationResult", description = "점령/탈환 내부 계산 결과")
+    public record OccupationResult(
+            @Schema(description = "점령자 변경 여부", example = "true")
+            boolean changed,
+            @Schema(description = "점령 이벤트 타입", example = "SPOT_STEAL")
+            String type,
+            @Schema(description = "지급된 보너스 포인트", example = "100")
+            Integer bonusPoints,
+            @Schema(description = "현재 점령자 회원 ID", example = "2")
+            Long occupierMemberId,
+            @Schema(description = "현재 점령자의 누적 체크인 수", example = "4")
+            Integer occupierCheckinCount
+    ) {
+        public static OccupationResult unchanged(Spot spot) {
+            Long occupierMemberId = spot.getOccupier() == null ? null : spot.getOccupier().getId();
+            return new OccupationResult(
+                    false,
+                    null,
+                    0,
+                    occupierMemberId,
+                    spot.getOccupierCheckinCount()
+            );
+        }
+
+        public static OccupationResult changed(String type, Integer bonusPoints, Spot spot) {
+            Long occupierMemberId = spot.getOccupier() == null ? null : spot.getOccupier().getId();
+            return new OccupationResult(
+                    true,
+                    type,
+                    bonusPoints,
+                    occupierMemberId,
+                    spot.getOccupierCheckinCount()
             );
         }
     }

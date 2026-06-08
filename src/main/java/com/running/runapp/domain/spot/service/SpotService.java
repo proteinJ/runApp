@@ -23,12 +23,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.running.runapp.global.common.LocationUtils.calculateDistance;
@@ -39,6 +41,9 @@ import static com.running.runapp.global.common.LocationUtils.calculateDistance;
 @RequiredArgsConstructor
 @Slf4j
 public class SpotService {
+
+    private static final int SPOT_OCCUPY_BONUS_POINTS = 50;
+    private static final int SPOT_STEAL_BONUS_POINTS = 100;
 
     private final SpotRepository spotRepository;
     private final GeometryFactory geometryFactory;
@@ -117,7 +122,9 @@ public class SpotService {
                 spot.getDescription(),
                 spot.getRewardAmount(),
                 spot.getLatitude(), // 위도
-                spot.getLongitude() // 경도
+                spot.getLongitude(), // 경도
+                spot.getOccupier() == null ? null : spot.getOccupier().getId(),
+                spot.getOccupierCheckinCount()
         );
     }
 
@@ -129,7 +136,7 @@ public class SpotService {
     public SpotResponse.SpotCheckinResponse spotCheckin(Long spotId, SpotRequest.SpotCheckinRequest dto, String email) {
         // [ 기본 Entity 조회 ]
         // Spot 찾기 (아래 편의메서드 사용)
-        Spot spot = findSpotById(spotId);
+        Spot spot = findSpotByIdForUpdate(spotId);
 
         // Member 찾기
         Member member = memberRepository.findByEmail(email)
@@ -200,7 +207,7 @@ public class SpotService {
         ProfileResponse.ExpRewardResult expRewardResult = profileService.rewardExp(member.getId(), spot.getExpAmount());
 
         // Points(Reward) 지급
-        Integer updatedPointAmount = memberProfile.addPointAmount(spot.getRewardAmount());
+        memberProfile.addPointAmount(spot.getRewardAmount());
 
         // Point 획득 기록 생성 (By Builder)
         PointHistory pointHistory = PointHistory.builder()
@@ -223,11 +230,21 @@ public class SpotService {
 
         // DB에 저장
          pointHistoryRepository.save(pointHistory);
-         spotVisitLogRepository.save(spotVisitLog);
+         spotVisitLogRepository.saveAndFlush(spotVisitLog);
+
+        SpotResponse.OccupationResult occupationResult =
+                rewardOccupationIfNeeded(spot, member, memberProfile, dto.timestamp());
 
 
         // 반환 dto 생성 및 반환
-        return SpotResponse.SpotCheckinResponse.of(spot, pointHistory.getAmount(), updatedPointAmount, spotVisitLog.getId(), expRewardResult);
+        return SpotResponse.SpotCheckinResponse.of(
+                spot,
+                pointHistory.getAmount(),
+                memberProfile.getTotalPoint(),
+                spotVisitLog.getId(),
+                expRewardResult,
+                occupationResult
+        );
     }
 
 
@@ -302,5 +319,73 @@ public class SpotService {
     private Spot findSpotById(Long spotId) {
         return spotRepository.findById(spotId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.SPOT_NOT_FOUND));
+    }
+
+    private Spot findSpotByIdForUpdate(Long spotId) {
+        return spotRepository.findByIdForUpdate(spotId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.SPOT_NOT_FOUND));
+    }
+
+    private SpotResponse.OccupationResult rewardOccupationIfNeeded(
+            Spot spot,
+            Member checkinMember,
+            Profile checkinMemberProfile,
+            LocalDateTime requestedAt
+    ) {
+        List<SpotVisitLogRepository.OccupierCandidateRow> candidates =
+                spotVisitLogRepository.findOccupierCandidatesBySpotId(spot.getId(), PageRequest.of(0, 2));
+
+        if (candidates.isEmpty()) {
+            return SpotResponse.OccupationResult.unchanged(spot);
+        }
+
+        SpotVisitLogRepository.OccupierCandidateRow top = candidates.get(0);
+        boolean hasTopTie = candidates.size() > 1
+                && Objects.equals(top.getCheckinCount(), candidates.get(1).getCheckinCount());
+
+        if (hasTopTie) {
+            return SpotResponse.OccupationResult.unchanged(spot);
+        }
+
+        Long currentOccupierId = spot.getOccupier() == null ? null : spot.getOccupier().getId();
+        Long newOccupierId = top.getMemberId();
+        Integer newOccupierCheckinCount = Math.toIntExact(top.getCheckinCount());
+
+        if (Objects.equals(currentOccupierId, newOccupierId)) {
+            spot.updateOccupier(spot.getOccupier(), newOccupierCheckinCount);
+            return SpotResponse.OccupationResult.unchanged(spot);
+        }
+
+        if (!Objects.equals(newOccupierId, checkinMember.getId())) {
+            Member currentTopMember = memberRepository.findById(newOccupierId)
+                    .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+            spot.updateOccupier(currentTopMember, newOccupierCheckinCount);
+            return SpotResponse.OccupationResult.unchanged(spot);
+        }
+
+        PointHistory.PointType pointType = currentOccupierId == null
+                ? PointHistory.PointType.SPOT_OCCUPY
+                : PointHistory.PointType.SPOT_STEAL;
+        int bonusPoints = pointType == PointHistory.PointType.SPOT_OCCUPY
+                ? SPOT_OCCUPY_BONUS_POINTS
+                : SPOT_STEAL_BONUS_POINTS;
+
+        spot.updateOccupier(checkinMember, newOccupierCheckinCount);
+        checkinMemberProfile.addPointAmount(bonusPoints);
+
+        pointHistoryRepository.save(PointHistory.builder()
+                .member(checkinMember)
+                .spot(spot)
+                .amount(bonusPoints)
+                .type(pointType)
+                .description(spot.getName() + " " + occupationDescription(pointType))
+                .createdAt(requestedAt == null ? LocalDateTime.now() : requestedAt)
+                .build());
+
+        return SpotResponse.OccupationResult.changed(pointType.name(), bonusPoints, spot);
+    }
+
+    private String occupationDescription(PointHistory.PointType pointType) {
+        return pointType == PointHistory.PointType.SPOT_OCCUPY ? "점령 보상" : "탈환 보상";
     }
 }
