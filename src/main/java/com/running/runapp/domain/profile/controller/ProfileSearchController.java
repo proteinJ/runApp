@@ -33,6 +33,7 @@ public class ProfileSearchController {
     ) {
         List<Profile> profiles = profileRepository.findByNicknameContainingIgnoreCase(nickname);
 
+        Long myProfileId = me.getProfile().getId();
         List<SocialResponse.SearchMemberSummary> result = profiles.stream()
                 .filter(m -> !m.getMember().getId().equals(me.getId()))
                 .map(m -> new SocialResponse.SearchMemberSummary(
@@ -42,22 +43,22 @@ public class ProfileSearchController {
                         UnitUtils.metersToKm(m.getTotalDistance()),
                         m.getAvgPace(),
                         m.getEquippedTitle() != null ? m.getEquippedTitle().getName() : null,
-                        relationStatus(me.getId(), m.getMember().getId())
+                        relationStatus(myProfileId, m.getId())
                 ))
                 .toList();
 
         return ResponseEntity.ok(ApiResponse.success("유저 검색 완료", result));
     }
 
-    private String relationStatus(Long me, Long other) {
-        List<Follow> relations = followRepository.findRelationBetween(me, other);
+    private String relationStatus(Long myProfileId, Long otherProfileId) {
+        List<Follow> relations = followRepository.findRelationBetween(myProfileId, otherProfileId);
         if (relations.isEmpty()) return "NONE";
 
         Follow f = relations.get(0);
 
         if (f.getStatus() == Follow.FollowStatus.ACCEPTED) return "FRIEND";
 
-        if (f.getFollower().getId().equals(me)) return "PENDING_SENT";
+        if (f.getFollower().getId().equals(myProfileId)) return "PENDING_SENT";
         return "PENDING_RECEIVED";
     }
 }
