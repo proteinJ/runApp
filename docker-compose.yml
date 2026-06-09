@@ -19,8 +19,7 @@ services:
       KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID:-bcb235643a01538feaac40d0f2c53f4b}
       KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET:-}
       DEPLOY_SECRET: ${DEPLOY_SECRET:-local_temporary_secret_key_1234}
-      MONITORING_USERNAME: ${MONITORING_USERNAME:-monitoring}
-      MONITORING_PASSWORD: ${MONITORING_PASSWORD:-monitoring-local-password}
+      MONITORING_PASSWORD: ${MONITORING_PASSWORD:-1234}
       LOG_PATH: /app/logs
     volumes:
       - app_logs:/app/logs
@@ -73,9 +72,8 @@ services:
         scrape_configs:
           - job_name: runapp
             metrics_path: /actuator/prometheus
-            basic_auth:
-              username: "$${MONITORING_USERNAME}"
-              password: "$${MONITORING_PASSWORD}"
+            authorization:
+              credentials: "$${MONITORING_PASSWORD}"
             static_configs:
               - targets:
                   - app:8080
@@ -83,11 +81,10 @@ services:
                   application: runapp
         EOF
         exec /bin/prometheus --config.file=/tmp/prometheus.yml
+    environment:
+      MONITORING_PASSWORD: ${MONITORING_PASSWORD:-1234}
     ports:
       - "${PROMETHEUS_PORT:-9090}:9090"
-    environment:
-      MONITORING_USERNAME: ${MONITORING_USERNAME:-monitoring}
-      MONITORING_PASSWORD: ${MONITORING_PASSWORD:-monitoring-local-password}
     volumes:
       - prometheus_data:/prometheus
     depends_on:
