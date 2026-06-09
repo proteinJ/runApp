@@ -225,6 +225,8 @@ public class SpotService {
          pointHistoryRepository.save(pointHistory);
          spotVisitLogRepository.save(spotVisitLog);
 
+        log.warn("Spot checkin success: spotId={}, memberId={}, reward={}", spotId, member.getId(), spot.getRewardAmount());
+
 
         // 반환 dto 생성 및 반환
         return SpotResponse.SpotCheckinResponse.of(spot, pointHistory.getAmount(), updatedPointAmount, spotVisitLog.getId(), expRewardResult);

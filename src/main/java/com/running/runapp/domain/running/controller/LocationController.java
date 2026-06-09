@@ -26,6 +26,7 @@ public class LocationController {
             LocationMessage message
     ) {
         message.setGroupId(groupId);
+        log.debug("Location received: groupId={}, memberId={}", groupId, message.getMemberId());
         redisTemplate.convertAndSend("group:" + groupId, message);
     }
 }

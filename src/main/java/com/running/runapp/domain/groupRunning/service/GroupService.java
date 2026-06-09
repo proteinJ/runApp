@@ -13,6 +13,7 @@ import com.running.runapp.domain.profile.dto.ProfileResponse;
 import com.running.runapp.global.error.BusinessException;
 import com.running.runapp.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -116,6 +118,7 @@ public class GroupService {
 
         groupMemberRepository.save(participant);
         groupRunning.addParticipants(member);
+        log.info("Group joined: groupId={}, memberId={}", groupId, member.getId());
     }
 
     @Transactional
@@ -131,6 +134,7 @@ public class GroupService {
         }
 
         groupMemberRepository.delete(groupMember);
+        log.info("Group left: groupId={}, memberId={}", groupId, member.getId());
     }
 
     /**
@@ -154,6 +158,7 @@ public class GroupService {
             throw new BusinessException(ErrorCode.NOT_START_TIME_YET);
         }
 
+        log.info("Group run started: groupId={}, memberId={}", groupId, member.getId());
         return GroupResponse.GroupDetail.from(groupRunning, member.getId());
     }
 
@@ -177,6 +182,7 @@ public class GroupService {
 
         // 그룹 러닝 상태 종료로 변경
         groupRunning.groupRunEnd();
+        log.info("Group run finished: groupId={}, memberId={}", groupId, member.getId());
 
         // 나중에 추가할 부분] 웹소켓으로 종료 이벤트 발행
         // messagingTemplate.convertAndSend("/topic/group/" + groupId, new RunEndEvent());

@@ -60,12 +60,14 @@ public class RunService {
 
         if (request.getPath() == null || request.getPath().size() < 2) {
             runningRecordRepository.delete(record);
+            log.warn("Run record deleted - insufficient path: memberId={}, runId={}", member.getId(), runId);
             throw new BusinessException(ErrorCode.RUN_DISTANCE_TOO_SHORT);
         }
 
         double calculatedDistanceMeter = DistanceUtils.totalDistanceMeter(request);
         if (calculatedDistanceMeter < 150.0) {
             runningRecordRepository.delete(record);
+            log.warn("Run record deleted - distance too short: memberId={}, runId={}, distanceM={}", member.getId(), runId, calculatedDistanceMeter);
             throw new BusinessException(ErrorCode.RUN_DISTANCE_TOO_SHORT);
         }
 
@@ -80,6 +82,8 @@ public class RunService {
 
         // 칭호 지급 조건 확인 및 처리
         titleService.checkAndGrantTitles(member.getProfile());
+
+        log.info("Run finished: memberId={}, runId={}, distanceKm={}", member.getId(), record.getId(), UnitUtils.metersToKm(calculatedDistanceMeter));
 
         return RunResponse.RunFinishResponse.builder()
                 .runId(record.getId())

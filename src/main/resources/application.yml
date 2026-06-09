@@ -52,3 +52,17 @@ jwt:
 kakao:
   client-id: ${bcb235643a01538feaac40d0f2c53f4b}
   client-secret: ${KAKAO_CLIENT_SECRET:} # 있으면 사용, 없으면 빈값
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers
+  endpoint:
+    health:
+      show-details: always
+  health:
+    redis:
+      enabled: true
+    db:
+      enabled: true

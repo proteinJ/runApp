@@ -26,6 +26,8 @@ public class RedisSubscriber implements MessageListener {
             String publishMessage = redisTemplate.getStringSerializer().deserialize(message.getBody());
             LocationMessage locationMessage = objectMapper.readValue(publishMessage, LocationMessage.class);
 
+            log.debug("Redis message broadcast: groupId={}, memberId={}", locationMessage.getGroupId(), locationMessage.getMemberId());
+
             // 해당 방(/topic/group/{groupId}을 구독 중인 웹소켓 클라이언트들에게 쏴줌
             String destination = "/topic/group/" + locationMessage.getGroupId().toString();
             messagingTemplate.convertAndSend(destination, locationMessage);
