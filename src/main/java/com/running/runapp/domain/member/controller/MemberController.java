@@ -32,14 +32,14 @@ public class MemberController {
 
     @Operation(summary = "회원가입", description = "새로운 사용자 회원가입")
     @PostMapping("/join")
-    public ResponseEntity<ApiResponse<Long>> join(@RequestBody MemberRequest.Join dto) {
+    public ResponseEntity<ApiResponse<Long>> join(@RequestBody @Valid MemberRequest.Join dto) {
         Long memberId = memberService.join(dto);
 
         return ResponseEntity.ok(ApiResponse.success("회원가입 완료", memberId));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(@RequestBody MemberRequest.Login dto) {
+    public ResponseEntity<ApiResponse<LoginResponse>> login(@RequestBody @Valid MemberRequest.Login dto) {
         LoginResponse res = memberService.login(dto);
         return ResponseEntity.ok(ApiResponse.success("로그인 완료", res));
     }

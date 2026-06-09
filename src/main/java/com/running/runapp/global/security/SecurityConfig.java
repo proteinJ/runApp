@@ -53,7 +53,7 @@ public class SecurityConfig {
 
             // API별 접근 권한 설정
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/v1/member/join", "/api/v1/member/login", "/api/v1/auth/kakao/token", "swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/ws/run/**", "/deploy").permitAll()
+                    .requestMatchers("/api/v1/member/join", "/api/v1/member/login", "/api/v1/auth/kakao/token", "swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/ws/run/**", "/deploy", "/actuator/health", "/actuator/info", "/actuator/prometheus").permitAll()
                     .requestMatchers("/api/v1/member/password", "/api/v1/groups/**").authenticated()
                     .anyRequest().authenticated()
             )
@@ -61,7 +61,6 @@ public class SecurityConfig {
             // 일반적인 로그인 필터(UsernamePasswordAuthenticationFilter) 작동 전 내가 만든 필터 체인 먼저 실행되도록
             .addFilterBefore(new JwtAuthenticationFilter(jwtProvider, redisTemplate),
                     UsernamePasswordAuthenticationFilter.class);
-            System.out.println("jwt 로그인 필터 성공");
         
         return http.build();
     }

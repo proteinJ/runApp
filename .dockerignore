@@ -1,0 +1,11 @@
+.git
+.gradle
+.idea
+postgres_data
+logs
+build/*
+!build/libs/
+!build/libs/**
+*.iml
+*.log
+.DS_Store

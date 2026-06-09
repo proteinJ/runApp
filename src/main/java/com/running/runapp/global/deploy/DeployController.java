@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class DeployController {
 
-    @Value("${DEPLOY_SECRET}")
+    @Value("${spring.deploy.secret}")
     private String deploySecret;
 
     @PostMapping("/deploy")

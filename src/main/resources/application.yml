@@ -1,4 +1,7 @@
 spring:
+  application:
+    name: runapp
+
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -49,18 +52,33 @@ jwt:
   access-token-validity-in-milliseconds: ${JWT_ACCESS_TOKEN_TIME}
   refresh-token-validity-in-milliseconds: ${JWT_REFRESH_TOKEN_TIME}
 
-kakao:
-  client-id: ${bcb235643a01538feaac40d0f2c53f4b}
-  client-secret: ${KAKAO_CLIENT_SECRET:} # 있으면 사용, 없으면 빈값
+oauth:
+  kakao:
+    client-id: ${KAKAO_CLIENT_ID:bcb235643a01538feaac40d0f2c53f4b}
+    client-secret: ${KAKAO_CLIENT_SECRET:} # 있으면 사용, 없으면 빈값
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,loggers
+        include: health,info,metrics,loggers,prometheus
   endpoint:
     health:
       show-details: always
+    prometheus:
+      access: unrestricted
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+      percentiles:
+        http.server.requests: 0.5,0.95,0.99
   health:
     redis:
       enabled: true

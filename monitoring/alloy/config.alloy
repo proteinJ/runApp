@@ -1,0 +1,47 @@
+logging {
+  level = "info"
+}
+
+local.file_match "runapp_logs" {
+  path_targets = [
+    {
+      __path__     = "/var/log/runapp/*.log",
+      job          = "runapp",
+      application  = "runapp",
+      environment  = "docker-compose",
+    },
+  ]
+  sync_period = "10s"
+}
+
+loki.source.file "runapp_logs" {
+  targets    = local.file_match.runapp_logs.targets
+  forward_to = [loki.process.runapp_logs.receiver]
+}
+
+loki.process "runapp_logs" {
+  stage.regex {
+    expression = "^(?P<timestamp>\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3}) \\[(?P<thread>[^\\]]+)\\] (?P<level>[A-Z]+)\\s+\\[(?P<requestId>[^\\]]+)\\] (?P<logger>[^ ]+) - (?P<message>.*)$"
+  }
+
+  stage.timestamp {
+    source   = "timestamp"
+    format   = "2006-01-02 15:04:05.000"
+    location = "Asia/Seoul"
+  }
+
+  stage.labels {
+    values = {
+      level  = "level",
+      logger = "logger",
+    }
+  }
+
+  forward_to = [loki.write.local.receiver]
+}
+
+loki.write "local" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}

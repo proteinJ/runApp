@@ -1,23 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property name="LOG_PATH" value="logs"/>
-    <property name="LOG_FILE" value="${LOG_PATH}/baton.log"/>
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="runapp"/>
+    <property name="LOG_PATH" value="${LOG_PATH:-logs}"/>
+    <property name="LOG_FILE" value="${LOG_PATH}/${APP_NAME}.log"/>
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%X{requestId:-no-request}] %logger{36} - %msg%n"/>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>${LOG_PATTERN}</pattern>
         </encoder>
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_FILE}</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/baton.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${LOG_PATH}/${APP_NAME}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>10MB</maxFileSize>
             <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
         </rollingPolicy>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>${LOG_PATTERN}</pattern>
         </encoder>
     </appender>
 

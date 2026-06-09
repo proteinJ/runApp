@@ -54,6 +54,7 @@ public class MemberService {
      */
     @Transactional
     public Long join(MemberRequest.Join req) {
+        log.info("Member join requested: email={}, nickname={}", req.email(), req.nickname());
         validateDuplicateMember(req);
 
         String encodedPassword = passwordEncoder.encode(req.password());
@@ -86,6 +87,8 @@ public class MemberService {
 
         profile.equipTitle(grantedTitle);
 
+        log.info("Member join succeeded: memberId={}, email={}, nickname={}",
+                savedMember.getId(), savedMember.getEmail(), profile.getNickname());
         return savedMember.getId();
     }
 
@@ -185,9 +188,11 @@ public class MemberService {
      */
     private void validateDuplicateMember(MemberRequest.Join req) {
         if (memberRepository.existsByEmail(req.email())) {
+            log.warn("Member join failed: duplicated email={}", req.email());
             throw new BusinessException(ErrorCode.EMAIL_DUPLICATION);
         }
         if (profileRepository.findByNickname(req.nickname()).isPresent()) {
+            log.warn("Member join failed: duplicated nickname={}", req.nickname());
             throw new BusinessException(ErrorCode.NICKNAME_DUPLICATION);
         }
     }

@@ -1,21 +1,117 @@
-version: '3.8'
-
 services:
+  app:
+    build:
+      context: .
+    image: runapp-api:local
+    container_name: runapp-api
+    ports:
+      - "${APP_PORT:-8081}:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      DB_URL: ${DB_URL:-jdbc:postgresql://db:5432/${COMPOSE_DB_NAME:-runapp}}
+      DB_USERNAME: ${DB_USERNAME:-${COMPOSE_DB_USERNAME:-runapp}}
+      DB_PASSWORD: ${DB_PASSWORD:-${COMPOSE_DB_PASSWORD:-runapp}}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-local-development-secret-key-for-runapp-monitoring}
+      JWT_ACCESS_TOKEN_TIME: ${JWT_ACCESS_TOKEN_TIME:-3600000}
+      JWT_REFRESH_TOKEN_TIME: ${JWT_REFRESH_TOKEN_TIME:-1209600000}
+      KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID:-bcb235643a01538feaac40d0f2c53f4b}
+      KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET:-}
+      DEPLOY_SECRET: ${DEPLOY_SECRET:-local_temporary_secret_key_1234}
+      LOG_PATH: /app/logs
+    volumes:
+      - app_logs:/app/logs
+    depends_on:
+      redis:
+        condition: service_healthy
+
   db:
     image: postgis/postgis:16-3.4
     container_name: postgres-container
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${COMPOSE_DB_NAME:-runapp}
+      POSTGRES_USER: ${COMPOSE_DB_USERNAME:-runapp}
+      POSTGRES_PASSWORD: ${COMPOSE_DB_PASSWORD:-runapp}
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${COMPOSE_DB_USERNAME:-runapp} -d ${COMPOSE_DB_NAME:-runapp}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   # Redis
   redis:
     image: redis:latest
     container_name: redis-container
     ports:
-      - "${REDIS_PORT}:6379"
+      - "${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    depends_on:
+      - app
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    command:
+      - "-config.file=/etc/loki/local-config.yml"
+    ports:
+      - "${LOKI_PORT:-3100}:3100"
+    volumes:
+      - ./monitoring/loki/loki-config.yml:/etc/loki/local-config.yml:ro
+      - loki_data:/loki
+
+  alloy:
+    image: grafana/alloy:latest
+    container_name: alloy
+    command:
+      - "run"
+      - "--server.http.listen-addr=0.0.0.0:12345"
+      - "/etc/alloy/config.alloy"
+    volumes:
+      - ./monitoring/alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - app_logs:/var/log/runapp:ro
+    depends_on:
+      - loki
+      - app
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+      - loki
+
+volumes:
+  app_logs:
+  prometheus_data:
+  loki_data:
+  grafana_data:

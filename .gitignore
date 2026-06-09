@@ -1,5 +1,6 @@
 # DB 데이터
 postgres_data/
+logs/
 
 # 로컬 환경 변수
 .env
