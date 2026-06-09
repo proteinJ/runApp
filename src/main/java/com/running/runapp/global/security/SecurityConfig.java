@@ -27,6 +27,7 @@ public class SecurityConfig {
     private final JwtProvider jwtProvider;
     private final RedisTemplate<String, Object> redisTemplate;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private final MonitoringBasicAuthFilter monitoringBasicAuthFilter;
 
     // 비밀번호 암호화
     @Bean
@@ -57,6 +58,8 @@ public class SecurityConfig {
                     .requestMatchers("/api/v1/member/password", "/api/v1/groups/**").authenticated()
                     .anyRequest().authenticated()
             )
+
+            .addFilterBefore(monitoringBasicAuthFilter, UsernamePasswordAuthenticationFilter.class)
 
             // 일반적인 로그인 필터(UsernamePasswordAuthenticationFilter) 작동 전 내가 만든 필터 체인 먼저 실행되도록
             .addFilterBefore(new JwtAuthenticationFilter(jwtProvider, redisTemplate),
