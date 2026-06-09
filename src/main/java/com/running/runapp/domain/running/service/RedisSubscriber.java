@@ -22,14 +22,14 @@ public class RedisSubscriber implements MessageListener {
     @Override
     public void onMessage(Message message, byte[] pattern) {
         try {
-            //Redis에서 온 JSON 데이터를 객체로 변환
             String publishMessage = redisTemplate.getStringSerializer().deserialize(message.getBody());
+            log.info("[Redis] onMessage raw={}", publishMessage);
             LocationMessage locationMessage = objectMapper.readValue(publishMessage, LocationMessage.class);
 
             log.debug("Redis message broadcast: groupId={}, memberId={}", locationMessage.getGroupId(), locationMessage.getMemberId());
 
-            // 해당 방(/topic/group/{groupId}을 구독 중인 웹소켓 클라이언트들에게 쏴줌
             String destination = "/topic/group/" + locationMessage.getGroupId().toString();
+            log.info("[Redis] broadcast → {} memberId={}", destination, locationMessage.getMemberId());
             messagingTemplate.convertAndSend(destination, locationMessage);
 
         } catch (Exception e) {

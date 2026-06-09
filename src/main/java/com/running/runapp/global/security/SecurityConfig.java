@@ -54,7 +54,7 @@ public class SecurityConfig {
 
             // API별 접근 권한 설정
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/v1/member/join", "/api/v1/member/login", "/api/v1/auth/kakao/token", "swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/ws/run/**", "/deploy", "/actuator/health", "/actuator/info", "/actuator/prometheus").permitAll()
+                    .requestMatchers("/api/v1/member/join", "/api/v1/member/login", "/api/v1/auth/kakao/token", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/ws/run", "/ws/run/**", "/deploy", "/actuator/health", "/actuator/info", "/actuator/prometheus").permitAll()
                     .requestMatchers("/api/v1/member/password", "/api/v1/groups/**").authenticated()
                     .anyRequest().authenticated()
             )
