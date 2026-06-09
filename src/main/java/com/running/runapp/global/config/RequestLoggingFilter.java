@@ -1,5 +1,6 @@
 package com.running.runapp.global.config;
 
+import com.running.runapp.global.error.ErrorLoggingAttribute;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,12 +39,25 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } finally {
             long elapsedMs = System.currentTimeMillis() - startTime;
-            log.info("HTTP {} {} status={} durationMs={} remoteAddr={}",
-                    request.getMethod(),
-                    request.getRequestURI(),
-                    response.getStatus(),
-                    elapsedMs,
-                    request.getRemoteAddr());
+            Object errorCode = request.getAttribute(ErrorLoggingAttribute.ERROR_CODE);
+            Object errorMessage = request.getAttribute(ErrorLoggingAttribute.ERROR_MESSAGE);
+            if (errorCode == null) {
+                log.info("HTTP {} {} status={} durationMs={} remoteAddr={}",
+                        request.getMethod(),
+                        request.getRequestURI(),
+                        response.getStatus(),
+                        elapsedMs,
+                        request.getRemoteAddr());
+            } else {
+                log.info("HTTP {} {} status={} errorCode={} errorMessage=\"{}\" durationMs={} remoteAddr={}",
+                        request.getMethod(),
+                        request.getRequestURI(),
+                        response.getStatus(),
+                        errorCode,
+                        errorMessage,
+                        elapsedMs,
+                        request.getRemoteAddr());
+            }
             MDC.remove(REQUEST_ID_MDC_KEY);
         }
     }
