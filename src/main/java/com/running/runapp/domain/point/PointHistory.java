@@ -40,6 +40,6 @@ public class PointHistory { // 11. 여기서부터 설계도 시작
 
     // 포인트 타입 종류 정의 (내부에 간단히 만듦)
     public enum PointType {
-        EARN, SPEND
+        EARN, SPEND, SPOT_OCCUPY, SPOT_STEAL
     }
 }

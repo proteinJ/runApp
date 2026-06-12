@@ -25,27 +25,28 @@ public class FollowService {
 
     // 친구 신청
     public SocialResponse.FollowInfo requestFollow(Member me, SocialRequest.FollowSend dto) {
+        Profile myProfile = me.getProfile();
         Profile target = profileRepository.findByNickname(dto.targetNickname())
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
-        if (me.getId().equals(target.getId())) {
+        if (myProfile.getId().equals(target.getId())) {
             throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
         }
 
         // 이미 관계있는지 체크
-        List<Follow> relations = followRepository.findRelationBetween(me.getId(), target.getId());
+        List<Follow> relations = followRepository.findRelationBetween(myProfile.getId(), target.getId());
         if (!relations.isEmpty()) {
             throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
         }
 
-        Follow follow = Follow.request(me.getProfile(), target);
+        Follow follow = Follow.request(myProfile, target);
         Follow saved = followRepository.save(follow);
 
         return SocialResponse.FollowInfo.builder()
                 .followId(saved.getId())
                 .followerId(me.getId())
-                .followerNickname(me.getProfile().getNickname())
-                .followingId(target.getId())
+                .followerNickname(myProfile.getNickname())
+                .followingId(target.getMember().getId())
                 .followingNickname(target.getNickname())
                 .status(saved.getStatus().name())
                 .build();

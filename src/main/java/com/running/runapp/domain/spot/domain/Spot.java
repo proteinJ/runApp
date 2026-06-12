@@ -1,5 +1,6 @@
 package com.running.runapp.domain.spot.domain;
 
+import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.domain.spot.dto.SpotRequest;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
@@ -50,6 +51,14 @@ public class Spot {
     private Double latitude;
     private Double longitude;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "occupier_member_id")
+    private Member occupier;
+
+    @Builder.Default
+    @Column(name = "occupier_checkin_count", nullable = false, columnDefinition = "integer default 0")
+    private Integer occupierCheckinCount = 0;
+
     public void updateSpotInfo(String name, String description, Integer rewardAmount,
                                String imageUrl, Point location, Double latitude, Double longitude) {
         if (name != null) this.name = name;
@@ -73,5 +82,10 @@ public class Spot {
         Optional.ofNullable(dto.name()).ifPresent(name -> this.name = name);
         Optional.ofNullable(dto.description()).ifPresent(desc -> this.description = desc);
         Optional.ofNullable(dto.rewardAmount()).ifPresent(reward -> this.rewardAmount = reward);
+    }
+
+    public void updateOccupier(Member occupier, Integer occupierCheckinCount) {
+        this.occupier = occupier;
+        this.occupierCheckinCount = occupierCheckinCount;
     }
 }
