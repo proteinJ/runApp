@@ -12,6 +12,7 @@ import com.running.runapp.domain.running.dto.UnitUtils;
 import com.running.runapp.global.common.ApiResponse;
 import com.running.runapp.global.common.annotaion.LoginMember;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,19 @@ public class ProfileController {
         ProfileResponse.MyProfile myProfileRes = profileService.getMyProfile(member);
 
         return ResponseEntity.ok(ApiResponse.success("내 프로필 조회 성공", myProfileRes));
+    }
+
+    @Operation(
+            summary = "회원 프로필 조회",
+            description = "memberId로 회원의 공개 프로필 정보를 조회합니다. 점령자 memberId로 닉네임과 프로필 정보를 표시할 때 사용할 수 있습니다."
+    )
+    @GetMapping("/{memberId}")
+    public ResponseEntity<ApiResponse<ProfileResponse.PublicProfile>> getProfileByMemberId(
+            @Parameter(description = "조회할 회원 ID", example = "2")
+            @PathVariable Long memberId
+    ) {
+        ProfileResponse.PublicProfile profile = profileService.getProfileByMemberId(memberId);
+        return ResponseEntity.ok(ApiResponse.success("회원 프로필 조회 성공", profile));
     }
 
     @Operation(summary = "칭호 장착", description = "소유하고 있는 칭호 장착")

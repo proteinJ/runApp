@@ -63,6 +63,21 @@ public class ProfileService {
                 .toList();
     }
 
+    public ProfileResponse.PublicProfile getProfileByMemberId(Long memberId) {
+        Profile profile = profileRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PROFILE_NOT_FOUND));
+
+        return new ProfileResponse.PublicProfile(
+                profile.getMember().getId(),
+                profile.getNickname(),
+                profile.getLevel(),
+                UnitUtils.metersToKm(profile.getTotalDistance()),
+                profile.getAvgPace(),
+                profile.getEquippedTitle() != null ? profile.getEquippedTitle().getName() : null,
+                profile.getCoreColorCode()
+        );
+    }
+
     @Transactional
     public ProfileResponse.ExpRewardResult rewardExp(Long memberId, Long gainedExp) {
         Profile profile = profileRepository.findByMemberId(memberId)
