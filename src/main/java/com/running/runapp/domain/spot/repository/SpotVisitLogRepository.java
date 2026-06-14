@@ -16,6 +16,8 @@ public interface SpotVisitLogRepository extends JpaRepository<SpotVisitLog, Stri
 
     Optional<SpotVisitLog> findFirstByMemberAndSpotOrderByVisitedAtDesc(Member member, Spot spot);
 
+    long countBySpot_IdAndMember_Id(Long spotId, Long memberId);
+
     @Query("""
         SELECT l FROM SpotVisitLog l
         JOIN FETCH l.spot

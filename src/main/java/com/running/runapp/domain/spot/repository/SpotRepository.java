@@ -22,6 +22,24 @@ public interface SpotRepository extends JpaRepository<Spot, Long> {
     @Query("select s from Spot s left join fetch s.occupier where s.id = :spotId")
     Optional<Spot> findByIdForUpdate(@Param("spotId") Long spotId);
 
+    @Query("""
+        select s from Spot s
+        join fetch s.occupier o
+        left join fetch o.profile
+        where s.occupier is not null
+        order by s.occupiedAt desc, s.id asc
+    """)
+    List<Spot> findOccupiedSpots();
+
+    @Query("""
+        select s from Spot s
+        join fetch s.occupier o
+        left join fetch o.profile
+        where o.id = :memberId
+        order by s.occupiedAt desc, s.id asc
+    """)
+    List<Spot> findOccupiedSpotsByMemberId(@Param("memberId") Long memberId);
+
     @Query(value = "SELECT s.spot_id, s.name, s.reward_amount, s.latitude, s.longitude, " +
             "NOT EXISTS (SELECT 1 FROM spot_visit_log v WHERE v.spot_id = s.spot_id AND v.member_id = :memberId " +
             "AND v.visited_at > NOW() AT TIME ZONE 'Asia/Seoul' - INTERVAL '24 hours') as can_check_in " +

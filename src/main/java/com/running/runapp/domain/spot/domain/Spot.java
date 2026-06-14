@@ -9,6 +9,7 @@ import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.locationtech.jts.geom.Point;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Entity
@@ -59,6 +60,9 @@ public class Spot {
     @Column(name = "occupier_checkin_count", nullable = false, columnDefinition = "integer default 0")
     private Integer occupierCheckinCount = 0;
 
+    @Column(name = "occupied_at")
+    private LocalDateTime occupiedAt;
+
     public void updateSpotInfo(String name, String description, Integer rewardAmount,
                                String imageUrl, Point location, Double latitude, Double longitude) {
         if (name != null) this.name = name;
@@ -85,7 +89,17 @@ public class Spot {
     }
 
     public void updateOccupier(Member occupier, Integer occupierCheckinCount) {
+        boolean shouldInitializeOccupiedAt = this.occupier == null && occupier != null && this.occupiedAt == null;
         this.occupier = occupier;
         this.occupierCheckinCount = occupierCheckinCount;
+        if (shouldInitializeOccupiedAt) {
+            this.occupiedAt = LocalDateTime.now();
+        }
+    }
+
+    public void changeOccupier(Member occupier, Integer occupierCheckinCount, LocalDateTime occupiedAt) {
+        this.occupier = occupier;
+        this.occupierCheckinCount = occupierCheckinCount;
+        this.occupiedAt = occupiedAt == null ? LocalDateTime.now() : occupiedAt;
     }
 }

@@ -2,6 +2,7 @@ package com.running.runapp.domain.spot.service;
 
 import com.running.runapp.domain.member.domain.Member;
 import com.running.runapp.domain.member.repository.MemberRepository;
+import com.running.runapp.domain.notification.service.NotificationService;
 import com.running.runapp.domain.point.PointHistory;
 import com.running.runapp.domain.point.PointHistoryRepository;
 import com.running.runapp.domain.profile.domain.Profile;
@@ -52,6 +53,7 @@ public class SpotService {
     private final SpotVisitLogRepository spotVisitLogRepository;
     private final PointHistoryRepository pointHistoryRepository;
     private final ProfileService profileService;
+    private final NotificationService notificationService;
 
 
     /**
@@ -113,8 +115,9 @@ public class SpotService {
      * Spot 상세 정보
      */
     @Transactional(readOnly = true)
-    public SpotResponse.DetailInfo spotInfoResponse(Long spotId) {
+    public SpotResponse.DetailInfo spotInfoResponse(Long spotId, Long memberId) {
         Spot spot = findSpotById(spotId);
+        long myCheckinCount = spotVisitLogRepository.countBySpot_IdAndMember_Id(spotId, memberId);
 
         return new SpotResponse.DetailInfo(
                 spot.getId(),
@@ -124,7 +127,8 @@ public class SpotService {
                 spot.getLatitude(), // 위도
                 spot.getLongitude(), // 경도
                 spot.getOccupier() == null ? null : spot.getOccupier().getId(),
-                spot.getOccupierCheckinCount()
+                spot.getOccupierCheckinCount(),
+                myCheckinCount
         );
     }
 
@@ -313,6 +317,20 @@ public class SpotService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<SpotResponse.OccupiedSpotInfo> getOccupiedSpots() {
+        return spotRepository.findOccupiedSpots().stream()
+                .map(SpotResponse.OccupiedSpotInfo::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<SpotResponse.OccupiedSpotInfo> getMyOccupiedSpots(Long memberId) {
+        return spotRepository.findOccupiedSpotsByMemberId(memberId).stream()
+                .map(SpotResponse.OccupiedSpotInfo::from)
+                .toList();
+    }
+
 
     /**
      * 편의 메서드
@@ -350,6 +368,7 @@ public class SpotService {
         }
 
         Long currentOccupierId = spot.getOccupier() == null ? null : spot.getOccupier().getId();
+        Member previousOccupier = spot.getOccupier();
         Long newOccupierId = top.getMemberId();
         Integer newOccupierCheckinCount = Math.toIntExact(top.getCheckinCount());
 
@@ -372,7 +391,7 @@ public class SpotService {
                 ? SPOT_OCCUPY_BONUS_POINTS
                 : SPOT_STEAL_BONUS_POINTS;
 
-        spot.updateOccupier(checkinMember, newOccupierCheckinCount);
+        spot.changeOccupier(checkinMember, newOccupierCheckinCount, LocalDateTime.now());
         checkinMemberProfile.addPointAmount(bonusPoints);
 
         pointHistoryRepository.save(PointHistory.builder()
@@ -383,6 +402,10 @@ public class SpotService {
                 .description(spot.getName() + " " + occupationDescription(pointType))
                 .createdAt(requestedAt == null ? LocalDateTime.now() : requestedAt)
                 .build());
+
+        if (pointType == PointHistory.PointType.SPOT_STEAL) {
+            notificationService.createSpotStolen(previousOccupier, checkinMember, spot);
+        }
 
         return SpotResponse.OccupationResult.changed(pointType.name(), bonusPoints, spot);
     }

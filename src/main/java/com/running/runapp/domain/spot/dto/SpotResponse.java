@@ -59,10 +59,42 @@ public class SpotResponse {
             @Schema(description = "현재 점령자 회원 ID. 점령자가 없으면 null", example = "1")
             Long occupierMemberId,
             @Schema(description = "현재 점령자의 해당 스팟 누적 체크인 수", example = "3")
-            Integer occupierCheckinCount
+            Integer occupierCheckinCount,
+            @Schema(description = "현재 로그인 회원의 해당 스팟 누적 체크인 수", example = "2")
+            Long myCheckinCount
 //            String imageUrl,
 //            List<String> tags
     ) {}
+
+    @Schema(name = "OccupiedSpotInfo", description = "점령된 스팟 정보 응답")
+    public record OccupiedSpotInfo(
+            @Schema(description = "스팟 ID", example = "1")
+            Long spotId,
+            @Schema(description = "스팟 이름", example = "구서 이마트 앞 광장")
+            String name,
+            @Schema(description = "스팟 위도", example = "35.2486")
+            Double latitude,
+            @Schema(description = "스팟 경도", example = "129.0921")
+            Double longitude,
+            @Schema(description = "점령자 회원 ID", example = "5")
+            Long occupierMemberId,
+            @Schema(description = "점령자 닉네임", example = "날쌘돌이")
+            String occupierNickname,
+            @Schema(description = "점령/탈환 발생 시각. 기존 데이터는 null일 수 있습니다.", example = "2026-06-14T10:40:00")
+            LocalDateTime occupiedAt
+    ) {
+        public static OccupiedSpotInfo from(Spot spot) {
+            return new OccupiedSpotInfo(
+                    spot.getId(),
+                    spot.getName(),
+                    spot.getLatitude(),
+                    spot.getLongitude(),
+                    spot.getOccupier().getId(),
+                    spot.getOccupier().getProfile() == null ? null : spot.getOccupier().getProfile().getNickname(),
+                    spot.getOccupiedAt()
+            );
+        }
+    }
 
 
     public record CooldownInfo(

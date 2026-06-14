@@ -26,19 +26,6 @@ public class SpotController {
     private final SpotService spotService;
 
     @Operation(
-            summary = "Spot 상세 조회",
-            description = "스팟 기본 정보와 현재 점령자 정보를 조회합니다. 점령자는 해당 스팟 누적 체크인 수가 가장 많은 회원입니다."
-    )
-    @GetMapping("/{spotId}")
-    public ResponseEntity<ApiResponse<SpotResponse.DetailInfo>> getSpot(
-            @Parameter(description = "스팟 ID", example = "32")
-            @PathVariable Long spotId
-    ) {
-        SpotResponse.DetailInfo spotInfoResponse = spotService.spotInfoResponse(spotId);
-        return ResponseEntity.ok(ApiResponse.success("Spot 상세 정보 불러오기 완료", spotInfoResponse));
-    }
-
-    @Operation(
             summary = "Spot 체크인",
             description = """
                     러닝 중인 기록으로 스팟에 체크인합니다.
@@ -70,6 +57,28 @@ public class SpotController {
         return ResponseEntity.ok(ApiResponse.success("체크인 쿨타임 조회 완료", cooldowns));
     }
 
+    @Operation(
+            summary = "전체 점령 Spot 조회",
+            description = "현재 점령자가 있는 모든 스팟을 조회합니다. 점령된 스팟이 없으면 빈 배열을 반환합니다."
+    )
+    @GetMapping("/occupied")
+    public ResponseEntity<ApiResponse<List<SpotResponse.OccupiedSpotInfo>>> getOccupiedSpots() {
+        List<SpotResponse.OccupiedSpotInfo> occupiedSpots = spotService.getOccupiedSpots();
+        return ResponseEntity.ok(ApiResponse.success("점령 스팟 조회 성공", occupiedSpots));
+    }
+
+    @Operation(
+            summary = "내 점령 Spot 조회",
+            description = "현재 로그인한 회원이 점령자인 스팟만 조회합니다. 점령한 스팟이 없으면 빈 배열을 반환합니다."
+    )
+    @GetMapping("/occupied/me")
+    public ResponseEntity<ApiResponse<List<SpotResponse.OccupiedSpotInfo>>> getMyOccupiedSpots(
+            @AuthenticationPrincipal PrincipalDetails principal
+    ) {
+        List<SpotResponse.OccupiedSpotInfo> occupiedSpots = spotService.getMyOccupiedSpots(principal.getMemberId());
+        return ResponseEntity.ok(ApiResponse.success("내 점령 스팟 조회 성공", occupiedSpots));
+    }
+
     @Operation(summary = "주변 Spot 조회", description = "현재 위치 기준 주변 스팟과 체크인 가능 여부를 조회합니다.")
     @GetMapping("/nearby")
     public ResponseEntity<ApiResponse<List<SpotResponse.SummaryInfo>>> getNearbySpots(
@@ -80,5 +89,19 @@ public class SpotController {
                 spotService.getNearbySpots(dto, principal.getMemberId());
 
         return ResponseEntity.ok(ApiResponse.success("내 주변 스팟 조회 완료", nearbySpots));
+    }
+
+    @Operation(
+            summary = "Spot 상세 조회",
+            description = "스팟 기본 정보, 현재 점령자 정보, 현재 로그인 회원의 해당 스팟 누적 체크인 횟수를 조회합니다."
+    )
+    @GetMapping("/{spotId}")
+    public ResponseEntity<ApiResponse<SpotResponse.DetailInfo>> getSpot(
+            @AuthenticationPrincipal PrincipalDetails principal,
+            @Parameter(description = "스팟 ID", example = "32")
+            @PathVariable Long spotId
+    ) {
+        SpotResponse.DetailInfo spotInfoResponse = spotService.spotInfoResponse(spotId, principal.getMemberId());
+        return ResponseEntity.ok(ApiResponse.success("Spot 상세 정보 불러오기 완료", spotInfoResponse));
     }
 }

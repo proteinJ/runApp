@@ -1,6 +1,7 @@
 package com.running.runapp.domain.profile.service;
 
 import com.running.runapp.domain.member.domain.Member;
+import com.running.runapp.domain.notification.service.NotificationService;
 import com.running.runapp.domain.profile.domain.Follow;
 import com.running.runapp.domain.profile.domain.Profile;
 import com.running.runapp.domain.profile.dto.SocialRequest;
@@ -22,6 +23,7 @@ public class FollowService {
 
     private final FollowRepository followRepository;
     private final ProfileRepository profileRepository;
+    private final NotificationService notificationService;
 
     // 친구 신청
     public SocialResponse.FollowInfo requestFollow(Member me, SocialRequest.FollowSend dto) {
@@ -41,6 +43,7 @@ public class FollowService {
 
         Follow follow = Follow.request(myProfile, target);
         Follow saved = followRepository.save(follow);
+        notificationService.createFollowRequest(target.getMember(), me, saved.getId());
 
         return SocialResponse.FollowInfo.builder()
                 .followId(saved.getId())
@@ -62,6 +65,7 @@ public class FollowService {
         }
 
         follow.accept();
+        notificationService.createFollowAccepted(follow.getFollower().getMember(), me, follow.getId());
     }
 
     // 친구 신청 거절

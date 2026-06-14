@@ -21,6 +21,9 @@ public enum ErrorCode {
     // Notice (공지사항 관련)
     NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, "N001", "공지사항을 찾을 수 없습니다."),
 
+    // Notification (알림 관련)
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NF001", "존재하지 않는 알림입니다."),
+
     // Auth (인증 관련)
     AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "A001", " 인증에 실패하였습니다."),
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "A002", " 토큰이 만료되었습니다."),
