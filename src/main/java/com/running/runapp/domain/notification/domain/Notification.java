@@ -54,6 +54,7 @@ public class Notification {
     private LocalDateTime readAt;
 
     public enum NotificationType {
+        SPOT_STEAL_RISK,
         SPOT_STOLEN,
         FOLLOW_REQUEST,
         FOLLOW_ACCEPTED

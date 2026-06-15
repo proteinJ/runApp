@@ -21,6 +21,23 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
 
+    public void createSpotStealRisk(Member currentOccupier, Member challenger, Spot spot) {
+        if (currentOccupier == null || challenger == null || currentOccupier.getId().equals(challenger.getId())) {
+            return;
+        }
+
+        String actorNickname = getNickname(challenger);
+        notificationRepository.save(Notification.create(
+                currentOccupier,
+                challenger,
+                Notification.NotificationType.SPOT_STEAL_RISK,
+                "영토를 빼앗기기 직전이에요!",
+                "'" + actorNickname + "'님이 '" + spot.getName() + "' 스팟 점령에 바짝 따라왔습니다.",
+                Notification.TargetType.SPOT,
+                String.valueOf(spot.getId())
+        ));
+    }
+
     public void createSpotStolen(Member previousOccupier, Member newOccupier, Spot spot) {
         if (previousOccupier == null || newOccupier == null || previousOccupier.getId().equals(newOccupier.getId())) {
             return;

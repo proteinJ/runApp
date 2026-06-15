@@ -147,6 +147,7 @@ public class AdminService {
                 .name(dto.name())
                 .description(dto.description())
                 .rewardAmount(dto.rewardAmount())
+                .expAmount(dto.expAmount())
                 .location(point)
                 .latitude(dto.latitude())
                 .longitude(dto.longitude())

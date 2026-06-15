@@ -11,6 +11,7 @@ public class AdminSpotRequest {
             String description,
             String imageUrl,
             @Min(0) @Max(10000) Integer rewardAmount,
+            @Min(0) @Max(200) Long expAmount,
             double latitude,
             double longitude
     ) {}

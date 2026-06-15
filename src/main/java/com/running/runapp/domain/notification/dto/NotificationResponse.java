@@ -11,7 +11,7 @@ public class NotificationResponse {
     public record Info(
             @Schema(description = "알림 ID", example = "1")
             Long notificationId,
-            @Schema(description = "알림 타입", example = "SPOT_STOLEN", allowableValues = {"SPOT_STOLEN", "FOLLOW_REQUEST", "FOLLOW_ACCEPTED"})
+            @Schema(description = "알림 타입", example = "SPOT_STOLEN", allowableValues = {"SPOT_STEAL_RISK", "SPOT_STOLEN", "FOLLOW_REQUEST", "FOLLOW_ACCEPTED"})
             String type,
             @Schema(description = "알림 제목", example = "영토를 빼앗겼어요!")
             String title,

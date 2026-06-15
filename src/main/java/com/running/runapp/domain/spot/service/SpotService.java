@@ -359,16 +359,17 @@ public class SpotService {
             return SpotResponse.OccupationResult.unchanged(spot);
         }
 
+        Long currentOccupierId = spot.getOccupier() == null ? null : spot.getOccupier().getId();
+        Member previousOccupier = spot.getOccupier();
         SpotVisitLogRepository.OccupierCandidateRow top = candidates.get(0);
         boolean hasTopTie = candidates.size() > 1
                 && Objects.equals(top.getCheckinCount(), candidates.get(1).getCheckinCount());
 
         if (hasTopTie) {
+            notifySpotStealRiskIfNeeded(spot, checkinMember, currentOccupierId);
             return SpotResponse.OccupationResult.unchanged(spot);
         }
 
-        Long currentOccupierId = spot.getOccupier() == null ? null : spot.getOccupier().getId();
-        Member previousOccupier = spot.getOccupier();
         Long newOccupierId = top.getMemberId();
         Integer newOccupierCheckinCount = Math.toIntExact(top.getCheckinCount());
 
@@ -408,6 +409,19 @@ public class SpotService {
         }
 
         return SpotResponse.OccupationResult.changed(pointType.name(), bonusPoints, spot);
+    }
+
+    private void notifySpotStealRiskIfNeeded(Spot spot, Member challenger, Long currentOccupierId) {
+        if (currentOccupierId == null || challenger == null || Objects.equals(currentOccupierId, challenger.getId())) {
+            return;
+        }
+
+        long currentOccupierCheckinCount = spotVisitLogRepository.countBySpot_IdAndMember_Id(spot.getId(), currentOccupierId);
+        long challengerCheckinCount = spotVisitLogRepository.countBySpot_IdAndMember_Id(spot.getId(), challenger.getId());
+
+        if (currentOccupierCheckinCount == challengerCheckinCount) {
+            notificationService.createSpotStealRisk(spot.getOccupier(), challenger, spot);
+        }
     }
 
     private String occupationDescription(PointHistory.PointType pointType) {
