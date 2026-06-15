@@ -55,4 +55,12 @@ public class MemberRequest {
         @Schema(name = "password", description = "현재 비밀번호 (본인 확인용)", example = "password1234")
         @NotBlank String password
     ) {}
+
+    @Schema(description = "FCM 토큰 저장 요청")
+    public record FcmToken(
+        @Schema(name = "fcmToken", description = "Firebase Cloud Messaging 등록 토큰")
+        @NotBlank
+        @Size(max = 4096, message = "FCM 토큰은 4096자 이하이어야 합니다.")
+        String fcmToken
+    ) {}
 }

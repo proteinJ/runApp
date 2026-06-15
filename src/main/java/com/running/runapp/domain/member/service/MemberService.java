@@ -183,6 +183,14 @@ public class MemberService {
         return MemberResponse.Me.from(member);
     }
 
+    @Transactional
+    public void updateFcmToken(Long memberId, MemberRequest.FcmToken req) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+
+        member.updateFcmToken(req.fcmToken());
+    }
+
     /**
      * 중복 검증
      */

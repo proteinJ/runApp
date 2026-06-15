@@ -57,6 +57,16 @@ public class MemberController {
         return ResponseEntity.ok(ApiResponse.success("회원 정보 조회 성공", memberService.getMe(member)));
     }
 
+    @Operation(summary = "FCM 토큰 저장", description = "현재 로그인한 회원의 FCM 토큰을 저장하거나 갱신")
+    @PostMapping("/fcm-token")
+    public ResponseEntity<ApiResponse<Void>> updateFcmToken(
+            @LoginMember Member member,
+            @RequestBody @Valid MemberRequest.FcmToken dto
+    ) {
+        memberService.updateFcmToken(member.getId(), dto);
+        return ResponseEntity.ok(ApiResponse.success("FCM 토큰 저장 완료"));
+    }
+
     @Operation(summary = "회원 탈퇴", description = "비밀번호 확인 후 계정 삭제")
     @DeleteMapping("/me")
     public ResponseEntity<ApiResponse<Void>> withdraw(

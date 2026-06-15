@@ -31,6 +31,9 @@ public class Member {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @Column(name = "fcm_token", length = 4096)
+    private String fcmToken;
+
     // 관리자 페이지에서 수정 시 사용하는 필드들
     private String description;
 
@@ -49,6 +52,10 @@ public class Member {
 
     public void updateRealname(String realname) {
         this.realname = realname;
+    }
+
+    public void updateFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
     }
 
 
