@@ -1,0 +1,128 @@
+아래 내용을 바탕으로 Baton 소셜 러닝 앱의 시스템 아키텍처와 핵심 기능을 설명하는 발표자료 또는 구조도를 만들어줘.
+
+프로젝트 이름은 Baton이며, GPS 러닝 추적, 스팟 체크인, 그룹 러닝, 소셜 피드, 캐릭터 커스터마이징, 포인트/랭킹 기능을 제공하는 소셜 러닝 플랫폼이다.
+
+전체 구조는 Flutter 프론트엔드 앱과 Spring Boot 백엔드 API 서버, PostgreSQL/PostGIS 데이터베이스, Redis 실시간/캐시 계층, Docker Compose 기반 로컬 실행 및 Grafana/Prometheus/Loki 모니터링 구성으로 이루어진다.
+
+Frontend
+- Flutter 3.x 기반 모바일 앱이다.
+- 상태 관리는 Riverpod을 사용한다.
+- 화면 이동은 GoRouter를 사용한다.
+- API 통신은 Dio를 사용하고, AuthInterceptor가 요청마다 Bearer JWT 토큰을 붙인다.
+- 토큰과 설정값은 flutter_secure_storage와 SharedPreferences에 저장한다.
+- 지도와 위치 기능은 Google Maps Flutter, Geolocator, permission_handler를 사용한다.
+- 그룹 러닝 실시간 위치 공유는 STOMP WebSocket으로 처리한다.
+- 푸시 알림은 Firebase Messaging을 사용한다.
+- 소셜 로그인은 Kakao Login을 사용한다.
+- 주요 기능 모듈은 Auth, Running, Group Running, Spot, Profile, Shop, Run Share, Notifications, Settings이다.
+
+Frontend 주요 흐름
+- 사용자는 Flutter 앱에서 로그인/회원가입을 한다.
+- 로그인 후 JWT 토큰을 저장하고, 이후 API 요청에 Bearer Token으로 첨부한다.
+- 러닝 시작/종료, 스팟 체크인, 프로필 조회, 랭킹 조회 등은 REST API로 백엔드와 통신한다.
+- 그룹 러닝 중에는 /ws/run WebSocket endpoint에 연결하고, STOMP destination을 통해 위치를 송수신한다.
+- 구독 채널은 /topic/group/{groupId} 이다.
+- 위치 발행 채널은 /app/group/{groupId}/location 이다.
+- GPS 위치는 약 2초 주기로 publish된다.
+
+Backend
+- Java 17, Spring Boot 3.4.1 기반 API 서버이다.
+- Spring MVC Controller, Service, Repository 계층 구조를 가진다.
+- Spring Security와 JWT를 사용하여 Stateless 인증을 구성한다.
+- Access Token과 Refresh Token을 사용한다.
+- Refresh Token은 Redis에 저장한다.
+- 로그아웃 또는 만료 처리된 Access Token은 Redis 블랙리스트로 관리한다.
+- Swagger/OpenAPI를 통해 API 문서를 제공한다.
+- QueryDSL을 사용하여 동적 쿼리를 처리한다.
+- Spring Data JPA와 Hibernate Spatial을 사용한다.
+- WebSocket + STOMP를 사용해 그룹 러닝 실시간 위치 공유를 처리한다.
+
+Backend 주요 도메인
+- Auth / Member: 로그인, 회원가입, JWT 발급, 내 정보 조회, 회원 관리
+- Running: 개인 러닝 시작/종료, GPS 좌표 저장, 거리/페이스 계산
+- Group Running: 그룹 러닝 모집, 참여, 나가기, 실시간 위치 공유
+- Spot: 주변 스팟 조회, 30m 이내 체크인, 쿨다운 확인
+- Profile / Social: 프로필, 팔로우, 피드, 칭호, 캐릭터 색상 조회
+- Point / Ranking: 포인트 적립, 상점, 거리 기반 주간/전체 랭킹
+- Admin: 스팟, 회원, 공지사항 등 관리자 기능
+
+Database
+- PostgreSQL + PostGIS를 사용한다.
+- 회원, 러닝 기록, 그룹 러닝, 스팟, 프로필, 포인트, 랭킹 관련 데이터를 저장한다.
+- 위치 기반 기능을 위해 PostGIS 공간 쿼리를 사용한다.
+- 주변 스팟 조회는 반경 기반 공간 쿼리로 처리한다.
+- 러닝 경로는 GPS 좌표 리스트를 LineString 형태로 저장한다.
+- 로컬 DB 접속 정보:
+  - Host: localhost
+  - Port: 5432
+  - Database: runapp
+  - User: runapp
+  - Password: runapp
+
+Redis
+- Refresh Token 저장소로 사용한다.
+- Access Token 블랙리스트 저장소로 사용한다.
+- 그룹 러닝 실시간 위치 공유를 위한 Pub/Sub 브로드캐스트에 사용한다.
+- 로컬 Redis 접속 정보:
+  - Host: localhost
+  - Port: 6379
+
+Realtime Flow
+- Flutter 앱이 /ws/run WebSocket endpoint에 연결한다.
+- STOMP 연결 시 Authorization 헤더에 Bearer Access Token을 포함한다.
+- 클라이언트는 /topic/group/{groupId} 채널을 구독한다.
+- 클라이언트는 /app/group/{groupId}/location 채널로 자신의 GPS 위치를 발행한다.
+- 백엔드는 위치 메시지를 수신하고 Redis Pub/Sub을 통해 같은 그룹 참여자들에게 브로드캐스트한다.
+- 다른 참여자의 위치가 Flutter 앱 지도에 실시간으로 표시된다.
+
+Runtime / Server Visibility
+- Docker Compose로 백엔드 API, PostgreSQL/PostGIS, Redis, Prometheus, Loki, Alloy, Grafana를 함께 실행한다.
+- 실행 명령은 docker compose up -d 이다.
+- Spring Boot API 서버는 컨테이너 내부 8080 포트를 사용하고, 로컬에서는 8081 포트로 접근한다.
+- API 문서는 Swagger UI에서 확인한다:
+  - http://localhost:8081/swagger-ui.html
+- Grafana에서 서버 상태와 로그 대시보드를 확인한다:
+  - http://localhost:3000
+  - 기본 계정: admin / admin
+- Prometheus에서 메트릭을 확인한다:
+  - http://localhost:9090
+- Loki와 Alloy는 애플리케이션 로그 수집과 조회를 위한 구성이다.
+
+Architecture Diagram Requirements
+- 구조도는 왼쪽에서 오른쪽으로 흐르는 형태로 구성한다.
+- 왼쪽에는 Flutter Client를 배치한다.
+- 중앙에는 REST API + Security, Spring Boot Application을 배치한다.
+- 오른쪽에는 PostgreSQL + PostGIS와 Redis를 배치한다.
+- 하단에는 Runtime Containers와 Monitoring을 배치한다.
+- Flutter Client에서 REST API로 향하는 화살표에는 HTTPS / JSON / Bearer JWT를 표시한다.
+- Flutter Client와 Backend 사이의 실시간 통신에는 STOMP WebSocket, GPS 2초 Publish, Redis Pub/Sub을 표시한다.
+- Backend에서 PostgreSQL + PostGIS로 향하는 화살표는 영속 데이터 저장과 공간 쿼리를 의미한다.
+- Backend에서 Redis로 향하는 화살표는 토큰 저장, 블랙리스트, 실시간 위치 Pub/Sub을 의미한다.
+- Monitoring 영역에는 Grafana, Prometheus, Loki, Alloy를 표시한다.
+- Runtime Containers 영역에는 runapp-api, PostGIS, Redis, Grafana를 표시한다.
+
+Presentation Tone
+- 발표용으로 쉽게 이해되게 만든다.
+- 너무 많은 코드를 넣지 말고 핵심 기술과 흐름을 중심으로 설명한다.
+- 데이터베이스와 서버 확인 화면은 별도 슬라이드 또는 별도 섹션으로 정리한다.
+- “Swagger는 API 테스트 화면, Grafana는 서버 상태/로그 화면, PostGIS와 Redis는 앱 데이터와 실시간 기능을 담당한다”는 메시지가 명확히 보이게 한다.
+
+Suggested Slide Structure
+1. 소셜 러닝 플랫폼 시스템 아키텍처
+   - Flutter Client
+   - REST API + Security
+   - Spring Boot Application
+   - PostgreSQL + PostGIS
+   - Redis
+   - Monitoring / Runtime Containers
+
+2. DB와 서버 확인 구성
+   - docker compose up -d
+   - Swagger UI: http://localhost:8081/swagger-ui.html
+   - Grafana: http://localhost:3000
+   - Prometheus: http://localhost:9090
+   - PostgreSQL/PostGIS 접속 정보
+   - Redis 접속 정보
+
+핵심 요약 문장:
+Baton은 Flutter 앱에서 REST API와 STOMP WebSocket으로 Spring Boot 백엔드에 연결되고, PostgreSQL/PostGIS가 위치 기반 데이터를 저장하며, Redis가 인증 토큰과 실시간 위치 브로드캐스트를 처리하는 소셜 러닝 플랫폼이다. Docker Compose로 전체 서버 인프라를 띄우고, Swagger와 Grafana를 통해 API와 서버 상태를 확인할 수 있다.

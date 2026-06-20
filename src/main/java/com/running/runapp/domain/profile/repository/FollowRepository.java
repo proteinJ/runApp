@@ -21,8 +21,7 @@ public interface FollowRepository extends JpaRepository<Follow, String> {
 
     @Query("""
         select f from Follow f
-        where (f.follower.id = :me and f.following.id = :other)
-           or (f.follower.id = :other and f.following.id = :me)
+        where f.follower.id = :me and f.following.id = :other
     """)
     List<Follow> findRelationBetween(@Param("me") Long me, @Param("other") Long other);
 

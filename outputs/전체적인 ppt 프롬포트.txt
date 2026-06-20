@@ -1,0 +1,371 @@
+Baton 소셜 러닝 앱을 설명하는 발표용 PPT를 만들어줘.
+이 PPT는 단순 기능 나열이 아니라, “왜 이 앱을 만들었는지 → 어떤 문제를 해결하는지 → 사용자가 어떻게 쓰는지 → 프론트엔드/백엔드/DB/실시간/배포 구조가 어떻게 연결되는지”를 자연스럽게 설명하는 흐름이어야 한다.
+
+발표 대상은 개발 프로젝트를 평가하는 교수님, 팀원, 채용 면접관 또는 프로젝트 심사자라고 가정한다.
+기술적으로 충분히 자세하지만, 처음 보는 사람도 앱의 목적과 구조를 이해할 수 있게 만들어줘.
+
+전체 발표 톤
+- 발표용으로 깔끔하고 논리적인 흐름을 가진다.
+- 너무 마케팅처럼 과장하지 말고, 실제 구현된 기술과 기능 중심으로 설명한다.
+- 핵심 메시지는 “Baton은 혼자 하는 러닝을 함께 뛰는 경험으로 확장하는 위치 기반 소셜 러닝 플랫폼”이다.
+- 프론트엔드, 백엔드, 데이터베이스, 실시간 통신, 모니터링 구성이 하나의 서비스로 어떻게 연결되는지 보여준다.
+- 각 슬라이드는 제목, 핵심 메시지, 시각 자료 방향, 발표자가 말할 포인트를 포함한다.
+- 가능하면 구조도, 사용자 흐름도, 아키텍처 다이어그램, 기능별 카드, 데이터 흐름도를 활용한다.
+
+프로젝트 개요
+- 앱 이름: Baton
+- 앱 유형: GPS 기반 소셜 러닝 트래킹 플랫폼
+- 핵심 컨셉: 혼자 뛰는 러닝을 함께 달리는 경험으로 확장하는 앱
+- 주요 목적:
+  - 개인 러닝 기록 측정
+  - 그룹 러닝 참여와 실시간 위치 공유
+  - 주변 러닝 스팟 체크인
+  - 포인트, 레벨, 칭호, 랭킹을 통한 게이미피케이션
+  - 프로필, 팔로우, 피드 기반 소셜 기능
+  - 캐릭터 커스터마이징과 포인트샵 제공
+
+핵심 요약 문장
+Baton은 Flutter 앱에서 REST API와 STOMP WebSocket으로 Spring Boot 백엔드에 연결되고, PostgreSQL/PostGIS가 위치 기반 데이터를 저장하며, Redis가 인증 토큰과 실시간 위치 브로드캐스트를 처리하는 소셜 러닝 플랫폼이다. Docker Compose로 전체 서버 인프라를 실행하고, Swagger와 Grafana를 통해 API와 서버 상태를 확인할 수 있다.
+
+PPT 전체 추천 구성
+
+1. 표지 슬라이드
+제목: Baton - 소셜 러닝 트래킹 플랫폼
+부제: 혼자 뛰지 말고, 같이 뛰자
+내용:
+- 프로젝트 이름과 한 줄 소개
+- Flutter + Spring Boot 기반 위치 기반 소셜 러닝 앱
+- 발표자/팀명/날짜를 넣을 수 있는 공간
+시각 자료:
+- 러닝, 지도, 실시간 위치, 그룹 러닝을 연상시키는 심플한 배경
+발표 포인트:
+- Baton은 러닝 기록 앱을 넘어, 주변 러너와 함께 달리고 성장하는 경험을 제공하는 앱이라고 소개한다.
+
+2. 문제 정의 / 기획 배경
+제목: 왜 Baton이 필요한가
+핵심 메시지:
+혼자 하는 러닝은 지속 동기와 재미가 떨어질 수 있고, 함께 뛸 사람이나 목표를 찾기 어렵다.
+내용:
+- 기존 러닝 앱은 개인 기록 중심인 경우가 많다.
+- 러닝을 꾸준히 하려면 동기부여, 커뮤니티, 목표, 보상이 필요하다.
+- 위치 기반 스팟, 그룹 러닝, 랭킹, 포인트 시스템을 통해 러닝을 게임처럼 즐길 수 있게 한다.
+발표 포인트:
+- Baton은 GPS 기록, 소셜, 게이미피케이션을 합쳐 사용자가 계속 뛰고 싶게 만드는 앱이라고 설명한다.
+
+3. 서비스 핵심 가치
+제목: Baton의 핵심 가치
+핵심 메시지:
+Baton은 기록, 함께 달리기, 체크인, 성장 시스템을 하나로 연결한다.
+내용:
+- 기록: 거리, 페이스, 경로, 러닝 히스토리
+- 연결: 그룹 러닝, 실시간 위치 공유, 팔로우
+- 탐험: 주변 스팟 조회와 체크인
+- 성장: 경험치, 레벨, 칭호, 포인트, 랭킹
+- 표현: 캐릭터 색상, 내 방, 러닝 결과 공유 카드
+시각 자료:
+- 5개 카드 형태로 핵심 가치를 정리
+발표 포인트:
+- 앱의 기능을 단순히 나열하지 말고, 사용자 경험 관점에서 “기록-연결-탐험-성장-표현”으로 설명한다.
+
+4. 주요 사용자 흐름
+제목: 사용자는 Baton을 어떻게 사용하는가
+핵심 메시지:
+로그인 후 러닝을 시작하고, 그룹에 참여하거나 스팟을 체크인하며, 기록과 보상을 쌓는다.
+내용:
+1. 회원가입/로그인
+2. 홈 화면 진입
+3. 개인 러닝 시작 또는 그룹 러닝 참여
+4. GPS로 위치와 경로 기록
+5. 러닝 종료 후 거리, 페이스, 경험치 반영
+6. 주변 스팟 체크인 및 포인트 획득
+7. 프로필, 랭킹, 피드에서 결과 확인
+8. 포인트샵에서 캐릭터 커스터마이징
+시각 자료:
+- 왼쪽에서 오른쪽으로 흐르는 사용자 여정 다이어그램
+발표 포인트:
+- Baton은 “러닝을 하고 끝”이 아니라, 기록이 성장과 소셜 활동으로 이어지는 구조라고 설명한다.
+
+5. 주요 기능 소개
+제목: 핵심 기능
+내용:
+- 개인 러닝: GPS 기반 거리, 페이스, 경로 저장
+- 그룹 러닝: 모집글 생성, 참여, 실시간 위치 공유
+- 스팟 체크인: 주변 러닝 스팟 조회, 30m 이내 체크인, 쿨다운
+- 소셜 기능: 프로필, 팔로우, 피드, 친구 기능
+- 게이미피케이션: 경험치, 레벨, 칭호, 포인트, 랭킹
+- 커스터마이징: 캐릭터 색상, 포인트샵, 내 방
+- 러닝 공유: 러닝 결과 이미지 카드 생성
+시각 자료:
+- 기능별 아이콘 카드
+발표 포인트:
+- 각 기능이 독립적으로 존재하는 것이 아니라, 러닝 경험을 계속 이어가게 만드는 구조라고 설명한다.
+
+6. 프론트엔드 구조
+제목: Flutter Frontend Architecture
+핵심 메시지:
+Flutter 앱은 화면, 상태관리, 네트워크, 위치/지도, 실시간 통신 모듈로 구성된다.
+내용:
+- Framework: Flutter 3.x / Dart SDK 3.8
+- State Management: Riverpod
+- Navigation: GoRouter
+- Network: Dio + AuthInterceptor
+- Storage: flutter_secure_storage, SharedPreferences
+- Map & Location: Google Maps Flutter, Geolocator, permission_handler
+- Realtime: stomp_dart_client
+- Push: Firebase Messaging
+- Social Login: Kakao Login
+주요 프론트엔드 모듈:
+- Auth
+- Running
+- Group Running
+- Spot
+- Profile
+- Shop
+- Run Share
+- Notifications
+- Settings
+시각 자료:
+- Flutter Client 내부 구조도
+발표 포인트:
+- 프론트엔드는 단순 UI가 아니라 인증, 지도, 위치 권한, 실시간 통신, 상태관리까지 담당한다고 설명한다.
+
+7. 백엔드 구조
+제목: Spring Boot Backend Architecture
+핵심 메시지:
+백엔드는 Controller-Service-Repository 구조로 도메인별 기능을 분리하고, JWT 인증과 실시간 위치 통신을 처리한다.
+내용:
+- Java 17
+- Spring Boot 3.4.1
+- Spring MVC
+- Spring Security + JWT
+- Spring Data JPA
+- Hibernate Spatial
+- QueryDSL
+- WebSocket + STOMP
+- Swagger/OpenAPI
+주요 도메인:
+- Auth / Member
+- Running
+- Group Running
+- Spot
+- Profile / Social
+- Point / Ranking
+- Admin
+시각 자료:
+- Spring Boot Application 내부 모듈 다이어그램
+발표 포인트:
+- 각 도메인이 Controller-Service-Repository 흐름으로 나뉘어 유지보수하기 쉽게 설계되었다고 설명한다.
+
+8. 데이터베이스 구조와 위치 기반 처리
+제목: Database & Location Data
+핵심 메시지:
+PostgreSQL + PostGIS를 사용해 일반 데이터와 위치 기반 공간 데이터를 함께 처리한다.
+내용:
+- DB: PostgreSQL + PostGIS
+- ORM: Spring Data JPA + Hibernate Spatial
+- 저장 데이터:
+  - 회원
+  - 러닝 기록
+  - 그룹 러닝
+  - 스팟
+  - 프로필
+  - 포인트
+  - 랭킹
+- 위치 기반 처리:
+  - 주변 스팟 반경 조회
+  - 30m 이내 체크인 판정
+  - GPS 좌표 리스트를 LineString 형태로 저장
+  - 러닝 경로 시각화에 활용
+로컬 DB 정보:
+- Host: localhost
+- Port: 5432
+- Database: runapp
+- User: runapp
+- Password: runapp
+시각 자료:
+- 지도 좌표 → PostGIS → 러닝 경로/스팟 조회 흐름
+발표 포인트:
+- 일반적인 CRUD 앱이 아니라, 위치 데이터를 효율적으로 다루기 위해 PostGIS를 사용한 점을 강조한다.
+
+9. 실시간 그룹 러닝 구조
+제목: Realtime Group Running
+핵심 메시지:
+STOMP WebSocket과 Redis Pub/Sub으로 그룹 러닝 참여자들의 위치를 실시간 공유한다.
+내용:
+- Flutter 앱이 /ws/run WebSocket endpoint에 연결한다.
+- 연결 시 Authorization 헤더에 Bearer Access Token을 포함한다.
+- 클라이언트는 /topic/group/{groupId} 채널을 구독한다.
+- 클라이언트는 /app/group/{groupId}/location 채널로 자신의 위치를 발행한다.
+- GPS 위치는 약 2초 주기로 publish된다.
+- 백엔드는 위치 메시지를 수신하고 Redis Pub/Sub을 통해 같은 그룹 참여자들에게 브로드캐스트한다.
+- 다른 참여자들의 위치가 지도에 실시간으로 표시된다.
+시각 자료:
+- Client A, Client B, Spring Boot WebSocket, Redis Pub/Sub, 지도 표시 흐름도
+발표 포인트:
+- 이 기능은 Baton의 핵심 차별점으로, “함께 달리는 경험”을 기술적으로 구현한 부분이라고 강조한다.
+
+10. 인증 및 보안 구조
+제목: Authentication & Security
+핵심 메시지:
+JWT 기반 Stateless 인증을 사용하고, Redis로 Refresh Token과 Access Token 블랙리스트를 관리한다.
+내용:
+- 로그인 성공 시 Access Token과 Refresh Token 발급
+- Flutter 앱은 토큰을 SecureStorage에 저장
+- Dio AuthInterceptor가 API 요청마다 Bearer Token 첨부
+- Spring Security가 JWT 검증
+- Refresh Token은 Redis에 저장
+- 로그아웃 또는 만료된 Access Token은 Redis 블랙리스트로 관리
+시각 자료:
+- 로그인 → 토큰 저장 → API 요청 → JWT 검증 → Redis 확인 흐름
+발표 포인트:
+- 인증 상태를 서버 세션에 의존하지 않고 토큰 기반으로 처리하기 때문에 모바일 앱과 잘 맞는 구조라고 설명한다.
+
+11. 전체 시스템 아키텍처
+제목: Full-Stack System Architecture
+핵심 메시지:
+Flutter, Spring Boot, PostGIS, Redis, Monitoring이 하나의 서비스 흐름으로 연결된다.
+구조도 요구사항:
+- 왼쪽: Flutter Client
+- 중앙 왼쪽: REST API + Security
+- 중앙: Spring Boot Application
+- 오른쪽 위: PostgreSQL + PostGIS
+- 오른쪽 아래: Redis
+- 하단: Runtime Containers, Monitoring
+화살표:
+- Flutter Client → REST API + Security: HTTPS / JSON / Bearer JWT
+- Flutter Client ↔ Spring Boot: STOMP WebSocket / GPS 2초 Publish
+- Spring Boot → PostgreSQL + PostGIS: 영속 데이터 저장 / 공간 쿼리
+- Spring Boot → Redis: Refresh Token / 블랙리스트 / Pub/Sub
+- Runtime Containers → Monitoring: 서버 상태와 로그 확인
+발표 포인트:
+- 이 슬라이드는 전체 기술 구조를 한눈에 보여주는 핵심 슬라이드로 만든다.
+
+12. 로컬 서버 실행 및 확인 구성
+제목: DB와 서버 확인 구성
+핵심 메시지:
+Docker Compose로 서버 인프라를 실행하고, Swagger와 Grafana로 API와 서버 상태를 확인한다.
+내용:
+- 실행 명령:
+  - docker compose up -d
+- 실행 컨테이너:
+  - runapp-api
+  - PostgreSQL + PostGIS
+  - Redis
+  - Prometheus
+  - Loki
+  - Alloy
+  - Grafana
+- Swagger UI:
+  - http://localhost:8081/swagger-ui.html
+  - API 문서 확인 및 요청/응답 테스트
+- Grafana:
+  - http://localhost:3000
+  - 기본 계정: admin / admin
+  - 서버 상태와 로그 대시보드 확인
+- Prometheus:
+  - http://localhost:9090
+  - 메트릭 확인
+- PostgreSQL/PostGIS:
+  - localhost:5432
+  - DB/User/Password: runapp
+- Redis:
+  - localhost:6379
+시각 자료:
+- 서버 실행 → Swagger 확인 → Grafana 확인 → DB/Redis 확인 흐름도
+발표 포인트:
+- “Swagger는 API 테스트 화면, Grafana는 서버 상태/로그 화면, PostGIS와 Redis는 앱 데이터와 실시간 기능을 담당한다”는 메시지가 명확히 보이게 한다.
+
+13. 배포 및 운영 관점
+제목: Deployment & Operation
+핵심 메시지:
+GitHub Actions와 Docker Compose, Firebase App Distribution을 통해 프론트와 백엔드 배포 흐름을 구성한다.
+내용:
+- Frontend:
+  - Flutter build APK
+  - Firebase App Distribution으로 테스트 배포
+  - GitHub Actions Secrets로 환경 파일과 설정 주입
+- Backend:
+  - GitHub Actions에서 테스트 실행
+  - PostGIS와 Redis 서비스 컨테이너를 사용한 CI 테스트
+  - Deploy Webhook으로 서버 자동 배포
+- Monitoring:
+  - Actuator
+  - Prometheus
+  - Grafana
+  - Loki/Alloy
+시각 자료:
+- GitHub Actions → Build/Test → Deploy → Monitoring 흐름
+발표 포인트:
+- 단순히 로컬에서만 동작하는 앱이 아니라, 배포와 관찰 가능성까지 고려했다고 설명한다.
+
+14. 기술적 차별점
+제목: Technical Highlights
+핵심 메시지:
+Baton은 위치 기반 데이터, 실시간 통신, 게이미피케이션, 운영 모니터링을 통합한 프로젝트다.
+내용:
+- PostGIS 기반 위치 반경 조회와 경로 저장
+- STOMP WebSocket + Redis Pub/Sub 실시간 위치 공유
+- JWT + Redis 기반 인증/토큰 관리
+- Flutter 지도/GPS/권한 처리
+- Docker Compose 기반 로컬 인프라 구성
+- Grafana/Prometheus/Loki 기반 서버 상태와 로그 확인
+- 레벨, 칭호, 포인트, 랭킹 기반 게이미피케이션
+발표 포인트:
+- 기술 스택을 단순히 많이 쓴 것이 아니라, 각 기술이 앱의 핵심 경험을 위해 쓰였다는 점을 강조한다.
+
+15. 기대 효과 및 마무리
+제목: 기대 효과와 확장 가능성
+핵심 메시지:
+Baton은 러닝을 개인 기록에서 소셜 경험으로 확장하며, 향후 더 다양한 건강/커뮤니티 기능으로 확장할 수 있다.
+내용:
+- 러닝 지속 동기 강화
+- 주변 러너와의 연결
+- 위치 기반 체크인과 탐험 경험
+- 데이터 기반 랭킹과 성장 시스템
+- 향후 확장 가능성:
+  - 러닝 크루 추천
+  - AI 기반 러닝 코칭
+  - 스팟 이벤트
+  - 웨어러블 연동
+  - 실시간 음성 응원 또는 그룹 미션
+마무리 문장:
+Baton은 GPS 기록, 실시간 그룹 러닝, 위치 기반 스팟, 게이미피케이션을 결합해 러닝을 더 지속 가능하고 재미있는 경험으로 만드는 소셜 러닝 플랫폼이다.
+
+디자인 가이드
+- 전체 톤은 깔끔하고 현대적인 SaaS/모바일 앱 발표 느낌으로 만든다.
+- 과한 장식보다 명확한 구조와 흐름을 우선한다.
+- 주요 색상은 네이비/블루 계열을 중심으로 사용하고, DB는 그린, Redis/Realtime은 코랄 또는 레드, Monitoring은 퍼플 계열로 구분한다.
+- 구조도에는 너무 많은 텍스트를 넣지 말고 핵심 키워드 위주로 배치한다.
+- 상세 설명은 발표자 노트나 슬라이드 하단 설명으로 분리한다.
+- 코드 전체를 넣지 말고, endpoint나 포트처럼 발표에 필요한 정보만 표시한다.
+
+반드시 포함해야 하는 키워드
+- Baton
+- Flutter
+- Riverpod
+- GoRouter
+- Dio
+- AuthInterceptor
+- SecureStorage
+- Google Maps
+- Geolocator
+- Spring Boot
+- Spring Security
+- JWT
+- WebSocket
+- STOMP
+- PostgreSQL
+- PostGIS
+- Redis
+- Pub/Sub
+- Docker Compose
+- Swagger UI
+- Grafana
+- Prometheus
+- Loki
+- Alloy
+- Firebase App Distribution
+- GitHub Actions
+
+발표자가 강조할 한 문단 요약
+Baton은 GPS 기반 러닝 기록과 실시간 그룹 러닝을 결합한 소셜 러닝 앱이다. Flutter 앱은 지도, 위치, 상태관리, 인증 토큰 저장, STOMP WebSocket 통신을 담당하고, Spring Boot 백엔드는 JWT 인증, 도메인 API, 러닝 기록, 스팟 체크인, 그룹 러닝 상태 관리와 실시간 위치 메시지를 처리한다. PostgreSQL/PostGIS는 위치 기반 데이터와 러닝 경로를 저장하고, Redis는 Refresh Token, Access Token 블랙리스트, 실시간 위치 Pub/Sub을 담당한다. Docker Compose로 전체 인프라를 실행하고 Swagger와 Grafana로 API와 서버 상태를 확인할 수 있도록 구성했다.
