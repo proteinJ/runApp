@@ -20,11 +20,17 @@ public class GroupResponse {
             @Schema(description = "방장 닉네임", example = "달리기왕")
             String hostNickname,
 
+            @Schema(description = "방장 회원 ID", example = "10")
+            Long hostId,
+
             @Schema(description = "현재 참여 인원", example = "2")
             int currentParticipants,
 
             @Schema(description = "최대 참여 인원 (2~5)", example = "4")
             int maxParticipants,
+
+            @Schema(description = "러닝 거리(km)", example = "5")
+            Integer distance,
 
             @Schema(description = "러닝 시작 시간", example = "2026-06-10T19:00:00")
             LocalDateTime startTime,
@@ -49,8 +55,10 @@ public class GroupResponse {
                     group.getId(),
                     group.getTitle(),
                     group.getHost().getProfile().getNickname(),
+                    group.getHost().getId(),
                     group.getParticipants().size(),
                     group.getMaxParticipants(),
+                    group.getDistance(),
                     group.getStartTime(),
                     group.getDynamicStatus().name(),
                     group.getCreatedAt(),
@@ -71,6 +79,12 @@ public class GroupResponse {
             @Schema(description = "방장 닉네임", example = "달리기왕")
             String hostNickname,
 
+            @Schema(description = "방장 회원 ID", example = "10")
+            Long hostId,
+
+            @Schema(description = "모집글 내용", example = "페이스 6분대 환영, 반포대교 집합입니다.")
+            String content,
+
             @Schema(description = "그룹 상태", example = "RECRUITING",
                     allowableValues = {"RECRUITING", "RUNNING", "COMPLETED", "CANCELED"})
             String status,
@@ -80,6 +94,9 @@ public class GroupResponse {
 
             @Schema(description = "최대 참여 인원 (2~5)", example = "4")
             int maxParticipants,
+
+            @Schema(description = "러닝 거리(km)", example = "5")
+            Integer distance,
 
             @Schema(description = "러닝 장소명", example = "반포 한강공원")
             String location,
@@ -94,10 +111,13 @@ public class GroupResponse {
             List<String> participantNicknames,
 
             @Schema(description = "러닝 시작 시간", example = "2026-06-10T19:00:00")
-                    LocalDateTime startTime,
+            LocalDateTime startTime,
 
             @Schema(description = "러닝 종료 예정 시간", example = "2026-06-10T20:00:00")
             LocalDateTime endTime,
+
+            @Schema(description = "모집글 생성 시간", example = "2026-06-05T12:00:00")
+            LocalDateTime createdAt,
 
             @Schema(description = "러닝 장소 위도", example = "37.5133")
             Double lat,
@@ -112,9 +132,12 @@ public class GroupResponse {
                     group.getId(),
                     group.getTitle(),
                     group.getHost().getProfile().getNickname(),
+                    group.getHost().getId(),
+                    group.getContent(),
                     group.getDynamicStatus().name(),
                     group.getParticipants().size(),
                     group.getMaxParticipants(),
+                    group.getDistance(),
                     group.getLocation(),
                     group.getAddress(),
                     isParticipating,
@@ -123,6 +146,7 @@ public class GroupResponse {
                             .toList(),
                     group.getStartTime(),
                     group.getEndTime(),
+                    group.getCreatedAt(),
                     group.getLat(),
                     group.getLon()
             );
