@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.running.runapp.global.error.BusinessException;
 import com.running.runapp.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GoogleGeocodingService {
 
     private static final String GEOCODING_URL = "https://maps.googleapis.com/maps/api/geocode/json";
@@ -36,6 +38,7 @@ public class GoogleGeocodingService {
 
     public String resolveDong(Double lat, Double lng) {
         if (!StringUtils.hasText(apiKey) || lat == null || lng == null) {
+            log.warn("Google geocoding skipped: apiKeySet={}, lat={}, lng={}", StringUtils.hasText(apiKey), lat, lng);
             throw new BusinessException(ErrorCode.GEOCODING_FAILED);
         }
 
@@ -51,7 +54,15 @@ public class GoogleGeocodingService {
                 .retrieve()
                 .body(JsonNode.class);
 
-        if (root == null || !"OK".equals(root.path("status").asText())) {
+        String status = root == null ? null : root.path("status").asText();
+        if (root == null || !"OK".equals(status)) {
+            log.warn(
+                    "Google geocoding failed: status={}, errorMessage={}, lat={}, lng={}",
+                    status,
+                    root == null ? null : root.path("error_message").asText(null),
+                    lat,
+                    lng
+            );
             throw new BusinessException(ErrorCode.GEOCODING_FAILED);
         }
 
@@ -70,6 +81,12 @@ public class GoogleGeocodingService {
             }
         }
 
+        String formattedAddressDong = findDongInFormattedAddress(root);
+        if (StringUtils.hasText(formattedAddressDong)) {
+            return formattedAddressDong;
+        }
+
+        log.warn("Google geocoding could not resolve dong: lat={}, lng={}", lat, lng);
         throw new BusinessException(ErrorCode.GEOCODING_FAILED);
     }
 
@@ -92,6 +109,23 @@ public class GoogleGeocodingService {
                     if (targetType.equals(type.asText())) {
                         return component.path("long_name").asText();
                     }
+                }
+            }
+        }
+        return null;
+    }
+
+    private String findDongInFormattedAddress(JsonNode root) {
+        for (JsonNode result : root.path("results")) {
+            String formattedAddress = result.path("formatted_address").asText();
+            if (!StringUtils.hasText(formattedAddress)) {
+                continue;
+            }
+
+            for (String token : formattedAddress.split("\\s+")) {
+                String normalizedDong = normalizeDong(token);
+                if (StringUtils.hasText(normalizedDong)) {
+                    return normalizedDong;
                 }
             }
         }
