@@ -68,7 +68,12 @@ public enum ErrorCode {
     INSUFFICIENT_POINTS(HttpStatus.BAD_REQUEST, "SH003", "포인트가 부족합니다."),
 
     // Running (러닝 관련)
-    RUN_DISTANCE_TOO_SHORT(HttpStatus.BAD_REQUEST, "R001", "최소 0.15km 이상 달려야 기록이 저장됩니다.");
+    RUN_DISTANCE_TOO_SHORT(HttpStatus.BAD_REQUEST, "R001", "최소 0.15km 이상 달려야 기록이 저장됩니다."),
+
+    // Ghost Run (고스트런 관련)
+    GHOST_RANKING_NOT_FOUND(HttpStatus.NOT_FOUND, "GR001", "존재하지 않는 고스트 랭킹입니다."),
+    GHOST_START_LOCATION_TOO_FAR(HttpStatus.BAD_REQUEST, "GR002", "고스트 시작 지점 10m 이내에서만 시작할 수 있습니다."),
+    GEOCODING_FAILED(HttpStatus.BAD_REQUEST, "GR003", "주소 변환에 실패했습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

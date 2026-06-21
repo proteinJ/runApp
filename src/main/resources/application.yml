@@ -57,6 +57,10 @@ oauth:
     client-id: ${KAKAO_CLIENT_ID:bcb235643a01538feaac40d0f2c53f4b}
     client-secret: ${KAKAO_CLIENT_SECRET:} # 있으면 사용, 없으면 빈값
 
+google:
+  maps:
+    api-key: ${GOOGLE_MAPS_API_KEY:${MAPS_API_KEY:}}
+
 management:
   endpoints:
     web:
